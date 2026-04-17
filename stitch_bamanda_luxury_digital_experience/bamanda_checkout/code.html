@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Checkout - Bamanda</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#e8c25f",
+                    "on-surface-variant": "#414944",
+                    "surface-variant": "#e5e2dd",
+                    "on-secondary-container": "#765b00",
+                    "background": "#fcf9f4",
+                    "surface-container-high": "#ebe8e3",
+                    "on-primary": "#ffffff",
+                    "surface": "#fcf9f4",
+                    "on-primary-fixed-variant": "#234f3f",
+                    "secondary": "#755b00",
+                    "inverse-on-surface": "#f3f0eb",
+                    "on-tertiary-container": "#ba977f",
+                    "tertiary-fixed": "#ffdcc4",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#2b1706",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed": "#241a00",
+                    "tertiary-container": "#48301d",
+                    "primary-container": "#0f3d2e",
+                    "secondary-container": "#fdd670",
+                    "on-error-container": "#93000a",
+                    "surface-container-low": "#f6f3ee",
+                    "surface-container-highest": "#e5e2dd",
+                    "on-surface": "#1c1c19",
+                    "tertiary-fixed-dim": "#e5bfa5",
+                    "inverse-primary": "#a2d1bb",
+                    "outline": "#717974",
+                    "on-background": "#1c1c19",
+                    "primary-fixed-dim": "#a2d1bb",
+                    "secondary-fixed": "#ffdf91",
+                    "surface-tint": "#3b6756",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "inverse-surface": "#31302d",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-bright": "#fcf9f4",
+                    "outline-variant": "#c0c8c3",
+                    "on-primary-fixed": "#002116",
+                    "tertiary": "#301b0a",
+                    "on-tertiary-fixed-variant": "#5c412d",
+                    "on-secondary-fixed-variant": "#594400",
+                    "surface-container": "#f0ede9",
+                    "primary-fixed": "#beedd7",
+                    "on-primary-container": "#7ba894",
+                    "on-secondary": "#ffffff",
+                    "primary": "#00261a",
+                    "surface-dim": "#dcdad5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Noto Serif"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>.glass-effect {
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px)
+    }
+.wood-grain {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDShCA3YjXuxCHhW60MohGFbji-fybp0IM3679G0yOxek3_wiWhod6Dp8cMxj0woeR7LVRjyvB7_KguX0egykjqRyhq8wVB-sq6Lac0PmfMM7t52R3JlItZKssCrnXkjhzpoP2knMyOSaQXUYu69Io14RGjdWCqKEE3G-BDbegabeOZDAvBi6xanxqqQEh1_WRP9rR_jwq9sQpnqZw_3u5TzonoxU8htupJMqFaLP5sNvLi7FbtP35BM8kZujJyTiPwpOFfbaXLmghZ);
+    background-repeat: repeat
+    }
+.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+    }</style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- Top Navigation (Shell Sub-Page Suppression applies, showing minimalist branding) -->
+<header class="bg-[#fcf9f4]/60 backdrop-blur-xl fixed top-0 w-full z-50 shadow-sm opacity-100">
+<div class="flex justify-between items-center px-8 py-4 w-full max-w-screen-2xl mx-auto">
+<a class="font-serif italic text-2xl text-[#0f3d2e] tracking-tight" href="/">Bamanda</a>
+<div class="flex items-center gap-4">
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Secure Checkout</span>
+<span class="material-symbols-outlined text-[#0f3d2e]" data-icon="lock">lock</span>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-24 px-6 md:px-12 max-w-screen-xl mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+<!-- Left: Transactional Focus -->
+<div class="lg:col-span-7 space-y-12">
+<section>
+<h1 class="font-headline text-4xl md:text-5xl text-primary-container mb-4 tracking-tight">Finalize Your Sanctuary Experience</h1>
+<p class="text-on-surface-variant font-body text-lg max-w-prose leading-relaxed">
+                        To maintain our commitment to freshness and heritage, our concierges handle each order personally via WhatsApp.
+                    </p>
+</section>
+<form class="space-y-8">
+<!-- Delivery Information -->
+<div class="space-y-6">
+<div class="flex items-center gap-3">
+<span class="font-label text-xs uppercase tracking-widest text-secondary font-bold">Step 01</span>
+<h2 class="font-headline text-xl text-primary">Delivery Details</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="font-label text-xs uppercase tracking-widest text-on-surface-variant px-1">Full Name</label>
+<input class="w-full bg-surface-container-highest border-none focus:ring-0 focus:border-b-2 focus:border-secondary transition-all px-4 py-4 rounded-none placeholder:text-outline-variant" placeholder="Kwame Mensah" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-label text-xs uppercase tracking-widest text-on-surface-variant px-1">Phone Number</label>
+<input class="w-full bg-surface-container-highest border-none focus:ring-0 focus:border-b-2 focus:border-secondary transition-all px-4 py-4 rounded-none placeholder:text-outline-variant" placeholder="+233 XX XXX XXXX" type="tel"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label text-xs uppercase tracking-widest text-on-surface-variant px-1">Delivery Address</label>
+<textarea class="w-full bg-surface-container-highest border-none focus:ring-0 focus:border-b-2 focus:border-secondary transition-all px-4 py-4 rounded-none placeholder:text-outline-variant" placeholder="Suite 402, Heritage Heights, Accra..." rows="3"></textarea>
+</div>
+</div>
+<!-- Subtle Tonal Highlight for Premium Messaging -->
+<div class="bg-surface-container-low p-8 rounded-none flex items-start gap-4">
+<span class="material-symbols-outlined text-secondary" data-icon="auto_awesome">auto_awesome</span>
+<div>
+<p class="font-label text-xs uppercase tracking-widest text-secondary font-bold mb-1">Our Heritage Promise</p>
+<p class="text-sm text-on-surface-variant leading-relaxed">Your order is prepared using ancestral techniques and locally-sourced organic ingredients. Once you place the order, our curator will confirm the delivery window.</p>
+</div>
+</div>
+<!-- CTA Section -->
+<div class="pt-4">
+<button class="group relative w-full bg-primary text-on-primary py-6 px-8 flex justify-between items-center transition-all hover:bg-primary-container rounded-md overflow-hidden" type="submit">
+<div class="absolute inset-0 wood-grain opacity-5 pointer-events-none"></div>
+<span class="font-label text-sm uppercase tracking-[0.2rem] font-bold relative z-10">Place Order via WhatsApp</span>
+<span class="material-symbols-outlined group-hover:translate-x-2 transition-transform relative z-10" data-icon="arrow_right_alt">arrow_right_alt</span>
+</button>
+<p class="text-center text-xs text-outline-variant mt-4 font-label uppercase tracking-widest">Secure Hand-Off to Private Concierge</p>
+</div>
+</form>
+</div>
+<!-- Right: Order Summary & Sensory Reinforcement (Asymmetric Bento) -->
+<div class="lg:col-span-5">
+<div class="sticky top-32 space-y-8">
+<!-- Order Card -->
+<div class="bg-surface-container-low p-8 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-secondary-container/10 rounded-bl-full"></div>
+<h3 class="font-headline text-2xl text-primary-container mb-8">Your Selections</h3>
+<div class="space-y-6">
+<!-- Item -->
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<p class="font-headline text-lg">Smoked Egusi with Wild Greens</p>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Heritage Recipe • Organic</p>
+</div>
+<p class="font-label text-secondary font-bold">₵ 145</p>
+</div>
+<!-- Item -->
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<p class="font-headline text-lg">Jollof Rice Arancini</p>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Small Plates • Seasonal</p>
+</div>
+<p class="font-label text-secondary font-bold">₵ 85</p>
+</div>
+<div class="pt-6 border-t border-outline-variant/20 flex justify-between items-center">
+<p class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Subtotal</p>
+<p class="font-headline text-xl">₵ 230</p>
+</div>
+</div>
+</div>
+<!-- Sensory Reinforcement Image (Gallery Scroller Style) -->
+<div class="grid grid-cols-2 gap-4">
+<div class="aspect-[4/5] rounded-tl-full overflow-hidden bg-surface-container-highest">
+<img alt="Bamanda Specialty Dish" class="w-full h-full object-cover grayscale-[20%] hover:grayscale-0 transition-all duration-700" data-alt="Close-up of a vibrant African stew with textured garnish in a dark stoneware bowl on a rustic wood surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApNC5QEcezu8DT6Bp1Mt4fuhKq6-LsZl9PAgB73kEHehjYs4zomxPXq6mp-V16UD5hldmYjnBFFtSts4qokF1THUQ_yO10hxi04-BuxYNiNCvPzzuLcrukQDLLDLNfFCDP3Tw3IfoIpVuC09emkevDpouf0BNLxQt2k-JLfOCwblYn6e2vkj8jsEnhzEyszdOCsZzMBqydWPaC1Pah5uygZ9YNARs738gcYOOsg3poj6fjhDLIugDhW5bvJ9uxIeua0vZISjX-t3S1"/>
+</div>
+<div class="aspect-[4/5] overflow-hidden bg-surface-container-highest self-end">
+<img alt="Fresh Ingredients" class="w-full h-full object-cover grayscale-[20%] hover:grayscale-0 transition-all duration-700" data-alt="Overhead shot of fresh tropical herbs, ginger roots, and bright red chilies on a cream-colored marble background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSonuAaVzVtDZ3WtxXosPPrsX18CrUcdpyMGRlptVOFF2upqBGn7QXKCjYfjt2_Xasjh12f3yQS7lr6mJGLgkVgs6942Rwu9QSyVbWh77F80O1QFconEfCkmzM4ZHtGn_oiY5BUF3qF7LXEZenApMyqhSju9tYiHXRTcHROYfaJVjwp-EJXaz-MkLNxYxDOp-pKciwhwIomGWXUlKCsw_56MA6zT9jXJJ8GI_oZ96n_I9HEUDxig8_dM5aKG4hU_WovCyFurRaetQG"/>
+</div>
+</div>
+<!-- Trust Badge -->
+<div class="flex items-center gap-6 p-4">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="verified">verified</span>
+</div>
+<div>
+<p class="font-label text-xs uppercase tracking-widest font-bold">Chef's Quality</p>
+<p class="text-xs text-on-surface-variant">Every dish is inspected by Chef Amara before departure.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer (Shell Footer) -->
+<footer class="bg-[#0f3d2e] w-full py-12 px-8">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6 max-w-screen-2xl mx-auto">
+<div class="space-y-2">
+<span class="font-serif text-white opacity-90 text-xl italic">Bamanda</span>
+<p class="font-sans text-sm tracking-wide text-[#fcf9f4]/60">© 2024 Bamanda. Cultivating Heritage through Taste.</p>
+</div>
+<div class="flex gap-8">
+<a class="text-[#fcf9f4]/60 hover:text-white transition-opacity font-sans text-sm tracking-wide" href="#">Sustainability</a>
+<a class="text-[#fcf9f4]/60 hover:text-white transition-opacity font-sans text-sm tracking-wide" href="#">Legal</a>
+<a class="text-[#fcf9f4]/60 hover:text-white transition-opacity font-sans text-sm tracking-wide" href="#">Contact</a>
+</div>
+</div>
+</footer>
+</body></html>

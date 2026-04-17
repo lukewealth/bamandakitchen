@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bamanda - Our Menu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#e8c25f",
+                        "on-surface-variant": "#414944",
+                        "surface-variant": "#e5e2dd",
+                        "on-secondary-container": "#765b00",
+                        "background": "#fcf9f4",
+                        "surface-container-high": "#ebe8e3",
+                        "on-primary": "#ffffff",
+                        "surface": "#fcf9f4",
+                        "on-primary-fixed-variant": "#234f3f",
+                        "secondary": "#755b00",
+                        "inverse-on-surface": "#f3f0eb",
+                        "on-tertiary-container": "#ba977f",
+                        "tertiary-fixed": "#ffdcc4",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#2b1706",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#241a00",
+                        "tertiary-container": "#48301d",
+                        "primary-container": "#0f3d2e",
+                        "secondary-container": "#fdd670",
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#f6f3ee",
+                        "surface-container-highest": "#e5e2dd",
+                        "on-surface": "#1c1c19",
+                        "tertiary-fixed-dim": "#e5bfa5",
+                        "inverse-primary": "#a2d1bb",
+                        "outline": "#717974",
+                        "on-background": "#1c1c19",
+                        "primary-fixed-dim": "#a2d1bb",
+                        "secondary-fixed": "#ffdf91",
+                        "surface-tint": "#3b6756",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#31302d",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#fcf9f4",
+                        "outline-variant": "#c0c8c3",
+                        "on-primary-fixed": "#002116",
+                        "tertiary": "#301b0a",
+                        "on-tertiary-fixed-variant": "#5c412d",
+                        "on-secondary-fixed-variant": "#594400",
+                        "surface-container": "#f0ede9",
+                        "primary-fixed": "#beedd7",
+                        "on-primary-container": "#7ba894",
+                        "on-secondary": "#ffffff",
+                        "primary": "#00261a",
+                        "surface-dim": "#dcdad5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24
+    }
+.grain-overlay {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAakz8TiYqojl4JKHfeLd8x4_cJm6hKxNU85dgYJT1OENnY6MrkPpSOeadVB0Pj9C73KEB26G6h-Vn0No2u-kqkPXJruPk8M-uzOHImvU2Y8-ckIonK8DG--iyMDGzMkB2amHaiss0Qh7WVjCAsU2f2bFhqmSftS5UBvVDhRDvRAToeln7rqn9au-s3UOQRFo7nw4TYJArJQNELLuls0lT9515vAFwf2IEFM3Lg7D4zVgOFHNxKlcWW1r0SPpQGSBf_K6zt_w9A-Z2A);
+    opacity: 0.03;
+    pointer-events: none
+    }
+.glass-nav {
+    backdrop-filter: blur(24px)
+    }</style>
+</head>
+<body class="bg-background font-body text-on-surface selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#fcf9f4]/60 backdrop-blur-xl transition-all duration-300">
+<div class="flex justify-between items-center px-8 py-4 w-full max-w-screen-2xl mx-auto">
+<div class="font-serif italic text-2xl text-[#0f3d2e] tracking-tight">Bamanda</div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="font-serif text-lg tracking-tight text-[#755b00] border-b-2 border-[#755b00] pb-1" href="#">Our Menu</a>
+<a class="font-serif text-lg tracking-tight text-[#1c1c19] opacity-80 hover:text-[#755b00] transition-colors duration-300" href="#">Heritage</a>
+<a class="font-serif text-lg tracking-tight text-[#1c1c19] opacity-80 hover:text-[#755b00] transition-colors duration-300" href="#">Gallery</a>
+<a class="font-serif text-lg tracking-tight text-[#1c1c19] opacity-80 hover:text-[#755b00] transition-colors duration-300" href="#">Location</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-[#0f3d2e] scale-95 duration-200 active:scale-90">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-20">
+<!-- Hero Section -->
+<section class="px-8 max-w-screen-2xl mx-auto mb-16">
+<div class="relative overflow-hidden rounded-xl h-[409px] flex items-center bg-primary-container">
+<div class="grain-overlay absolute inset-0"></div>
+<img alt="Bamanda Experience" class="absolute inset-0 w-full h-full object-cover opacity-50" data-alt="Cinematic close-up of a perfectly plated traditional West African dish with golden sauce and vibrant herbs on a dark ceramic plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWlX3wbhjyHqqGDAXSDbkOzeZpEeK6PDqg-BXxmVcYwsALuVsIj13gBHsbSNsxUHpxxdrXZ_PyhxzHPDETWaQgCUJrNXj79gF8DztKhO56AzyMikQj8UBR9KQlsZN8Pax62fBV-dB5Pjjq561Pu79AKVuXDPoCk9tuxVFzBIeBnx-V4y5iAEDhTp8iW8YFVaxwks7SNFx0J8CZfVFB8X8JSqpQoDJ8qsBVXcB7w_PahqFFOE5pgGmVAkRr0gk0wqNnOveWNwEYmQer"/>
+<div class="relative z-10 px-12 max-w-3xl">
+<h1 class="font-headline text-5xl md:text-7xl text-on-primary mb-4 tracking-tight">Our Curated Palette</h1>
+<p class="text-on-primary-container font-body text-lg leading-relaxed max-w-xl">
+                        A sensory journey through the heart of the continent, where ancestral techniques meet modern refinement.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Sticky Controls -->
+<section class="sticky top-16 z-40 bg-background/80 backdrop-blur-md py-6 px-8 border-b border-outline-variant/15">
+<div class="max-w-screen-2xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-8">
+<!-- Search Bar -->
+<div class="flex-1 max-w-xl relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full bg-surface-container-highest border-none rounded-md py-4 pl-12 pr-4 font-body text-on-surface focus:ring-0 focus:border-b-2 focus:border-secondary transition-all" placeholder="Search our signature dishes..." type="text"/>
+</div>
+<!-- Category Tabs -->
+<div class="flex items-center space-x-8 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+<button class="font-label uppercase tracking-widest text-xs text-secondary border-b-2 border-secondary whitespace-nowrap pb-1">All Dishes</button>
+<button class="font-label uppercase tracking-widest text-xs text-on-surface-variant hover:text-secondary transition-colors whitespace-nowrap pb-1">Small Plates</button>
+<button class="font-label uppercase tracking-widest text-xs text-on-surface-variant hover:text-secondary transition-colors whitespace-nowrap pb-1">Ancestral Mains</button>
+<button class="font-label uppercase tracking-widest text-xs text-on-surface-variant hover:text-secondary transition-colors whitespace-nowrap pb-1">Earth &amp; Sea</button>
+<button class="font-label uppercase tracking-widest text-xs text-on-surface-variant hover:text-secondary transition-colors whitespace-nowrap pb-1">Nectars</button>
+</div>
+</div>
+</section>
+<!-- Menu Grid -->
+<section class="px-8 max-w-screen-2xl mx-auto mt-16">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-16 gap-x-12">
+<!-- Card 1 -->
+<div class="group">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low aspect-[4/5] mb-6">
+<img alt="Signature Jollof" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Vibrant red smoky Jollof rice presented in a traditional earthenware bowl with a sprig of fresh thyme and scattered pepper flakes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeQQmAy05FTBSPnveLGnyPkPac6QiLU3cHfTPnZojtuVIXyaEQki-0evuZa_XBZCUkFlNmAyzniJSRHVODpqYacJNZ1Euo8XLiCGyZTOmzWaZ7hliJg4MIjPBTv_kZpm8ylK-5-zwkjd0Lpasck5rMqNZ34vZ8mFow7MxtLRtWyVVyvwFiVzMd5U7M_CvZXbk5OZEvNJUkKxrPC-vpabDGYGSdllgvP0_14WtDtm4jFzHXqy1Yanh8NMA0COozRn1XNXVnFNLea5Eb"/>
+<button class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface hover:text-error transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="favorite">favorite</span>
+</button>
+</div>
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="font-headline text-2xl text-on-surface mb-1">Heritage Smoky Jollof</h3>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">Infused with applewood smoke and aged long-grain rice.</p>
+</div>
+<span class="font-label text-secondary font-bold whitespace-nowrap">₦ 12,500</span>
+</div>
+<button class="w-full py-3 bg-primary text-on-primary font-label uppercase tracking-widest text-xs rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add_shopping_cart">add_shopping_cart</span>
+                        Add to Cart
+                    </button>
+</div>
+<!-- Card 2 -->
+<div class="group">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low aspect-[4/5] mb-6">
+<img alt="Okra Forest" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Artistic arrangement of pan-seared okra pods with heritage spices and edible flowers on a pale cream textured plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaeRMqkqQOyudGi-w4fgG1wr1aL98gJZvZqmwUAuA80l_aif3-2XkBLhwnqZkko_wtbrcxNnj7JsazDxfdbusBK55iRsXTxcPYkvVJll2njz6WMUD0eryvVpw5ObnEIw3t1J9fBLUkDPCtf99ke-e5M-Yc6rnXncQnIdXE2dfbtQ7mkCkzOPHRH_WU0wJ82DZSsVXihnpGFvYlxBuEZej9ElxCSpAk6gcAU38KKnmGLiGz5ZAITB75rDO1A04_Epk970JMnOPAZm4Z"/>
+<button class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface hover:text-error transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="favorite">favorite</span>
+</button>
+</div>
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="font-headline text-2xl text-on-surface mb-1">Pan-Seared Okra Forest</h3>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">Crispy wild okra with fermented locust bean reduction.</p>
+</div>
+<span class="font-label text-secondary font-bold whitespace-nowrap">₦ 8,200</span>
+</div>
+<button class="w-full py-3 bg-primary text-on-primary font-label uppercase tracking-widest text-xs rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add_shopping_cart">add_shopping_cart</span>
+                        Add to Cart
+                    </button>
+</div>
+<!-- Card 3 -->
+<div class="group">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low aspect-[4/5] mb-6">
+<img alt="Braised Lamb" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Slow-braised lamb shank falling off the bone, glazed with a dark reduction, served on a bed of silky yam purée" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF8I7KKVyvS3b5NhAcvAw8e2VyfC07iLA9lYjDwqW9MJIm-2u3G0I0EX1UGboLTU-u2QOPieqoz48jMOqy7_Z0MkFanRr80b5QmB5y3CSZCXPxYDyfGVNjCj2h7eka-Qe6YE8TXUWXRMAhyiMtkty9IkRVk2dm9ivJOiPqEF3dv8ApskL3oOnKHi6s_vu_bTMUv-6GWksOua2NW5DapI-craOjmaABc2aGR8Rux0ljuqsRWFQtYOqIqfMVakhINeIH9_emg6XT9EkO"/>
+<button class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface hover:text-error transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="favorite">favorite</span>
+</button>
+</div>
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="font-headline text-2xl text-on-surface mb-1">12-Hour Braised Lamb</h3>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">Milk-fed lamb, silky yam cream, and aromatic jus.</p>
+</div>
+<span class="font-label text-secondary font-bold whitespace-nowrap">₦ 18,900</span>
+</div>
+<button class="w-full py-3 bg-primary text-on-primary font-label uppercase tracking-widest text-xs rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add_shopping_cart">add_shopping_cart</span>
+                        Add to Cart
+                    </button>
+</div>
+<!-- Card 4 -->
+<div class="group">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low aspect-[4/5] mb-6">
+<img alt="Wild Salad" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Abstract composition of wild bitter leaves, fresh orange slices, and toasted seeds with a light honey vinaigrette" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1swXYZLVEy_7VVY25M0xg3C5I-X6ekL5dZLgRfxX4lO_chwXiSSg1xU8DL4OVO5IV7lYGxRX1H11ddO12mxwDUXB51te5vA8CGDX2GWBXzBXKhVA1W6oJbcIpmh-kf0YjZtsmnSBNNEmDbwx4MVJI-GcNnk9rZ55lCN39Ow_SiXj_dcuLlM-SEV7SmTCHV9Q6Skn6d9ca4_xvXxuTkRlEOOiv9AuKT0Rk393nseCIQ0pXoX1hXEMXlUXxFKRlJv_CzLtKYE9gRYoG"/>
+<button class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface hover:text-error transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="favorite">favorite</span>
+</button>
+</div>
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="font-headline text-2xl text-on-surface mb-1">Wild Bitter Leaf Salad</h3>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">Modern interpretation with sun-dried oranges and hibiscus.</p>
+</div>
+<span class="font-label text-secondary font-bold whitespace-nowrap">₦ 6,500</span>
+</div>
+<button class="w-full py-3 bg-primary text-on-primary font-label uppercase tracking-widest text-xs rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add_shopping_cart">add_shopping_cart</span>
+                        Add to Cart
+                    </button>
+</div>
+<!-- Card 5 -->
+<div class="group">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low aspect-[4/5] mb-6">
+<img alt="Fisherman's Catch" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Steamed whole red snapper with lemon grass, ginger, and scotch bonnet peppers in a light clear broth" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhhwTd1ceh0c5h6_LIv7MaJYl4-lBrS9GphsZAQTrm7saV5pEnzcMMphtY46Urm_oKwDqA8TW3TobyYdLiPWLQoCzwP2HNUV86kIb69P5Wk0pjoslRe39dtX_eEWtjKkBWShvFB0ihjMFYCgcIlyvzXjsE6KxjUtuZfnvybGmS_hubhnWpuI7wPKDYmzYiatXsEQ3-BiZy98vVbRjPBJQfmwtB1YsRhHVH5z2csITk_LsbbwlO8DmCflsyWTwMNQxA6c-uaG6Fyiue"/>
+<button class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface hover:text-error transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="favorite">favorite</span>
+</button>
+</div>
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="font-headline text-2xl text-on-surface mb-1">Fisherman's Ivory Broth</h3>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">Whole steamed snapper in aromatic ginger-lemongrass infusion.</p>
+</div>
+<span class="font-label text-secondary font-bold whitespace-nowrap">₦ 21,000</span>
+</div>
+<button class="w-full py-3 bg-primary text-on-primary font-label uppercase tracking-widest text-xs rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add_shopping_cart">add_shopping_cart</span>
+                        Add to Cart
+                    </button>
+</div>
+<!-- Card 6 -->
+<div class="group">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low aspect-[4/5] mb-6">
+<img alt="Chocolate Dessert" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Dark chocolate lava cake with gold leaf, served alongside a scoop of palm-sugar vanilla bean ice cream" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCX6FP3bPlGCFRBo482S4wVGVgJd0tSF8u5kxS5MMtglh5fxdKWhPW24qZAhuVKm8pxZ13cjKafBE87w4As-qFdwPuyc0Y-uc6NYTPHwH2BJAO7eDWBjfYaJr0GB6oBDtB1XLV8gQCRJNw-h194eDsf6yu27mg9nxp9b72rjCGEZQAQNFQ7G6L62I7cV_t3Rcc1ofT4XIscUAKuFHkoA0fmRWdTgecASNFUCeIiBujpxAcGrGAd334bex6wmUq2ov6YtCKhD5h7qjzE"/>
+<button class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-on-surface hover:text-error transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="favorite">favorite</span>
+</button>
+</div>
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="font-headline text-2xl text-on-surface mb-1">Onyx Cocoa Melt</h3>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">Single-origin West African cocoa with palm sugar glaze.</p>
+</div>
+<span class="font-label text-secondary font-bold whitespace-nowrap">₦ 7,800</span>
+</div>
+<button class="w-full py-3 bg-primary text-on-primary font-label uppercase tracking-widest text-xs rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add_shopping_cart">add_shopping_cart</span>
+                        Add to Cart
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#0f3d2e] dark:bg-[#051510] w-full py-12 px-8">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6 max-w-screen-2xl mx-auto">
+<div class="font-serif text-white opacity-90 text-2xl italic">Bamanda</div>
+<div class="flex gap-8">
+<a class="font-sans text-sm tracking-wide text-[#fcf9f4]/60 hover:text-white transition-all underline underline-offset-4" href="#">Sustainability</a>
+<a class="font-sans text-sm tracking-wide text-[#fcf9f4]/60 hover:text-white transition-all underline underline-offset-4" href="#">Legal</a>
+<a class="font-sans text-sm tracking-wide text-[#fcf9f4]/60 hover:text-white transition-all underline underline-offset-4" href="#">Press</a>
+<a class="font-sans text-sm tracking-wide text-[#fcf9f4]/60 hover:text-white transition-all underline underline-offset-4" href="#">Careers</a>
+</div>
+<div class="font-sans text-sm tracking-wide text-[#fcf9f4]/60">
+                © 2024 Bamanda. Cultivating Heritage through Taste.
+            </div>
+</div>
+</footer>
+<!-- SideNavBar (Hidden by default, used for mobile/expanded menu) -->
+<div class="hidden h-full w-80 fixed right-0 top-0 z-[60] bg-[#f6f3ee] flex flex-col p-8 space-y-6 shadow-2xl shadow-[#1c1c19]/10 transition-transform duration-500 translate-x-full" id="sideNav">
+<div class="flex flex-col items-center mb-8">
+<div class="w-16 h-16 rounded-full bg-primary-container mb-4 flex items-center justify-center">
+<span class="font-serif italic text-2xl text-on-primary">B</span>
+</div>
+<div class="font-serif text-xl text-[#0f3d2e]">Bamanda</div>
+<div class="font-sans uppercase tracking-widest text-[10px] opacity-60">Modern African Sanctuary</div>
+</div>
+<nav class="flex flex-col space-y-2">
+<a class="flex items-center gap-4 p-4 bg-[#0f3d2e] text-[#fcf9f4] rounded-md transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="font-sans uppercase tracking-widest text-xs">Menu</span>
+</a>
+<a class="flex items-center gap-4 p-4 text-[#48301d] hover:bg-[#e5e2dd] rounded-md transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+<span class="font-sans uppercase tracking-widest text-xs">Reservations</span>
+</a>
+<a class="flex items-center gap-4 p-4 text-[#48301d] hover:bg-[#e5e2dd] rounded-md transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="local_library">local_library</span>
+<span class="font-sans uppercase tracking-widest text-xs">Private Dining</span>
+</a>
+<a class="flex items-center gap-4 p-4 text-[#48301d] hover:bg-[#e5e2dd] rounded-md transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-sans uppercase tracking-widest text-xs">The Story</span>
+</a>
+<a class="flex items-center gap-4 p-4 text-[#48301d] hover:bg-[#e5e2dd] rounded-md transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span class="font-sans uppercase tracking-widest text-xs">Contact</span>
+</a>
+</nav>
+<div class="mt-auto pt-8">
+<button class="w-full py-4 bg-secondary text-white font-label uppercase tracking-widest text-xs rounded-md">Order on WhatsApp</button>
+</div>
+</div>
+</body></html>

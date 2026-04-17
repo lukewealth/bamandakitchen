@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#e8c25f",
+                    "on-surface-variant": "#414944",
+                    "surface-variant": "#e5e2dd",
+                    "on-secondary-container": "#765b00",
+                    "background": "#fcf9f4",
+                    "surface-container-high": "#ebe8e3",
+                    "on-primary": "#ffffff",
+                    "surface": "#fcf9f4",
+                    "on-primary-fixed-variant": "#234f3f",
+                    "secondary": "#755b00",
+                    "inverse-on-surface": "#f3f0eb",
+                    "on-tertiary-container": "#ba977f",
+                    "tertiary-fixed": "#ffdcc4",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#2b1706",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed": "#241a00",
+                    "tertiary-container": "#48301d",
+                    "primary-container": "#0f3d2e",
+                    "secondary-container": "#fdd670",
+                    "on-error-container": "#93000a",
+                    "surface-container-low": "#f6f3ee",
+                    "surface-container-highest": "#e5e2dd",
+                    "on-surface": "#1c1c19",
+                    "tertiary-fixed-dim": "#e5bfa5",
+                    "inverse-primary": "#a2d1bb",
+                    "outline": "#717974",
+                    "on-background": "#1c1c19",
+                    "primary-fixed-dim": "#a2d1bb",
+                    "secondary-fixed": "#ffdf91",
+                    "surface-tint": "#3b6756",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "inverse-surface": "#31302d",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-bright": "#fcf9f4",
+                    "outline-variant": "#c0c8c3",
+                    "on-primary-fixed": "#002116",
+                    "tertiary": "#301b0a",
+                    "on-tertiary-fixed-variant": "#5c412d",
+                    "on-secondary-fixed-variant": "#594400",
+                    "surface-container": "#f0ede9",
+                    "primary-fixed": "#beedd7",
+                    "on-primary-container": "#7ba894",
+                    "on-secondary": "#ffffff",
+                    "primary": "#00261a",
+                    "surface-dim": "#dcdad5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Noto Serif"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>.glass-nav {
+    background: rgba(252, 249, 244, 0.6);
+    backdrop-filter: blur(24px)
+    }
+.wood-texture {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAHQR-GjNPOMJt3gEP1SLXrU52NYZ41TNPbyeHIRrT1ETTyxJcKl0DL6VdtbgKM6qS0nzcV6XQ7clJ-FZHJbW9nZMxO6vesICyQA-5HOGYcLrooJZj11huMByVEgp9P3m6-9S5vgrZZwuuGZlftK2l-xHnH-jHEqlRW37euwq8HtoCh0nRExxe0UDmHxYYPjwxL9M_r9jL1OfFPteo2J3uJsjcpeHpuomHcd-w4WDwtohHX-VZ7_XgUdrT71c-LC866-_8Q24anfKgv);
+    background-blend-mode: overlay
+    }
+.asymmetric-frame {
+    border-top-left-radius: 2rem
+    }</style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 glass-nav shadow-sm opacity-5">
+<div class="flex justify-between items-center px-8 py-4 w-full max-w-screen-2xl mx-auto">
+<a class="font-serif italic text-2xl text-[#0f3d2e] dark:text-[#fcf9f4]" href="#">Bamanda</a>
+<nav class="hidden md:flex items-center space-x-8 font-serif text-lg tracking-tight">
+<a class="text-[#1c1c19] dark:text-[#fcf9f4] opacity-80 hover:text-[#755b00] transition-colors duration-300" href="#">Our Menu</a>
+<a class="text-[#1c1c19] dark:text-[#fcf9f4] opacity-80 hover:text-[#755b00] transition-colors duration-300" href="#">Heritage</a>
+<a class="text-[#1c1c19] dark:text-[#fcf9f4] opacity-80 hover:text-[#755b00] transition-colors duration-300" href="#">Gallery</a>
+<a class="text-[#1c1c19] dark:text-[#fcf9f4] opacity-80 hover:text-[#755b00] transition-colors duration-300" href="#">Location</a>
+</nav>
+<div class="flex items-center space-x-4">
+<button class="p-2 scale-95 duration-200 text-[#0f3d2e]">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+</button>
+<button class="md:hidden p-2">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</div>
+</div>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative h-[921px] w-full overflow-hidden flex items-center justify-center">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover" data-alt="dramatic wide shot of a minimalist luxury dining room with dark wood furniture and soft warm spotlights highlighting organic textures" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHoUt48V1KqbH-K2NGOkLj88TTNqErBJ6yMxMFO31CYrO3217LpErXWr8BhwnQlO6swti7DliSi9A2Zn3OtBrtnz28gJi7e-KTVx1KLprf0ak1M9kvr7okoVtc1Ygwm_5rFSMVgDSOr_F3D3xxePrEfkitdoKOaB-HL-xMfbC4M5680gpFauJIVvEaFelV40jkdPlfiN-C9AAgghGvld24PwbJwSd20fGoKuWxzr3945ZtCTY7qyxuY8TDY2aIrNaRIRUvH-1JA1Jt"/>
+<div class="absolute inset-0 bg-primary/30"></div>
+</div>
+<div class="relative z-10 text-center px-6">
+<h1 class="font-headline text-5xl md:text-8xl text-white mb-8 tracking-tighter leading-tight">
+                    Eating Well.<br/><span class="italic">Living Healthy.</span>
+</h1>
+<div class="flex flex-col md:flex-row items-center justify-center gap-6">
+<button class="bg-primary text-on-primary px-10 py-4 rounded-md font-label uppercase tracking-widest text-sm hover:opacity-90 transition-all">
+                        Order Now
+                    </button>
+<button class="bg-secondary-container/10 text-secondary-container border border-secondary-container/30 backdrop-blur-md px-10 py-4 rounded-md font-label uppercase tracking-widest text-sm hover:bg-secondary-container/20 transition-all">
+                        View Heritage
+                    </button>
+</div>
+</div>
+<!-- Slider Dots -->
+<div class="absolute bottom-12 flex space-x-3">
+<div class="w-12 h-0.5 bg-white"></div>
+<div class="w-12 h-0.5 bg-white/30"></div>
+<div class="w-12 h-0.5 bg-white/30"></div>
+</div>
+</section>
+<!-- Brand Story Strip -->
+<section class="bg-primary-container wood-texture py-24 text-on-primary-container relative overflow-hidden">
+<div class="max-w-4xl mx-auto px-8 text-center">
+<span class="font-label text-secondary-fixed-dim uppercase tracking-[0.3rem] text-xs block mb-6">Our Philosophy</span>
+<p class="font-headline text-2xl md:text-4xl leading-relaxed text-surface opacity-90 italic">
+                    "We believe that the table is a sacred sanctuary. At Bamanda, every ingredient tells the story of the earth, curated with the precision of a master artisan."
+                </p>
+<div class="mt-12 flex justify-center">
+<div class="w-px h-16 bg-secondary-fixed-dim/40"></div>
+</div>
+</div>
+</section>
+<!-- Category Preview (Bento-style) -->
+<section class="py-32 px-8 bg-surface">
+<div class="max-w-screen-2xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8 h-auto md:h-[600px]">
+<div class="md:col-span-8 group relative overflow-hidden rounded-xl bg-surface-container-low">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="top down view of an elegant plated african jollof rice dish with grilled proteins and vibrant vegetable garnishes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9g3N8jRf0F3MIvQ48Eh8BkC3-xaDWOOfnjXsew4CZrtdHuYFnp8786erVnaOJk7FyS4F1qC3E6r5czNjSF5EK8JeMhSOVkE9NsNaBlqegEB0rkYawGXhjV3VnudJo4bPCwLwoxCU18ybFgn3s8PmjTso87j2ir8uz5uVwEEegcApk4ElpSSVOu3pm5iwgyjj-tyg8RWt_EHzJLnApqC46YAccwHMa4ckBweNsvi-8heTN4sAPRx-fklgbaO7VhtsULhj1G8kV0gnq"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
+<div class="absolute bottom-10 left-10">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-secondary-fixed-dim" data-icon="restaurant">restaurant</span>
+<span class="font-label uppercase text-white tracking-widest text-xs">Heritage Collection</span>
+</div>
+<h3 class="font-headline text-4xl text-white">African Classics</h3>
+</div>
+</div>
+<div class="md:col-span-4 flex flex-col gap-8">
+<div class="h-1/2 group relative overflow-hidden rounded-xl bg-surface-container-low">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="close up of a pan-seared sea bass with saffron foam and microgreens on a dark ceramic plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9DljOUkwzQqGF-LOoNMNtrlDYq_ElndiFHGJ9IEfE6_BRsHuCkJePy62h_7hJOBX8QLuLvbnyhV2x6kVO-oNXiwE0l-DTVVeqX4vkHqO90R9YtoJzxCxpwyC0rOZcPgWMrM4MBI3CiKZ1oXrZs0GIUkHnIULIQQkslgmVJDT3CCiV43q1jHyspkoj2oVa0W1dd5ie0wg1QEmu_eWaHb6-elojKxNKZ7quUimTphCw5_GYCb16hsCjb36LCkU3fwrpTQMbZq4Fj9LL"/>
+<div class="absolute inset-0 bg-gradient-to-t from-tertiary-container/80 to-transparent"></div>
+<div class="absolute bottom-6 left-6">
+<span class="material-symbols-outlined text-secondary-fixed-dim mb-2" data-icon="public">public</span>
+<h3 class="font-headline text-2xl text-white">Intercontinental</h3>
+</div>
+</div>
+<div class="h-1/2 group relative overflow-hidden rounded-xl bg-surface-container-low">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="a sophisticated hibiscus infused cocktail in a crystal coupe glass with a gold rim and botanical garnish" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATilvWGwrp3Ur6tY0ZPEFZE7ucVz-cCRa6KblG0-j8aEwCLB5R8QWkQ5o8dR9W-OHaxCeh-7yvSgZezYfYDYgMX2uSgbQOEwfldegiuk49V5V2cyTtPl-hDjtR5ntFX7GWAsfAX0Xuwa1jKU9gViffTMvHzkKtWEc78TseT2qLWXlmN2OVBLxyIIg7IX5o1HWcUyxoEsvmyvalhjNkfX7ze1Fknna3QQn1eCNqMxBJRY7iL6lEn_jxK_3Xc5-FuWOWYiiZvh6eZ5cY"/>
+<div class="absolute inset-0 bg-gradient-to-t from-secondary/80 to-transparent"></div>
+<div class="absolute bottom-6 left-6">
+<span class="material-symbols-outlined text-secondary-fixed-dim mb-2" data-icon="local_bar">local_bar</span>
+<h3 class="font-headline text-2xl text-white">Curated Drinks</h3>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Now Selling (Featured Dishes) -->
+<section class="py-32 bg-surface-container-low">
+<div class="max-w-screen-2xl mx-auto px-8">
+<div class="flex flex-col md:flex-row justify-between items-end mb-20">
+<div class="max-w-xl">
+<span class="font-label text-secondary uppercase tracking-[0.2rem] text-xs block mb-4">The Current Gallery</span>
+<h2 class="font-headline text-5xl md:text-6xl text-primary leading-tight">Now Selling</h2>
+</div>
+<a class="font-label uppercase text-secondary-fixed-variant tracking-widest text-sm border-b border-secondary-fixed-variant pb-1 hover:text-secondary transition-colors" href="#">Browse Full Menu</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-24">
+<!-- Dish Card 1 -->
+<div class="group">
+<div class="asymmetric-frame overflow-hidden mb-8 aspect-[4/5] bg-surface-container">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="artistic plating of braised short ribs with root vegetable puree and red wine reduction in a bright studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNYlKK7hoOuFSBlTLywz1OlMdA0GGdhb79wwd1Y-cCV5C2vxTYXg40b-qTlNCJxmDLrgYZGSbfRzGoy4o1ZXheNYVWHvMdvGINTpYDZfWfN4u6z16yIWp2PXPHf-NsuHBq-nb__TKr8nEtlKthKvFAYO4GISElyYpg1877-EFlEDd8fr4Tgf2jCULSif3Q6UsDCDCc8CI7lCQcfhSwnqLOQ0Kcgej1DUhLA8d3sMmhYBZNQQ8i9b9n8cgrd5-CLxv4UIDTRrxqaw-z"/>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-headline text-2xl text-on-surface mb-2">Braised Heritage Beef</h4>
+<p class="font-body text-on-surface-variant text-sm mb-4">48-hour slow cooked ribs, seasonal tubers, jus.</p>
+</div>
+<span class="font-label text-secondary font-bold">$42.00</span>
+</div>
+</div>
+<!-- Dish Card 2 -->
+<div class="group">
+<div class="asymmetric-frame overflow-hidden mb-8 aspect-[4/5] bg-surface-container">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="modern presentation of grilled spicy prawns with charred lime and herb oil on a textured white plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBae2v0Znv28u44QriaUXl56pK0FOZ2zRmUCYoqG6Mv_ojRwlVTMVSPuYvDRvWytuzL6_uFeXdys_UX5qvkusd5GsR-oWYrJOoJnXpJw1I6wk72DCUrKLSmbzrSQLqwPfV-tUMN__gR79aaHrYAJMh7r3eg1mm1Bfsz4mdw9LXHFRxzT8vg8ZepqNWObHcQuXjkv7TCJEHRGCaPzc4FDLXWd4bsXpN7hXoFpvJqizNkTh78b7c7YAGa5qlmCDRf0xQttvv6bzzcnKDa"/>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-headline text-2xl text-on-surface mb-2">Spiced Ocean King Prawns</h4>
+<p class="font-body text-on-surface-variant text-sm mb-4">African bird's eye chili, smoked butter, citrus.</p>
+</div>
+<span class="font-label text-secondary font-bold">$38.00</span>
+</div>
+</div>
+<!-- Dish Card 3 -->
+<div class="group">
+<div class="asymmetric-frame overflow-hidden mb-8 aspect-[4/5] bg-surface-container">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="gourmet vegan dish featuring roasted cauliflower steaks with pomegranate and tahini drizzle in a moody setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPcxTyGq0KxvdynNGExj2RgGt-Y0o8Ev63Yc4oJOduz6QTzQrlnG3Po4XwtbKT469_rYaerzmH5Nq396eiLhdkNhYlbu8LArLOPIpYEuUj2uQIN_Qm8Yi7YkAZGHudSSK3Cr6V-pJqDJSbP-gM5zte07rwvqlhwNqL77n7wK4LuhNeK_7i4OlXckgu5Ts5lLO9W28oLIQ_GF9vQxPAdS51fW7RkE3rHWgMfM3NTq-pChAZtkrrkGVHzElGY5XbkpfIm4KrxXU9wG4s"/>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-headline text-2xl text-on-surface mb-2">Truffled Yam Gnocchi</h4>
+<p class="font-body text-on-surface-variant text-sm mb-4">Forest mushrooms, brown butter, sage, truffle oil.</p>
+</div>
+<span class="font-label text-secondary font-bold">$34.00</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Sticky Cart Icon -->
+<div class="fixed bottom-8 right-8 z-[70]">
+<button class="bg-secondary-container text-on-secondary-container p-5 rounded-full shadow-2xl flex items-center justify-center hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-3xl" data-icon="shopping_cart">shopping_cart</span>
+<span class="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-bold">2</span>
+</button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-[#0f3d2e] dark:bg-[#051510] w-full py-12 px-8">
+<div class="max-w-screen-2xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="text-center md:text-left">
+<h3 class="font-serif text-white opacity-90 text-2xl mb-2">Bamanda</h3>
+<p class="font-sans text-[#fcf9f4]/60 text-sm tracking-wide">© 2024 Bamanda. Cultivating Heritage through Taste.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-sans text-sm tracking-wide text-[#fcf9f4]/60 hover:text-white underline underline-offset-4 transition-opacity" href="#">Sustainability</a>
+<a class="font-sans text-sm tracking-wide text-[#fcf9f4]/60 hover:text-white underline underline-offset-4 transition-opacity" href="#">Legal</a>
+<a class="font-sans text-sm tracking-wide text-[#fcf9f4]/60 hover:text-white underline underline-offset-4 transition-opacity" href="#">Press</a>
+<a class="font-sans text-sm tracking-wide text-[#fcf9f4]/60 hover:text-white underline underline-offset-4 transition-opacity" href="#">Careers</a>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-[#fcf9f4]/60 cursor-pointer hover:text-white" data-icon="public">public</span>
+<span class="material-symbols-outlined text-[#fcf9f4]/60 cursor-pointer hover:text-white" data-icon="share">share</span>
+</div>
+</div>
+</footer>
+</body></html>

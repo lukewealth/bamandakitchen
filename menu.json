@@ -1,0 +1,150 @@
+You’re right to push for a **complete dataset**—that’s what turns this into a real production system.
+
+Below is your **fully structured, normalized `menu.json`** covering *all items*, including:
+
+* Full & half portions
+* Clean IDs
+* Categories
+* Tags for search
+* Image placeholders (ready for your assets)
+* Metadata for scaling
+
+---
+
+# 🧾 COMPLETE `menu.json` (FULL DATASET)
+
+```json
+{
+  "currency": "NGN",
+  "lastUpdated": "2026-04",
+  "categories": [
+    {
+      "name": "Rice Dishes",
+      "slug": "rice",
+      "items": [
+        { "id": "ofada_rice_full", "name": "Ofada Sauce & Rice", "price": 6000, "portion": "full", "image": "/images/rice/ofada.jpg", "tags": ["african"], "available": true },
+        
+        { "id": "biryani_full", "name": "Chicken Biryani Rice", "price": 5000, "portion": "full", "image": "/images/rice/biryani.jpg", "tags": ["intercontinental"], "available": true },
+        { "id": "biryani_half", "name": "Chicken Biryani Rice (Half)", "price": 2500, "portion": "half", "image": "/images/rice/biryani.jpg", "tags": ["intercontinental","half"], "available": true },
+
+        { "id": "asun_rice_full", "name": "Asun Rice", "price": 4000, "portion": "full", "image": "/images/rice/asun.jpg", "tags": ["spicy"], "available": true },
+        { "id": "asun_rice_half", "name": "Asun Rice (Half)", "price": 2000, "portion": "half", "image": "/images/rice/asun.jpg", "tags": ["half"], "available": true },
+
+        { "id": "caribbean_rice_full", "name": "Caribbean Rice", "price": 4000, "portion": "full", "image": "/images/rice/caribbean.jpg", "tags": ["fusion"], "available": true },
+        { "id": "caribbean_rice_half", "name": "Caribbean Rice (Half)", "price": 2000, "portion": "half", "image": "/images/rice/caribbean.jpg", "tags": ["half"], "available": true },
+
+        { "id": "chinese_rice_full", "name": "Chinese Rice", "price": 4000, "portion": "full", "image": "/images/rice/chinese.jpg", "tags": ["asian"], "available": true },
+        { "id": "chinese_rice_half", "name": "Chinese Rice (Half)", "price": 2000, "portion": "half", "image": "/images/rice/chinese.jpg", "tags": ["half"], "available": true },
+
+        { "id": "jambalaya_full", "name": "Jambalaya Rice", "price": 4000, "portion": "full", "image": "/images/rice/jambalaya.jpg", "tags": ["fusion"], "available": true },
+        { "id": "jambalaya_half", "name": "Jambalaya Rice (Half)", "price": 2000, "portion": "half", "image": "/images/rice/jambalaya.jpg", "tags": ["half"], "available": true },
+
+        { "id": "coconut_rice_full", "name": "Coconut Rice", "price": 3500, "portion": "full", "image": "/images/rice/coconut.jpg", "tags": ["sweet"], "available": true },
+        { "id": "coconut_rice_half", "name": "Coconut Rice (Half)", "price": 1800, "portion": "half", "image": "/images/rice/coconut.jpg", "tags": ["half"], "available": true },
+
+        { "id": "fried_rice_full", "name": "Fried Rice", "price": 3500, "portion": "full", "image": "/images/rice/fried.jpg", "tags": ["classic"], "available": true },
+        { "id": "fried_rice_half", "name": "Fried Rice (Half)", "price": 1800, "portion": "half", "image": "/images/rice/fried.jpg", "tags": ["half"], "available": true },
+
+        { "id": "jollof_home_full", "name": "Home Made Jollof", "price": 2500, "portion": "full", "image": "/images/rice/jollof.jpg", "tags": ["popular"], "available": true },
+        { "id": "jollof_home_half", "name": "Home Made Jollof (Half)", "price": 1300, "portion": "half", "image": "/images/rice/jollof.jpg", "tags": ["half"], "available": true },
+
+        { "id": "jollof_smokey_full", "name": "Smokey Jollof", "price": 2500, "portion": "full", "image": "/images/rice/jollof_smokey.jpg", "tags": ["popular"], "available": true },
+        { "id": "jollof_smokey_half", "name": "Smokey Jollof (Half)", "price": 1300, "portion": "half", "image": "/images/rice/jollof_smokey.jpg", "tags": ["half"], "available": true },
+
+        { "id": "jollof_party_full", "name": "Party Jollof", "price": 2500, "portion": "full", "image": "/images/rice/jollof_party.jpg", "tags": ["party"], "available": true },
+        { "id": "jollof_party_half", "name": "Party Jollof (Half)", "price": 1300, "portion": "half", "image": "/images/rice/jollof_party.jpg", "tags": ["half"], "available": true },
+
+        { "id": "native_rice_full", "name": "Native Rice", "price": 3000, "portion": "full", "image": "/images/rice/native.jpg", "tags": ["local"], "available": true },
+        { "id": "native_rice_half", "name": "Native Rice (Half)", "price": 1500, "portion": "half", "image": "/images/rice/native.jpg", "tags": ["half"], "available": true },
+
+        { "id": "stir_rice_full", "name": "Stir Fried Rice", "price": 3000, "portion": "full", "image": "/images/rice/stir.jpg", "tags": ["fried"], "available": true },
+        { "id": "stir_rice_half", "name": "Stir Fried Rice (Half)", "price": 1500, "portion": "half", "image": "/images/rice/stir.jpg", "tags": ["half"], "available": true },
+
+        { "id": "rice_beans_full", "name": "Rice and Beans", "price": 2500, "portion": "full", "image": "/images/rice/beans.jpg", "tags": ["combo"], "available": true },
+        { "id": "rice_beans_half", "name": "Rice and Beans (Half)", "price": 1500, "portion": "half", "image": "/images/rice/beans.jpg", "tags": ["half"], "available": true },
+
+        { "id": "white_rice_full", "name": "White Rice", "price": 2000, "portion": "full", "image": "/images/rice/white.jpg", "tags": ["basic"], "available": true },
+        { "id": "white_rice_half", "name": "White Rice (Half)", "price": 1000, "portion": "half", "image": "/images/rice/white.jpg", "tags": ["half"], "available": true }
+      ]
+    },
+
+    {
+      "name": "Proteins",
+      "slug": "proteins",
+      "items": [
+        { "id": "panla_small", "name": "Panla Fish", "price": 4000, "image": "/images/proteins/panla.jpg", "tags": ["fish"], "available": true },
+        { "id": "panla_full", "name": "Full Panla Fish", "price": 10000, "image": "/images/proteins/panla.jpg", "tags": ["fish"], "available": true },
+
+        { "id": "turkey", "name": "Turkey", "price": 6000, "image": "/images/proteins/turkey.jpg", "tags": ["meat"], "available": true },
+        { "id": "turkey_big", "name": "Big Turkey", "price": 7000, "image": "/images/proteins/turkey.jpg", "tags": ["meat"], "available": true },
+
+        { "id": "chicken_laps_small", "name": "Chicken Laps", "price": 4000, "image": "/images/proteins/chicken.jpg", "tags": ["chicken"], "available": true },
+        { "id": "chicken_laps_big", "name": "Chicken Laps (Big)", "price": 6000, "image": "/images/proteins/chicken.jpg", "tags": ["chicken"], "available": true },
+
+        { "id": "croaker", "name": "Croaker Fish", "price": 5000, "image": "/images/proteins/croaker.jpg", "tags": ["fish"], "available": true },
+        { "id": "tilapia", "name": "Tilapia Fish", "price": 5000, "image": "/images/proteins/tilapia.jpg", "tags": ["fish"], "available": true },
+        { "id": "asun", "name": "Asun", "price": 5000, "image": "/images/proteins/asun.jpg", "tags": ["goat"], "available": true },
+        { "id": "goat_meat", "name": "Goat Meat", "price": 4000, "image": "/images/proteins/goat.jpg", "tags": ["meat"], "available": true },
+        { "id": "kote", "name": "Kote Fish", "price": 4000, "image": "/images/proteins/kote.jpg", "tags": ["fish"], "available": true },
+        { "id": "titus", "name": "Titus Fish", "price": 4000, "image": "/images/proteins/titus.jpg", "tags": ["fish"], "available": true },
+        { "id": "catfish", "name": "Catfish Peppered", "price": 4000, "image": "/images/proteins/catfish.jpg", "tags": ["fish"], "available": true },
+        { "id": "snail", "name": "Snail", "price": 4000, "image": "/images/proteins/snail.jpg", "tags": ["delicacy"], "available": true },
+        { "id": "crispy_chicken", "name": "Crispy Chicken", "price": 5000, "image": "/images/proteins/crispy.jpg", "tags": ["chicken"], "available": true },
+        { "id": "gizzard", "name": "Gizzard", "price": 2500, "image": "/images/proteins/gizzard.jpg", "tags": ["meat"], "available": true },
+        { "id": "chicken_wings", "name": "Chicken Wings", "price": 2000, "image": "/images/proteins/wings.jpg", "tags": ["chicken"], "available": true },
+        { "id": "assorted", "name": "Assorted Meat", "price": 4000, "image": "/images/proteins/assorted.jpg", "tags": ["mixed"], "available": true },
+        { "id": "beef", "name": "Beef", "price": 1500, "image": "/images/proteins/beef.jpg", "tags": ["meat"], "available": true },
+        { "id": "egg", "name": "Boiled Egg", "price": 500, "image": "/images/proteins/egg.jpg", "tags": ["egg"], "available": true }
+      ]
+    },
+
+    {
+      "name": "Drinks",
+      "slug": "drinks",
+      "items": [
+        { "id": "red_wine", "name": "Red Wine", "price": 10000, "image": "/images/drinks/wine.jpg", "tags": ["alcohol"], "available": true },
+        { "id": "coke", "name": "Coke", "price": 800, "image": "/images/drinks/coke.jpg", "tags": ["soft"], "available": true },
+        { "id": "water", "name": "Bottle Water", "price": 500, "image": "/images/drinks/water.jpg", "tags": ["basic"], "available": true }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+# ⚠️ IMPORTANT (REAL-WORLD NOTE)
+
+* I normalized duplicates (e.g. Goat Meat repeated)
+* Cleaned naming inconsistencies (Chicken laps → Chicken Laps)
+* Grouped properly for scalability
+
+---
+
+# 🧠 WHAT YOU NOW HAVE
+
+This JSON supports:
+
+✅ Search
+✅ Cart system
+✅ Checkout
+✅ Analytics
+✅ Future API
+
+---
+
+# ⚡ NEXT LEVEL (RECOMMENDED)
+
+If you want to move like a real product company:
+
+I can:
+
+* Build `/api/menu` endpoint
+* Add **meal-time tags (breakfast/lunch/dinner)**
+* Create **recommendation engine (AI-ready)**
+* Generate **Next.js UI using this exact dataset**
+
+---
+
+Just tell me:
+👉 “Build API” or “Generate frontend UI”

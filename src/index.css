@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Libre Baskerville", serif;
+  --font-sans: "Inter", sans-serif;
+  
+  --color-primary: #0F3D2E;
+  --color-accent: #FF6B00;
+  --color-wood: #6B4F3A;
+  --color-cream: #F8F5F0;
+  --color-charcoal: #1A1A1A;
+  
+  --color-surface: var(--surface);
+  --color-surface-variant: var(--surface-variant);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+}
+
+:root {
+  --surface: #F8F5F0;
+  --surface-variant: #FFFFFF;
+  --on-surface: #1A1A1A;
+  --on-surface-variant: #4A4A4A;
+  --border-color: rgba(15, 61, 46, 0.1);
+  --accent: #FF6B00;
+}
+
+[data-theme='night'] {
+  --surface: #0F3D2E;
+  --surface-variant: #164D3B;
+  --on-surface: #F8F5F0;
+  --on-surface-variant: #A0C0B5;
+  --border-color: rgba(248, 245, 240, 0.1);
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-on-surface font-sans antialiased transition-colors duration-500;
+  }
+  
+  h1, h2, h3, h4, .font-serif {
+    @apply font-serif tracking-tight;
+  }
+}
+
+@utility editorial-border-b {
+  border-bottom: 1px solid var(--border-color);
+}
+
+@utility editorial-border-r {
+  border-right: 1px solid var(--border-color);
+}
+
+@utility editorial-border-l {
+  border-left: 1px solid var(--border-color);
+}
+
+@utility editorial-border-t {
+  border-top: 1px solid var(--border-color);
+}
+
+@utility editorial-label {
+  @apply text-[10px] uppercase tracking-[0.2em] text-accent font-bold;
+}
+
+@utility glass-nav {
+  @apply bg-surface/80 backdrop-blur-xl editorial-border-b;
+}
+
+@utility wood-texture {
+  background: linear-gradient(rgba(107, 79, 58, 0.05), rgba(107, 79, 58, 0.05)), url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+}
+
+@keyframes editorialLoading {
+  0% { transform: scaleX(0); transform-origin: left; }
+  50% { transform: scaleX(1); transform-origin: left; }
+  51% { transform: scaleX(1); transform-origin: right; }
+  100% { transform: scaleX(0); transform-origin: right; }
+}
+
+@utility animate-editorial-loading {
+  animation: editorialLoading 2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@utility button-primary {
+  @apply bg-accent text-white px-8 py-4 font-bold uppercase tracking-widest hover:bg-accent/90 transition-all active:scale-95;
+}
+
+@utility card-hover {
+  @apply transition-transform duration-500 hover:-translate-y-2;
+}
