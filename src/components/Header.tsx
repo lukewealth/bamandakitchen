@@ -43,7 +43,7 @@ export default function Header({
               className="flex items-center space-x-4 group"
             >
               <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-accent/20 group-hover:border-accent transition-colors">
-                <img src="/BamandaKitchen.jpg" alt="Bamanda Logo" className="w-full h-full object-cover" />
+                <img src="/logo.jpg" alt="Bamanda Logo" className="w-full h-full object-cover" />
               </div>
               <span className="font-serif text-2xl text-on-surface tracking-widest uppercase italic group-hover:text-accent transition-colors duration-500">
                 Bamanda
