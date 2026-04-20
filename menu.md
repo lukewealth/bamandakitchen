@@ -152,6 +152,10 @@ Sprite - 800
 Fanta - 800
 Bottle Water - 500 
 
+Goat meat pepper soup - 8,000
+Chicken pepper soup - 8,000
+Turkey pepper soup - 7,000
+
 Write with image references and Naira price with a Menu.json and menu.md Agent insytructions alongside the current dishies with async and metadatas across app search quary and input for checkout processing 
 
 const url = `https://wa.me/234XXXXXXXXXX?text=${message}`;

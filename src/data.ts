@@ -16,7 +16,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 6000,
     category: 'Rice Dishes',
     mealTime: ['Lunch', 'Dinner'],
-    image: '/images/meals/ofada_rice.png',
+    image: '/images/meals/Ofada_Rice.png',
     portion: 'full',
     tags: ['african', 'spicy', 'classic'],
     available: true
@@ -102,7 +102,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 2000,
     category: 'Proteins',
     mealTime: ['Lunch', 'Dinner'],
-    image: '/images/meals/chicken_wings.png',
+    image: '/images/meals/chicken_wings.jpg',
     tags: ['chicken', 'crispy'],
     available: true
   },
@@ -176,7 +176,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 1000,
     category: 'Snacks',
     mealTime: ['Breakfast', 'Lunch'],
-    image: 'https://images.unsplash.com/photo-1610450531541-0775d7e3666d?auto=format&fit=crop&q=80&w=800',
+    image: '/images/meals/moi_moi.png',
     tags: ['traditional', 'healthy', 'protein'],
     available: true
   },
@@ -191,7 +191,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 8000,
     category: 'African Dishes',
     mealTime: ['Dinner'],
-    image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=800',
+    image: '/images/meals/goat_peppersoup.webp',
     tags: ['spicy', 'african', 'comfort'],
     available: true
   },
@@ -202,7 +202,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 8000,
     category: 'African Dishes',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=800',
+    image: '/images/meals/chicken_peppersoup.jpg',
     tags: ['spicy', 'soup'],
     available: true
   },
@@ -213,7 +213,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 7000,
     category: 'African Dishes',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=800',
+    image: '/images/meals/turkey_peppersoup.jpg',
     tags: ['spicy', 'protein'],
     available: true
   },

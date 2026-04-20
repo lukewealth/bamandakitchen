@@ -132,6 +132,157 @@ This JSON supports:
 ✅ Future API
 
 ---
+{
+  "currency": "NGN",
+  "categories": [
+    {
+      "name": "Rice Dishes",
+      "slug": "rice",
+      "items": [
+        {
+          "id": "rice_ofada_full",
+          "name": "Ofada Sauce & Rice",
+          "price": 6000,
+          "image": "/images/rice/ofada_rice.jpg",
+          "tags": ["african", "spicy", "local"],
+          "available": true
+        },
+        {
+          "id": "rice_biryani_full",
+          "name": "Chicken Biryani Rice",
+          "price": 5000,
+          "image": "/images/rice/biryani.jpg",
+          "tags": ["intercontinental"],
+          "available": true
+        },
+        {
+          "id": "rice_biryani_half",
+          "name": "Chicken Biryani Rice (Half)",
+          "price": 2500,
+          "image": "/images/rice/biryani.jpg",
+          "tags": ["intercontinental", "half"],
+          "available": true
+        },
+        {
+          "id": "rice_jollof_smokey",
+          "name": "Smokey Jollof",
+          "price": 2500,
+          "image": "/images/rice/jollof_smokey.jpg",
+          "tags": ["popular"],
+          "available": true
+        },
+        {
+          "id": "rice_white",
+          "name": "White Rice",
+          "price": 2000,
+          "image": "/images/rice/white_rice.jpg",
+          "tags": ["basic"],
+          "available": true
+        }
+      ]
+    },
+
+    {
+      "name": "Proteins",
+      "slug": "proteins",
+      "items": [
+        {
+          "id": "protein_turkey",
+          "name": "Turkey",
+          "price": 6000,
+          "image": "/images/proteins/turkey.jpg",
+          "tags": ["grilled"],
+          "available": true
+        },
+        {
+          "id": "protein_goat",
+          "name": "Goat Meat",
+          "price": 4000,
+          "image": "/images/proteins/goat.jpg",
+          "tags": ["peppered"],
+          "available": true
+        },
+        {
+          "id": "protein_snail",
+          "name": "Snail",
+          "price": 4000,
+          "image": "/images/proteins/snail.jpg",
+          "tags": ["delicacy"],
+          "available": true
+        }
+      ]
+    },
+
+    {
+      "name": "Pasta & Noodles",
+      "slug": "pasta",
+      "items": [
+        {
+          "id": "pasta_seafood",
+          "name": "Seafood Pasta",
+          "price": 14000,
+          "image": "/images/pasta/seafood.jpg",
+          "tags": ["premium"],
+          "available": true
+        },
+        {
+          "id": "pasta_spaghetti_jollof",
+          "name": "Spaghetti Jollof",
+          "price": 2500,
+          "image": "/images/pasta/spaghetti.jpg",
+          "tags": ["local"],
+          "available": true
+        }
+      ]
+    },
+
+    {
+      "name": "Snacks",
+      "slug": "snacks",
+      "items": [
+        {
+          "id": "snack_shawarma_chicken",
+          "name": "Chicken Shawarma",
+          "price": 6000,
+          "image": "/images/snacks/shawarma.jpg",
+          "tags": ["fastfood"],
+          "available": true
+        },
+        {
+          "id": "snack_moimoi",
+          "name": "Moi Moi",
+          "price": 1000,
+          "image": "/images/snacks/moimoi.jpg",
+          "tags": ["protein"],
+          "available": true
+        }
+      ]
+    },
+
+    {
+      "name": "Drinks",
+      "slug": "drinks",
+      "items": [
+        {
+          "id": "drink_coke",
+          "name": "Coke",
+          "price": 800,
+          "image": "/images/drinks/coke.jpg",
+          "tags": ["soft drink"],
+          "available": true
+        },
+        {
+          "id": "drink_water",
+          "name": "Bottle Water",
+          "price": 500,
+          "image": "/images/drinks/water.jpg",
+          "tags": ["basic"],
+          "available": true
+        }
+      ]
+    }
+  ]
+}
 
 # ⚡ NEXT LEVEL (RECOMMENDED)
 
@@ -148,3 +299,14 @@ I can:
 
 Just tell me:
 👉 “Build API” or “Generate frontend UI”
+/images/rice/ofada_rice.jpg
+/images/rice/jollof_smokey.jpg
+/images/proteins/turkey.jpg
+/images/pasta/seafood_pasta.jpg
+/images/snacks/shawarma.jpg
+/images/drinks/coke.jpg
+
+
+Goat meat pepper soup - 8,000
+Chicken pepper soup - 8,000
+Turkey pepper soup - 7,000

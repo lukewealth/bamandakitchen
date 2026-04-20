@@ -9,7 +9,7 @@
       "price": 6000,
       "category": "Rice Dishes",
       "mealTime": ["Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/Ofada_Rice.png",
       "portion": "full",
       "tags": ["african", "spicy", "classic"],
       "available": true
@@ -21,7 +21,7 @@
       "price": 5000,
       "category": "Rice Dishes",
       "mealTime": ["Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/biryani.png",
       "portion": "full",
       "tags": ["intercontinental", "fragrant"],
       "available": true
@@ -33,7 +33,7 @@
       "price": 2500,
       "category": "Rice Dishes",
       "mealTime": ["Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1567620905732-2d1ec7bb7445?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/jollof_smokey.png",
       "tag": "Signature",
       "portion": "full",
       "tags": ["popular", "spicy", "african"],
@@ -46,7 +46,7 @@
       "price": 2000,
       "category": "Rice Dishes",
       "mealTime": ["Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/white_rice.png",
       "portion": "full",
       "tags": ["basic", "clean"],
       "available": true
@@ -58,7 +58,7 @@
       "price": 6000,
       "category": "Proteins",
       "mealTime": ["Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1518492104633-130d0cc84637?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/turkey.png",
       "tags": ["meat", "grilled"],
       "available": true
     },
@@ -69,7 +69,7 @@
       "price": 4000,
       "category": "Proteins",
       "mealTime": ["Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/goat_meat.png",
       "tags": ["meat", "african"],
       "available": true
     },
@@ -80,7 +80,7 @@
       "price": 4000,
       "category": "Proteins",
       "mealTime": ["Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/peppered_snail.jpg",
       "tags": ["delicacy", "african", "spicy"],
       "available": true
     },
@@ -91,7 +91,7 @@
       "price": 2000,
       "category": "Proteins",
       "mealTime": ["Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1567620817605-2423af964d8a?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/chicken_wings.jpg",
       "tags": ["chicken", "crispy"],
       "available": true
     },
@@ -102,7 +102,7 @@
       "price": 14000,
       "category": "Pasta & Noodles",
       "mealTime": ["Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/seafood_pasta.png",
       "tags": ["luxury", "seafood", "intercontinental"],
       "available": true
     },
@@ -113,7 +113,7 @@
       "price": 6500,
       "category": "Pasta & Noodles",
       "mealTime": ["Breakfast", "Lunch"],
-      "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/chicken_noodles.png",
       "tags": ["quick", "asian"],
       "available": true
     },
@@ -124,7 +124,7 @@
       "price": 2500,
       "category": "Pasta & Noodles",
       "mealTime": ["Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1546549032-9571cd6b27df?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/spaghetti_jollof.png",
       "tags": ["classic", "african"],
       "available": true
     },
@@ -135,7 +135,7 @@
       "price": 6000,
       "category": "Snacks",
       "mealTime": ["Breakfast", "Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1561651823-34feb02250e4?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/chicken_shawarma.png",
       "tags": ["popular", "quick", "street-food"],
       "available": true
     },
@@ -146,7 +146,7 @@
       "price": 12000,
       "category": "Snacks",
       "mealTime": ["Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/burger.png",
       "tags": ["gourmet", "fastfood"],
       "available": true
     },
@@ -157,7 +157,7 @@
       "price": 1000,
       "category": "Snacks",
       "mealTime": ["Breakfast", "Lunch"],
-      "image": "https://images.unsplash.com/photo-1610450531541-0775d7e3666d?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/moi_moi.png",
       "tags": ["traditional", "healthy", "protein"],
       "available": true
     },
@@ -168,7 +168,7 @@
       "price": 8000,
       "category": "African Dishes",
       "mealTime": ["Dinner"],
-      "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/goat_peppersoup.webp",
       "tags": ["spicy", "african", "comfort"],
       "available": true
     },
@@ -179,7 +179,7 @@
       "price": 8000,
       "category": "African Dishes",
       "mealTime": ["Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/chicken_peppersoup.jpg",
       "tags": ["spicy", "soup"],
       "available": true
     },
@@ -190,7 +190,7 @@
       "price": 7000,
       "category": "African Dishes",
       "mealTime": ["Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/turkey_peppersoup.jpg",
       "tags": ["spicy", "protein"],
       "available": true
     },
@@ -219,11 +219,11 @@
     {
       "id": "water",
       "name": "Bottle Water",
-      "description": "Premium bottled water with condensation, minimal clean aesthetic.",
+      "description: "Premium bottled water with condensation, minimal clean aesthetic.",
       "price": 500,
       "category": "Drinks",
       "mealTime": ["Breakfast", "Lunch", "Dinner"],
-      "image": "https://images.unsplash.com/photo-1523362628242-4a65853b14d8?auto=format&fit=crop&q=80&w=800",
+      "image": "/images/meals/water.png",
       "tags": ["basic", "hydration"],
       "available": true
     }
