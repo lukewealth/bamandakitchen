@@ -7,6 +7,7 @@ import { ArrowRight, Utensils, Globe, Martini, ShoppingBag, Heart } from 'lucide
 import { motion } from 'motion/react';
 import { MenuItem } from '../types';
 import { MENU_ITEMS } from '../data';
+import HeroSlider from '../components/HeroSlider';
 
 interface HomeScreenProps {
   onNavigateToMenu: (filter?: string) => void;
@@ -24,43 +25,7 @@ export default function HomeScreen({ onNavigateToMenu }: HomeScreenProps) {
   return (
     <div className="w-full pt-20 bg-cream">
       {/* Hero Section */}
-      <section className="relative h-[85vh] w-full overflow-hidden flex items-center justify-center">
-        <div className="absolute inset-0">
-          <img 
-            src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=2000" 
-            className="w-full h-full object-cover brightness-[0.4]"
-            alt="Hero Background"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/60 to-primary/20" />
-        </div>
-        
-        <div className="relative z-10 text-center px-6 max-w-5xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="font-serif text-[clamp(3.5rem,8vw,7rem)] text-white leading-[0.9] tracking-tight mb-8">
-              Eating Well. <br />
-              <span className="italic text-accent">Living Healthy.</span>
-            </h1>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <button 
-                onClick={() => onNavigateToMenu()}
-                className="button-primary w-full sm:w-auto"
-              >
-                Order Now
-              </button>
-              <button 
-                onClick={() => onNavigateToMenu()}
-                className="border-2 border-white text-white px-8 py-4 font-bold uppercase tracking-widest hover:bg-white hover:text-primary transition-all w-full sm:w-auto"
-              >
-                Explore Menu
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      <HeroSlider onNavigateToMenu={() => onNavigateToMenu()} />
 
       {/* Meal Time Segments */}
       <section className="py-24 px-6 max-w-7xl mx-auto">
