@@ -11,7 +11,7 @@ import FloatingCart from './components/FloatingCart';
 import HomeScreen from './screens/HomeScreen';
 import MenuScreen from './screens/MenuScreen';
 import CheckoutScreen from './screens/CheckoutScreen';
-import KitchenScreen from './screens/KitchenScreen';
+import AboutScreen from './screens/AboutScreen';
 import BlogScreen from './screens/BlogScreen';
 import ContactScreen from './screens/ContactScreen';
 import TrackOrderScreen from './screens/TrackOrderScreen';
@@ -140,8 +140,8 @@ export default function App() {
         {currentScreen === 'menu' && (
           <MenuScreen onAddToCart={handleAddToCart} initialFilter={menuFilter} />
         )}
-        {currentScreen === 'kitchen' && (
-          <KitchenScreen />
+        {currentScreen === 'about' && (
+          <AboutScreen />
         )}
         {currentScreen === 'blog' && (
           <BlogScreen />

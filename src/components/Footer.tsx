@@ -35,7 +35,7 @@ export default function Footer({ onNavigate }: FooterProps) {
                 {[
                   { label: 'Store', id: 'menu' },
                   { label: 'Journal', id: 'blog' },
-                  { label: 'Kitchen', id: 'kitchen' },
+                  { label: 'About Us', id: 'about' },
                   { label: 'Checkout', id: 'checkout' },
                   { label: 'Contact', id: 'contact' }
                 ].map((link) => (

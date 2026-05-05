@@ -68,7 +68,7 @@ export type Screen =
   | 'home' 
   | 'menu' 
   | 'checkout' 
-  | 'kitchen' 
+  | 'about' 
   | 'blog' 
   | 'contact' 
   | 'track-order' 

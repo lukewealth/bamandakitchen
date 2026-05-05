@@ -95,7 +95,7 @@ export default function Header({
         <nav className="hidden md:flex items-center space-x-12 font-sans text-[11px] uppercase tracking-[0.3em] font-extrabold">
           {[
             { id: 'menu', label: 'Store' },
-            { id: 'kitchen', label: 'Kitchen' },
+            { id: 'about', label: 'About' },
             { id: 'blog', label: 'Journal' },
             { id: 'contact', label: 'Contact' },
           ].map((item) => (
