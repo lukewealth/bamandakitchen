@@ -57,4 +57,17 @@ export interface BlogPost {
   author: string;
 }
 
-export type Screen = 'home' | 'menu' | 'checkout' | 'kitchen' | 'blog' | 'contact' | 'track-order' | 'admin';
+export type Screen = 
+  | 'home' 
+  | 'menu' 
+  | 'checkout' 
+  | 'kitchen' 
+  | 'blog' 
+  | 'contact' 
+  | 'track-order' 
+  | 'admin'
+  | 'heritage'
+  | 'sustainability'
+  | 'legal'
+  | 'press'
+  | 'careers';

@@ -16,6 +16,7 @@ import BlogScreen from './screens/BlogScreen';
 import ContactScreen from './screens/ContactScreen';
 import TrackOrderScreen from './screens/TrackOrderScreen';
 import AdminScreen from './screens/AdminScreen';
+import InfoScreen from './screens/InfoScreen';
 import { MenuItem, CartItem, Screen, Order } from './types';
 
 export default function App() {
@@ -118,6 +119,47 @@ export default function App() {
         {currentScreen === 'admin' && (
           <AdminScreen />
         )}
+        
+        {currentScreen === 'heritage' && (
+          <InfoScreen 
+            title="Our Heritage" 
+            subtitle="The Legacy"
+            onBack={() => setCurrentScreen('home')}
+            content="Bamanda Kitchen is more than a restaurant; it is a sanctuary of ancestral recipes. For centuries, our culinary traditions have been passed down through generations, preserved in the smoke of ancient hearths and the wisdom of our elders."
+          />
+        )}
+        {currentScreen === 'sustainability' && (
+          <InfoScreen 
+            title="Sustainability" 
+            subtitle="Earth First"
+            onBack={() => setCurrentScreen('home')}
+            content="We are committed to the preservation of our land. From sourcing organic ingredients to minimizing waste, every step we take is guided by our responsibility to the future."
+          />
+        )}
+        {currentScreen === 'legal' && (
+          <InfoScreen 
+            title="Legal" 
+            subtitle="Transparency"
+            onBack={() => setCurrentScreen('home')}
+            content="Your trust is our most valuable asset. Our legal framework ensures that your data is protected and our operations remain transparent and ethical."
+          />
+        )}
+        {currentScreen === 'press' && (
+          <InfoScreen 
+            title="Press" 
+            subtitle="The Gazette"
+            onBack={() => setCurrentScreen('home')}
+            content="Discover what the world is saying about Bamanda. From culinary reviews to feature stories on our heritage, stay updated with our latest manifestations."
+          />
+        )}
+        {currentScreen === 'careers' && (
+          <InfoScreen 
+            title="Careers" 
+            subtitle="Join the Curation"
+            onBack={() => setCurrentScreen('home')}
+            content="We are always seeking passionate individuals to join our culinary family. If you have a deep respect for heritage and a commitment to excellence, we welcome you."
+          />
+        )}
       </main>
 
       {currentScreen !== 'admin' && <Footer onNavigate={setCurrentScreen} />}
@@ -131,7 +173,7 @@ export default function App() {
         onCheckout={handleCheckout}
       />
 
-      {currentScreen !== 'admin' && currentScreen !== 'track-order' && (
+      {currentScreen !== 'admin' && (
         <FloatingCart 
           items={cart}
           onOpenCart={() => setIsCartOpen(true)}

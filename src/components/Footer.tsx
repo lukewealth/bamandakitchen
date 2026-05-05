@@ -53,11 +53,20 @@ export default function Footer({ onNavigate }: FooterProps) {
             <div className="space-y-6">
               <div className="editorial-label text-accent opacity-50">Heritage</div>
               <ul className="space-y-4">
-                {['Sustainability', 'Legal', 'Press', 'Careers'].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="font-sans text-[11px] uppercase tracking-[0.2em] font-bold text-white/60 hover:text-accent transition-all">
-                      {link}
-                    </a>
+                {[
+                  { label: 'Our Heritage', id: 'heritage' },
+                  { label: 'Sustainability', id: 'sustainability' },
+                  { label: 'Legal', id: 'legal' },
+                  { label: 'Press', id: 'press' },
+                  { label: 'Careers', id: 'careers' }
+                ].map((link) => (
+                  <li key={link.id}>
+                    <button 
+                      onClick={() => onNavigate(link.id as Screen)}
+                      className="font-sans text-[11px] uppercase tracking-[0.2em] font-bold text-white/60 hover:text-accent transition-all cursor-pointer"
+                    >
+                      {link.label}
+                    </button>
                   </li>
                 ))}
               </ul>
