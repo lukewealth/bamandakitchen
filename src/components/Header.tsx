@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { ShoppingBag, Sun, Moon, ChevronDown, BookOpen } from 'lucide-react';
+import { ShoppingBag, Sun, Moon, ChevronDown, BookOpen, Settings } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { Screen } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
@@ -117,6 +117,18 @@ export default function Header({
         </nav>
 
         <div className="flex items-center space-x-8">
+          {/* Admin Access */}
+          <button 
+            onClick={() => onNavigate('admin')}
+            className={cn(
+              "text-on-surface/60 hover:text-accent transition-all duration-500",
+              currentScreen === 'admin' && "text-accent"
+            )}
+            title="Curator Access"
+          >
+            <Settings className="w-4 h-4" />
+          </button>
+
           {/* Theme Toggle */}
           <button 
             onClick={onToggleTheme}
