@@ -50,7 +50,7 @@ export default function ContactScreen() {
                 </div>
                 <div>
                   <h3 className="editorial-label text-xs mb-2 opacity-50">Phone</h3>
-                  <p className="font-serif italic text-2xl text-on-surface">+234 908 765 4321</p>
+                  <p className="font-serif italic text-2xl text-on-surface">+234 902 408 4911</p>
                 </div>
               </div>
 

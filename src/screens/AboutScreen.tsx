@@ -13,7 +13,7 @@ export default function AboutScreen() {
       <section className="px-10 max-w-screen-2xl mx-auto mb-24">
         <div className="relative h-[600px] flex items-center editorial-border overflow-hidden bg-primary">
           <img 
-            src="/IMG_2031.png" 
+            src="/MD.png" 
             alt="Kitchen Manager" 
             className="absolute inset-0 w-full h-full object-cover grayscale brightness-75 hover:grayscale-0 transition-all duration-1000"
             referrerPolicy="no-referrer"
