@@ -7,10 +7,11 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Lock, LogOut, ShoppingBag, Utensils, BookOpen, X, Star, Edit, Trash2, Plus, 
-  CheckCircle2, Clock, Truck, Image as ImageIcon, Layout, Save, AlertCircle
+  CheckCircle2, Clock, Truck, Image as ImageIcon, Layout, Save, AlertCircle, MessageCircle
 } from 'lucide-react';
 import { MenuItem, Order, BlogPost, OrderStatus, BlogLayout, MenuCategory } from '../types';
 import { MENU_ITEMS } from '../data';
+import { formatStatusUpdateMessage, getWhatsAppUrl } from '../lib/order';
 
 export default function AdminScreen() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -79,6 +80,12 @@ export default function AdminScreen() {
 
   const updateOrderStatus = (orderId: string, newStatus: OrderStatus) => {
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+  };
+
+  const handleNotifyCustomer = (order: Order) => {
+    const message = formatStatusUpdateMessage(order);
+    const url = getWhatsAppUrl(message, order.customer.phone);
+    window.open(url, '_blank');
   };
 
   const deleteOrder = (orderId: string) => {
@@ -248,8 +255,14 @@ export default function AdminScreen() {
                       </div>
                       <div className="lg:w-48 space-y-2 lg:border-l border-primary/5 lg:pl-8 flex flex-col justify-center">
                         <button onClick={() => updateOrderStatus(order.id, 'preparing')} className="w-full bg-primary/5 hover:bg-orange-50 text-[10px] font-bold py-3 rounded-xl transition-colors">PREPARE</button>
-                        <button onClick={() => updateOrderStatus(order.id, 'on-the-way')} className="w-full bg-primary/5 hover:bg-blue-50 text-[10px] font-bold py-3 rounded-xl transition-colors">SHIP</button>
-                        <button onClick={() => updateOrderStatus(order.id, 'delivered')} className="w-full bg-primary/5 hover:bg-green-50 text-[10px] font-bold py-3 rounded-xl transition-colors">DELIVER</button>
+                        <button onClick={() => updateOrderStatus(order.id, 'on-the-way')} className="w-full bg-primary/5 hover:bg-blue-50 text-[10px] font-bold py-3 rounded-xl transition-all">SHIP</button>
+                        <button onClick={() => updateOrderStatus(order.id, 'delivered')} className="w-full bg-primary/5 hover:bg-green-50 text-[10px] font-bold py-3 rounded-xl transition-all">DELIVER</button>
+                        <button 
+                          onClick={() => handleNotifyCustomer(order)}
+                          className="w-full bg-accent/10 hover:bg-accent hover:text-white text-accent text-[10px] font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+                        >
+                          <MessageCircle className="w-3 h-3" /> NOTIFY PATRON
+                        </button>
                         <button onClick={() => deleteOrder(order.id)} className="w-full text-red-500 text-[10px] font-bold py-3 hover:bg-red-50 rounded-xl mt-4">ARCHIVE</button>
                       </div>
                     </div>

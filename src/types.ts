@@ -48,6 +48,11 @@ export interface Order {
   notes?: string;
   createdAt: string;
   estimatedDeliveryTime: number; // minutes remaining
+  metadata?: {
+    platform: string;
+    version: string;
+    device?: string;
+  };
 }
 
 export type BlogLayout = 'editorial' | 'minimal' | 'narrative' | 'journal' | 'luxury';

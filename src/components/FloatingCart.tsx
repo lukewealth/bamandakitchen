@@ -7,6 +7,7 @@ import { ShoppingBag, ArrowRight } from 'lucide-react';
 import { CartItem } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
+import { formatQuickWhatsAppMessage, getWhatsAppUrl } from '../lib/order';
 
 interface FloatingCartProps {
   items: CartItem[];
@@ -20,12 +21,8 @@ export default function FloatingCart({ items, onOpenCart }: FloatingCartProps) {
   if (totalItems === 0) return null;
 
   const handleWhatsAppCheckout = () => {
-    const message = encodeURIComponent(
-      `Hello Bamanda Kitchen! I would like to place an order:\n\n` +
-      items.map(item => `- ${item.name} (${item.quantity}x) - ₦${(item.price * item.quantity).toLocaleString()}`).join('\n') +
-      `\n\nTotal Estimated Cost: ₦${totalPrice.toLocaleString()}\n\nPlease confirm my order. Thank you!`
-    );
-    window.open(`https://wa.me/message/XZ7MJSS7V2ZCA1?text=${message}`, '_blank');
+    const message = formatQuickWhatsAppMessage(items, totalPrice);
+    window.open(getWhatsAppUrl(message), '_blank');
   };
 
   return (

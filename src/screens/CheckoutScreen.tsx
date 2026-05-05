@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { ArrowRight, Lock, Sparkles, CheckCircle2, MessageCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { CartItem, Order } from '../types';
+import { generateOrderId, formatWhatsAppMessage, getWhatsAppUrl } from '../lib/order';
 
 interface CheckoutScreenProps {
   items: CartItem[];
@@ -23,12 +24,6 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
   const deliveryFee = items.length > 0 ? 2500 : 0;
   const total = subtotal + deliveryFee;
 
-  const generateOrderId = () => {
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const random = Math.random().toString(36).substring(2, 5).toUpperCase();
-    return `BAM-${timestamp}-${random}`;
-  };
-
   const handleWhatsAppOrder = () => {
     if (!name || !phone || !address) {
       alert('Please fill in your name, phone, and address to proceed.');
@@ -36,30 +31,7 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
     }
 
     const orderId = generateOrderId();
-    const orderDetails = items.map(item => 
-      `• ${item.name} (${item.portion || 'Full'}) x ${item.quantity} - ₦${(item.price * item.quantity).toLocaleString()}`
-    ).join('\n');
-
-    const message = encodeURIComponent(
-      `🍱 *NEW ORDER - BAMANDA KITCHEN*\n` +
-      `🆔 *Order ID:* ${orderId}\n\n` +
-      `*Patron Details:*\n` +
-      `👤 Name: ${name}\n` +
-      `📞 Phone: ${phone}\n` +
-      `📍 Address: ${address}\n` +
-      (notes ? `📝 Notes: ${notes}\n` : '') +
-      `\n*Order Inventory:*\n${orderDetails}\n\n` +
-      `*Financial Summary:*\n` +
-      `💰 Subtotal: ₦${subtotal.toLocaleString()}\n` +
-      `🚚 Delivery: ₦${deliveryFee.toLocaleString()}\n` +
-      `⭐ *Total: ₦${total.toLocaleString()}*\n\n` +
-      `_Please confirm my curation for immediate dispatch._`
-    );
-
-    const whatsappUrl = `https://wa.me/message/XZ7MJSS7V2ZCA1?text=${message}`;
-    
-    // Complete the order in the app state
-    onOrderComplete({
+    const order: Order = {
       id: orderId,
       items,
       total,
@@ -67,8 +39,19 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
       customer: { name, phone, address },
       notes,
       createdAt: new Date().toISOString(),
-      estimatedDeliveryTime: 45
-    });
+      estimatedDeliveryTime: 45,
+      metadata: {
+        platform: 'Bamanda Heritage Web',
+        version: '1.0.0',
+        device: navigator.userAgent.split('(')[1]?.split(')')[0] || 'Unknown'
+      }
+    };
+
+    const message = formatWhatsAppMessage(order);
+    const whatsappUrl = getWhatsAppUrl(message);
+    
+    // Complete the order in the app state
+    onOrderComplete(order);
 
     window.open(whatsappUrl, '_blank');
   };

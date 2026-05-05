@@ -5,8 +5,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Package, ChefHat, Truck, CheckCircle2, Clock, MapPin, Phone, ArrowLeft } from 'lucide-react';
+import { Package, ChefHat, Truck, CheckCircle2, Clock, MapPin, Phone, ArrowLeft, MessageCircle } from 'lucide-react';
 import { Order, OrderStatus } from '../types';
+import { getWhatsAppUrl } from '../lib/order';
 
 interface TrackOrderScreenProps {
   order: Order | null;
@@ -36,6 +37,12 @@ export default function TrackOrderScreen({ order, onBack }: TrackOrderScreenProp
   };
 
   const currentStep = order ? getStatusIndex(order.status) : 0;
+
+  const handleContactKitchen = () => {
+    if (!order) return;
+    const message = encodeURIComponent(`Hello Bamanda Kitchen! I'm inquiring about my order #${order.id}. Current status is: ${order.status.toUpperCase()}.`);
+    window.open(getWhatsAppUrl(message), '_blank');
+  };
 
   if (!order) {
     return (
@@ -109,6 +116,19 @@ export default function TrackOrderScreen({ order, onBack }: TrackOrderScreenProp
                    <h3 className="editorial-label text-xs mb-2 opacity-40 uppercase tracking-widest">Contact</h3>
                    <p className="font-serif italic text-xl text-on-surface">{order.customer.phone}</p>
                  </div>
+               </div>
+
+               <div className="pt-8">
+                 <button 
+                   onClick={handleContactKitchen}
+                   className="w-full bg-accent text-white py-5 px-8 rounded-2xl flex justify-between items-center transition-all shadow-xl shadow-accent/20 hover:scale-[1.02] active:scale-[0.98]"
+                 >
+                   <div className="flex items-center gap-4">
+                     <MessageCircle className="w-5 h-5" />
+                     <span className="font-sans text-[11px] uppercase tracking-[0.3em] font-black">Contact Kitchen</span>
+                   </div>
+                   <span className="text-[10px] font-serif italic opacity-60 text-primary">Live WhatsApp</span>
+                 </button>
                </div>
 
                {order.notes && (
