@@ -26,6 +26,7 @@ export interface MenuItem {
   portion?: 'full' | 'half';
   tags: string[];
   available: boolean;
+  isTrending?: boolean; // For "Now Selling: Trending Hot Picks"
 }
 
 export interface CartItem extends MenuItem {
@@ -44,17 +45,23 @@ export interface Order {
     phone: string;
     address: string;
   };
+  notes?: string;
   createdAt: string;
   estimatedDeliveryTime: number; // minutes remaining
 }
 
+export type BlogLayout = 'editorial' | 'minimal' | 'narrative' | 'journal' | 'luxury';
+
 export interface BlogPost {
   id: string;
   title: string;
+  topic: string;
   content: string;
   image: string;
   date: string;
   author: string;
+  layout: BlogLayout;
+  category: string;
 }
 
 export type Screen = 

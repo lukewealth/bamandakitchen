@@ -3,18 +3,27 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ArrowRight, Utensils, Globe, Martini, ShoppingBag, Heart } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowRight, Utensils, Globe, Martini, ShoppingBag, Heart, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import { MenuItem } from '../types';
-import { MENU_ITEMS } from '../data';
 import HeroSlider from '../components/HeroSlider';
 
 interface HomeScreenProps {
   onNavigateToMenu: (filter?: string) => void;
+  onAddToCart: (item: MenuItem) => void;
 }
 
-export default function HomeScreen({ onNavigateToMenu }: HomeScreenProps) {
-  const trendingDishes = MENU_ITEMS.filter(item => item.tag === 'Signature' || ['7', '8'].includes(item.id));
+export default function HomeScreen({ onNavigateToMenu, onAddToCart }: HomeScreenProps) {
+  const [trendingDishes, setTrendingDishes] = useState<MenuItem[]>([]);
+
+  useEffect(() => {
+    const savedMenu = localStorage.getItem('bamanda_menu');
+    if (savedMenu) {
+      const menu: MenuItem[] = JSON.parse(savedMenu);
+      setTrendingDishes(menu.filter(item => item.isTrending));
+    }
+  }, []);
 
   const mealTimes = [
     { name: 'Breakfast', icon: '🍳', image: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&q=80&w=800' },
@@ -74,50 +83,65 @@ export default function HomeScreen({ onNavigateToMenu }: HomeScreenProps) {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {trendingDishes.map((dish) => (
-              <div key={dish.id} className="bg-white rounded-2xl overflow-hidden shadow-lg card-hover">
-                <div className="relative aspect-square">
-                  <img src={dish.image} className="w-full h-full object-cover" alt={dish.name} />
-                  {dish.tag && (
-                    <div className="absolute top-4 left-4 bg-accent text-white px-4 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full">
-                      {dish.tag}
+          {trendingDishes.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+              {trendingDishes.map((dish) => (
+                <motion.div 
+                  layout
+                  key={dish.id} 
+                  className="bg-white rounded-2xl overflow-hidden shadow-lg card-hover flex flex-col"
+                >
+                  <div className="relative aspect-square">
+                    <img src={dish.image} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" alt={dish.name} />
+                    <div className="absolute top-4 left-4 flex gap-2">
+                      <div className="bg-accent text-white px-4 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg">
+                        Trending
+                      </div>
+                      {dish.tag && (
+                        <div className="bg-primary text-white px-4 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg">
+                          {dish.tag}
+                        </div>
+                      )}
                     </div>
-                  )}
-                  <button className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-md rounded-full text-primary hover:text-accent transition-colors">
-                    <Heart className="w-5 h-5" />
-                  </button>
-                </div>
-                <div className="p-8">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-serif text-xl text-primary">{dish.name}</h3>
-                    <span className="font-bold text-accent">₦{dish.price.toLocaleString()}</span>
+                    <button className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-md rounded-full text-primary hover:text-accent transition-colors shadow-lg">
+                      <Heart className="w-5 h-5" />
+                    </button>
                   </div>
-                  <p className="text-sm text-on-surface-variant mb-6 line-clamp-2">{dish.description}</p>
-                  <button 
-                    onClick={() => onNavigateToMenu()}
-                    className="w-full flex items-center justify-center gap-2 border-2 border-accent text-accent px-6 py-3 rounded-xl font-bold hover:bg-accent hover:text-white transition-all"
-                  >
-                    <ShoppingBag className="w-4 h-4" /> Add to Cart
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+                  <div className="p-8 flex-1 flex flex-col">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-serif text-xl text-primary">{dish.name}</h3>
+                      <span className="font-bold text-accent">₦{dish.price.toLocaleString()}</span>
+                    </div>
+                    <p className="text-sm text-on-surface-variant mb-6 line-clamp-2 italic">{dish.description}</p>
+                    <div className="mt-auto">
+                      <button 
+                        onClick={() => onAddToCart(dish)}
+                        className="w-full flex items-center justify-center gap-2 bg-accent text-white px-6 py-4 rounded-xl font-bold hover:bg-accent/90 transition-all shadow-xl shadow-accent/20"
+                      >
+                        <ShoppingBag className="w-4 h-4" /> Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-20 text-center border-2 border-dashed border-primary/10 rounded-3xl">
+              <Star className="w-12 h-12 text-primary/10 mx-auto mb-4" />
+              <p className="font-serif italic text-2xl text-primary opacity-20">New signature curations manifesting soon.</p>
+            </div>
+          )}
         </div>
       </section>
 
       {/* Philosophy / Heritage Banner */}
-      <section className="py-32 bg-primary text-white overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
-          <img src="https://www.transparenttextures.com/patterns/wood-pattern.png" className="w-full h-full object-cover" alt="texture" />
-        </div>
+      <section className="py-32 bg-primary text-white overflow-hidden relative wood-texture">
         <div className="max-w-4xl mx-auto px-12 text-center relative z-10">
           <div className="w-16 h-1 bg-accent mx-auto mb-12" />
           <h2 className="font-serif italic text-5xl mb-10 leading-tight">
             "Heritage is the fire we keep, not the ash we preserve."
           </h2>
-          <p className="font-sans text-on-surface-variant max-w-2xl mx-auto text-lg leading-relaxed">
+          <p className="font-sans text-on-surface-variant max-w-2xl mx-auto text-lg leading-relaxed opacity-60">
             Bamanda Kitchen is a modern sanctuary of African gastronomy, where ancestral recipes meet contemporary precision.
           </p>
         </div>
@@ -127,21 +151,21 @@ export default function HomeScreen({ onNavigateToMenu }: HomeScreenProps) {
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
           <div className="group cursor-pointer" onClick={() => onNavigateToMenu('African Dishes')}>
-            <div className="w-24 h-24 bg-accent/10 text-accent rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-accent group-hover:text-white transition-all">
+            <div className="w-24 h-24 bg-accent/10 text-accent rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-accent group-hover:text-white transition-all shadow-sm">
               <Utensils className="w-10 h-10" />
             </div>
             <h3 className="font-serif text-2xl text-primary mb-2">African Dishes</h3>
             <p className="text-sm text-on-surface-variant italic">Rooted in tradition</p>
           </div>
           <div className="group cursor-pointer" onClick={() => onNavigateToMenu('Intercontinental')}>
-            <div className="w-24 h-24 bg-accent/10 text-accent rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-accent group-hover:text-white transition-all">
+            <div className="w-24 h-24 bg-accent/10 text-accent rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-accent group-hover:text-white transition-all shadow-sm">
               <Globe className="w-10 h-10" />
             </div>
             <h3 className="font-serif text-2xl text-primary mb-2">Intercontinental</h3>
             <p className="text-sm text-on-surface-variant italic">Global flavors, local soul</p>
           </div>
           <div className="group cursor-pointer" onClick={() => onNavigateToMenu('Drinks')}>
-            <div className="w-24 h-24 bg-accent/10 text-accent rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-accent group-hover:text-white transition-all">
+            <div className="w-24 h-24 bg-accent/10 text-accent rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-accent group-hover:text-white transition-all shadow-sm">
               <Martini className="w-10 h-10" />
             </div>
             <h3 className="font-serif text-2xl text-primary mb-2">Drinks</h3>

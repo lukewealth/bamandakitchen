@@ -17,31 +17,59 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
+  const [notes, setNotes] = useState('');
   
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const deliveryFee = items.length > 0 ? 2500 : 0;
   const total = subtotal + deliveryFee;
 
+  const generateOrderId = () => {
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const random = Math.random().toString(36).substring(2, 5).toUpperCase();
+    return `BAM-${timestamp}-${random}`;
+  };
+
   const handleWhatsAppOrder = () => {
+    if (!name || !phone || !address) {
+      alert('Please fill in your name, phone, and address to proceed.');
+      return;
+    }
+
+    const orderId = generateOrderId();
     const orderDetails = items.map(item => 
       `• ${item.name} (${item.portion || 'Full'}) x ${item.quantity} - ₦${(item.price * item.quantity).toLocaleString()}`
     ).join('\n');
 
     const message = encodeURIComponent(
-      `🍱 *NEW ORDER - BAMANDA KITCHEN*\n\n` +
+      `🍱 *NEW ORDER - BAMANDA KITCHEN*\n` +
+      `🆔 *Order ID:* ${orderId}\n\n` +
       `*Patron Details:*\n` +
-      `👤 Name: ${name || 'Not provided'}\n` +
-      `📞 Phone: ${phone || 'Not provided'}\n` +
-      `📍 Address: ${address || 'Not provided'}\n\n` +
-      `*Order Inventory:*\n${orderDetails}\n\n` +
-      `*Summary:*\n` +
+      `👤 Name: ${name}\n` +
+      `📞 Phone: ${phone}\n` +
+      `📍 Address: ${address}\n` +
+      (notes ? `📝 Notes: ${notes}\n` : '') +
+      `\n*Order Inventory:*\n${orderDetails}\n\n` +
+      `*Financial Summary:*\n` +
       `💰 Subtotal: ₦${subtotal.toLocaleString()}\n` +
       `🚚 Delivery: ₦${deliveryFee.toLocaleString()}\n` +
       `⭐ *Total: ₦${total.toLocaleString()}*\n\n` +
       `_Please confirm my curation for immediate dispatch._`
     );
 
-    const whatsappUrl = `https://wa.me/234XXXXXXXXXX?text=${message}`; // Replace with actual number
+    const whatsappUrl = `https://wa.me/message/XZ7MJSS7V2ZCA1?text=${message}`;
+    
+    // Complete the order in the app state
+    onOrderComplete({
+      id: orderId,
+      items,
+      total,
+      status: 'pending',
+      customer: { name, phone, address },
+      notes,
+      createdAt: new Date().toISOString(),
+      estimatedDeliveryTime: 45
+    });
+
     window.open(whatsappUrl, '_blank');
   };
 
@@ -73,34 +101,48 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3 group px-6 py-5 bg-white rounded-2xl shadow-sm border border-primary/5 focus-within:border-accent/50 transition-all">
-                  <label className="font-sans text-[10px] uppercase tracking-[0.3em] text-accent font-bold">Patron Name</label>
+                  <label className="font-sans text-[10px] uppercase tracking-[0.3em] text-accent font-bold">Patron Name *</label>
                   <input 
                     type="text" 
                     placeholder="Kwame Mensah"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full bg-transparent border-none focus:ring-0 p-0 placeholder:text-on-surface-variant/30 font-sans text-base text-primary"
+                    required
                   />
                 </div>
                 <div className="space-y-3 group px-6 py-5 bg-white rounded-2xl shadow-sm border border-primary/5 focus-within:border-accent/50 transition-all">
-                  <label className="font-sans text-[10px] uppercase tracking-[0.3em] text-accent font-bold">Contact Vector</label>
+                  <label className="font-sans text-[10px] uppercase tracking-[0.3em] text-accent font-bold">Contact Vector *</label>
                   <input 
                     type="tel" 
                     placeholder="+234 XX XXX XXXX"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full bg-transparent border-none focus:ring-0 p-0 placeholder:text-on-surface-variant/30 font-sans text-base text-primary"
+                    required
                   />
                 </div>
               </div>
 
               <div className="space-y-3 group px-6 py-5 bg-white rounded-2xl shadow-sm border border-primary/5 focus-within:border-accent/50 transition-all">
-                <label className="font-sans text-[10px] uppercase tracking-[0.3em] text-accent font-bold">Destination Address</label>
+                <label className="font-sans text-[10px] uppercase tracking-[0.3em] text-accent font-bold">Destination Address *</label>
                 <textarea 
                   placeholder="Street, City, Area..." 
-                  rows={3}
+                  rows={2}
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
+                  className="w-full bg-transparent border-none focus:ring-0 p-0 placeholder:text-on-surface-variant/30 font-sans text-base text-primary resize-none"
+                  required
+                />
+              </div>
+
+              <div className="space-y-3 group px-6 py-5 bg-white rounded-2xl shadow-sm border border-primary/5 focus-within:border-accent/50 transition-all">
+                <label className="font-sans text-[10px] uppercase tracking-[0.3em] text-accent font-bold">Additional Instructions (Optional)</label>
+                <textarea 
+                  placeholder="Preferences, allergy notes, delivery landmarks..." 
+                  rows={2}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
                   className="w-full bg-transparent border-none focus:ring-0 p-0 placeholder:text-on-surface-variant/30 font-sans text-base text-primary resize-none"
                 />
               </div>

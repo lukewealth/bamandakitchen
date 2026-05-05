@@ -110,6 +110,18 @@ export default function TrackOrderScreen({ order, onBack }: TrackOrderScreenProp
                    <p className="font-serif italic text-xl text-on-surface">{order.customer.phone}</p>
                  </div>
                </div>
+
+               {order.notes && (
+                 <div className="flex items-start gap-6">
+                   <div className="p-4 bg-primary/5 rounded-full border border-accent/10">
+                     <Clock className="w-6 h-6 text-accent" />
+                   </div>
+                   <div>
+                     <h3 className="editorial-label text-xs mb-2 opacity-40 uppercase tracking-widest">Instructions</h3>
+                     <p className="font-sans text-sm text-on-surface-variant leading-relaxed">{order.notes}</p>
+                   </div>
+                 </div>
+               )}
             </div>
           </div>
 

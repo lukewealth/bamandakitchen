@@ -17,7 +17,8 @@ import ContactScreen from './screens/ContactScreen';
 import TrackOrderScreen from './screens/TrackOrderScreen';
 import AdminScreen from './screens/AdminScreen';
 import InfoScreen from './screens/InfoScreen';
-import { MenuItem, CartItem, Screen, Order } from './types';
+import { MenuItem, CartItem, Screen, Order, BlogPost } from './types';
+import { MENU_ITEMS } from './data';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
@@ -27,6 +28,38 @@ export default function App() {
   const [theme, setTheme] = useState<'night' | 'day'>('night');
   const [isLoading, setIsLoading] = useState(false);
   const [activeOrder, setActiveOrder] = useState<Order | null>(null);
+  
+  // Dynamic Data
+  const [menu, setMenu] = useState<MenuItem[]>([]);
+
+  // Initial Data Load & Sync
+  useEffect(() => {
+    // Sync Menu
+    const savedMenu = localStorage.getItem('bamanda_menu');
+    if (savedMenu) {
+      setMenu(JSON.parse(savedMenu));
+    } else {
+      setMenu(MENU_ITEMS);
+      localStorage.setItem('bamanda_menu', JSON.stringify(MENU_ITEMS));
+    }
+
+    // Sync Blog Posts
+    const savedPosts = localStorage.getItem('bamanda_posts');
+    if (!savedPosts) {
+      const initialPosts: BlogPost[] = [{
+        id: '1',
+        title: 'The Ritual of Communal Dining',
+        topic: 'Heritage Rituals',
+        content: 'Understanding how the shared plate fosters community bonds and neurological connections through the act of communal dining. In our heritage, a meal is never just food—it is a conversation between souls.',
+        image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7bb7445?auto=format&fit=crop&q=80&w=1200',
+        date: 'May 2026',
+        author: 'Chef Amara',
+        layout: 'editorial',
+        category: 'Rituals'
+      }];
+      localStorage.setItem('bamanda_posts', JSON.stringify(initialPosts));
+    }
+  }, [currentScreen]); // Re-sync on screen changes to pick up Admin updates
 
   // Theme effect
   useEffect(() => {
@@ -76,6 +109,12 @@ export default function App() {
 
   const handleOrderComplete = (order: Order) => {
     setActiveOrder(order);
+    
+    // Persist to localStorage for Admin Screen
+    const savedOrders = localStorage.getItem('bamanda_orders');
+    const orders = savedOrders ? JSON.parse(savedOrders) : [];
+    localStorage.setItem('bamanda_orders', JSON.stringify([order, ...orders]));
+    
     setCart([]);
     setCurrentScreen('track-order');
   };
@@ -96,7 +135,7 @@ export default function App() {
 
       <main>
         {currentScreen === 'home' && (
-          <HomeScreen onNavigateToMenu={handleNavigateToMenu} />
+          <HomeScreen onNavigateToMenu={handleNavigateToMenu} onAddToCart={handleAddToCart} />
         )}
         {currentScreen === 'menu' && (
           <MenuScreen onAddToCart={handleAddToCart} initialFilter={menuFilter} />

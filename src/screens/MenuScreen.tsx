@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Search, ShoppingBag, Heart, Filter } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Filter, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MENU_ITEMS } from '../data';
 import { MenuItem } from '../types';
@@ -17,7 +17,7 @@ interface MenuScreenProps {
 const MEAL_TIMES = ['All Day', 'Breakfast', 'Lunch', 'Dinner'];
 
 export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenProps) {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(MENU_ITEMS);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeMealTime, setActiveMealTime] = useState(initialFilter || 'All Day');
   const [searchQuery, setSearchQuery] = useState('');
@@ -27,17 +27,15 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
   const categories = ['All', ...Array.from(new Set(menuItems.map(item => item.category)))];
 
   useEffect(() => {
-    const loadMenu = async () => {
-      try {
-        const response = await fetch('/menu.json');
-        const data = await response.json();
-        setMenuItems(data.menu);
-      } catch (error) {
-        console.error('Failed to fetch dynamic menu, using fallback data.', error);
+    const loadMenu = () => {
+      setIsLoading(true);
+      const savedMenu = localStorage.getItem('bamanda_menu');
+      if (savedMenu) {
+        setMenuItems(JSON.parse(savedMenu));
+      } else {
         setMenuItems(MENU_ITEMS);
-      } finally {
-        setIsLoading(false);
       }
+      setIsLoading(false);
     };
     loadMenu();
   }, []);
@@ -56,7 +54,7 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
     const matchesSearch = 
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
       item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      item.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     
     return matchesCategory && matchesMealTime && matchesSearch && item.available;
   });
@@ -150,8 +148,13 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
                     className="bg-white rounded-2xl overflow-hidden shadow-md card-hover group"
                   >
                     <div className="relative aspect-square overflow-hidden">
-                      <img src={item.image} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={item.name} />
+                      <img src={item.image} className="w-full h-full object-cover grayscale transition-transform duration-700 group-hover:scale-110" alt={item.name} />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                      {item.isTrending && (
+                        <div className="absolute top-4 left-4 bg-accent text-white px-3 py-1 rounded-full text-[8px] font-bold uppercase tracking-widest shadow-lg flex items-center gap-1">
+                          <Star className="w-2 h-2 fill-current" /> Trending
+                        </div>
+                      )}
                       <button className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-md rounded-full text-primary hover:text-accent transition-colors shadow-lg translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all">
                         <Heart className="w-5 h-5" />
                       </button>
