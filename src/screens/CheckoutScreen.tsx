@@ -6,13 +6,14 @@
 import { useState } from 'react';
 import { ArrowRight, Lock, Sparkles, CheckCircle2, MessageCircle } from 'lucide-react';
 import { motion } from 'motion/react';
-import { CartItem } from '../types';
+import { CartItem, Order } from '../types';
 
 interface CheckoutScreenProps {
   items: CartItem[];
+  onOrderComplete: (order: Order) => void;
 }
 
-export default function CheckoutScreen({ items }: CheckoutScreenProps) {
+export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScreenProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');

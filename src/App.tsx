@@ -7,12 +7,16 @@ import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
+import FloatingCart from './components/FloatingCart';
 import HomeScreen from './screens/HomeScreen';
 import MenuScreen from './screens/MenuScreen';
 import CheckoutScreen from './screens/CheckoutScreen';
 import KitchenScreen from './screens/KitchenScreen';
 import BlogScreen from './screens/BlogScreen';
-import { MenuItem, CartItem, Screen } from './types';
+import ContactScreen from './screens/ContactScreen';
+import TrackOrderScreen from './screens/TrackOrderScreen';
+import AdminScreen from './screens/AdminScreen';
+import { MenuItem, CartItem, Screen, Order } from './types';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
@@ -21,6 +25,7 @@ export default function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [theme, setTheme] = useState<'night' | 'day'>('night');
   const [isLoading, setIsLoading] = useState(false);
+  const [activeOrder, setActiveOrder] = useState<Order | null>(null);
 
   // Theme effect
   useEffect(() => {
@@ -68,6 +73,12 @@ export default function App() {
     setCurrentScreen('checkout');
   };
 
+  const handleOrderComplete = (order: Order) => {
+    setActiveOrder(order);
+    setCart([]);
+    setCurrentScreen('track-order');
+  };
+
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -95,12 +106,21 @@ export default function App() {
         {currentScreen === 'blog' && (
           <BlogScreen />
         )}
+        {currentScreen === 'contact' && (
+          <ContactScreen />
+        )}
         {currentScreen === 'checkout' && (
-          <CheckoutScreen items={cart} />
+          <CheckoutScreen items={cart} onOrderComplete={handleOrderComplete} />
+        )}
+        {currentScreen === 'track-order' && (
+          <TrackOrderScreen order={activeOrder} onBack={() => setCurrentScreen('menu')} />
+        )}
+        {currentScreen === 'admin' && (
+          <AdminScreen />
         )}
       </main>
 
-      <Footer />
+      {currentScreen !== 'admin' && <Footer onNavigate={setCurrentScreen} />}
 
       <CartDrawer 
         isOpen={isCartOpen}
@@ -110,6 +130,13 @@ export default function App() {
         onRemove={removeFromCart}
         onCheckout={handleCheckout}
       />
+
+      {currentScreen !== 'admin' && currentScreen !== 'track-order' && (
+        <FloatingCart 
+          items={cart}
+          onOpenCart={() => setIsCartOpen(true)}
+        />
+      )}
       
       {/* Editorial Loading Bar */}
       <div className={`fixed top-0 left-0 w-full h-[3px] z-[200] pointer-events-none transition-opacity duration-300 ${isLoading ? 'opacity-100' : 'opacity-0'}`}>

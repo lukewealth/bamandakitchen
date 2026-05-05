@@ -97,6 +97,7 @@ export default function Header({
             { id: 'menu', label: 'Store' },
             { id: 'kitchen', label: 'Kitchen' },
             { id: 'blog', label: 'Journal' },
+            { id: 'contact', label: 'Contact' },
           ].map((item) => (
             <button
               key={item.id}

@@ -32,4 +32,29 @@ export interface CartItem extends MenuItem {
   quantity: number;
 }
 
-export type Screen = 'home' | 'menu' | 'checkout' | 'kitchen' | 'blog';
+export type OrderStatus = 'pending' | 'preparing' | 'on-the-way' | 'delivered' | 'cancelled';
+
+export interface Order {
+  id: string;
+  items: CartItem[];
+  total: number;
+  status: OrderStatus;
+  customer: {
+    name: string;
+    phone: string;
+    address: string;
+  };
+  createdAt: string;
+  estimatedDeliveryTime: number; // minutes remaining
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  content: string;
+  image: string;
+  date: string;
+  author: string;
+}
+
+export type Screen = 'home' | 'menu' | 'checkout' | 'kitchen' | 'blog' | 'contact' | 'track-order' | 'admin';
