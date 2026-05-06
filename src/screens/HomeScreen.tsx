@@ -37,7 +37,7 @@ export default function HomeScreen({ onNavigateToMenu, onAddToCart }: HomeScreen
       <HeroSlider onNavigateToMenu={() => onNavigateToMenu()} />
 
       {/* Meal Time Segments */}
-      <section className="py-24 px-6 max-w-7xl mx-auto">
+      <section className="py-24 editorial-container">
         <div className="editorial-label mb-4 text-center">Meal Time Segments</div>
         <h2 className="font-serif text-4xl text-center mb-16 text-primary">Curated for Every Hour</h2>
         
@@ -47,7 +47,7 @@ export default function HomeScreen({ onNavigateToMenu, onAddToCart }: HomeScreen
               key={meal.name}
               whileHover={{ y: -10 }}
               onClick={() => onNavigateToMenu(meal.name)}
-              className="group cursor-pointer relative aspect-[3/4] overflow-hidden rounded-xl shadow-xl"
+              className="group cursor-pointer relative aspect-[4/5] overflow-hidden rounded-xl shadow-xl"
             >
               <img 
                 src={meal.image} 
@@ -69,7 +69,7 @@ export default function HomeScreen({ onNavigateToMenu, onAddToCart }: HomeScreen
 
       {/* Now Selling (Hot Picks) */}
       <section className="py-24 bg-primary/5 editorial-border-t">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="editorial-container">
           <div className="flex justify-between items-end mb-12">
             <div>
               <div className="editorial-label mb-2 text-accent">Now Selling</div>
@@ -91,7 +91,7 @@ export default function HomeScreen({ onNavigateToMenu, onAddToCart }: HomeScreen
                   key={dish.id} 
                   className="bg-white rounded-2xl overflow-hidden shadow-lg card-hover flex flex-col"
                 >
-                  <div className="relative aspect-square">
+                  <div className="relative aspect-[4/5]">
                     <img src={dish.image} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" alt={dish.name} />
                     <div className="absolute top-4 left-4 flex gap-2">
                       <div className="bg-accent text-white px-4 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg">
@@ -148,7 +148,7 @@ export default function HomeScreen({ onNavigateToMenu, onAddToCart }: HomeScreen
       </section>
 
       {/* Cuisine Categories (Quick Access) */}
-      <section className="py-24 px-6 max-w-7xl mx-auto">
+      <section className="py-24 editorial-container">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
           <div className="group cursor-pointer" onClick={() => onNavigateToMenu('African Dishes')}>
             <div className="w-24 h-24 bg-accent/10 text-accent rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-accent group-hover:text-white transition-all shadow-sm">

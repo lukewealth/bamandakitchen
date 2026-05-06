@@ -8,6 +8,7 @@ import { ArrowRight, Lock, Sparkles, CheckCircle2, MessageCircle } from 'lucide-
 import { motion } from 'motion/react';
 import { CartItem, Order } from '../types';
 import { generateOrderId, formatWhatsAppMessage, getWhatsAppUrl } from '../lib/order';
+import { useToast } from '../lib/toast-context';
 
 interface CheckoutScreenProps {
   items: CartItem[];
@@ -15,6 +16,7 @@ interface CheckoutScreenProps {
 }
 
 export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScreenProps) {
+  const { showToast } = useToast();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -26,7 +28,7 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
 
   const handleWhatsAppOrder = () => {
     if (!name || !phone || !address) {
-      alert('Please fill in your name, phone, and address to proceed.');
+      showToast('The logistics are incomplete. Please provide your name, phone, and address.', 'warning');
       return;
     }
 

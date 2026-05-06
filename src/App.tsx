@@ -19,6 +19,7 @@ import AdminScreen from './screens/AdminScreen';
 import InfoScreen from './screens/InfoScreen';
 import { MenuItem, CartItem, Screen, Order, BlogPost } from './types';
 import { MENU_ITEMS } from './data';
+import { ToastProvider } from './lib/toast-context';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
@@ -122,7 +123,8 @@ export default function App() {
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="min-h-screen bg-surface selection:bg-accent/30 overflow-x-hidden">
+    <ToastProvider>
+      <div className="min-h-screen bg-surface selection:bg-accent/30 overflow-x-hidden">
       <Header 
         currentScreen={currentScreen} 
         onNavigate={setCurrentScreen} 
@@ -223,6 +225,8 @@ export default function App() {
       <div className={`fixed top-0 left-0 w-full h-[3px] z-[200] pointer-events-none transition-opacity duration-300 ${isLoading ? 'opacity-100' : 'opacity-0'}`}>
         <div className="h-full bg-accent animate-editorial-loading" />
       </div>
-    </div>
-  );
-}
+      </div>
+      </ToastProvider>
+      );
+      }
+

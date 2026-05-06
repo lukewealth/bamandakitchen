@@ -88,7 +88,7 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
 
       {/* Filter Bar */}
       <section className="sticky top-20 z-40 bg-white/80 backdrop-blur-xl editorial-border-b shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="editorial-container py-4 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-2 md:pb-0">
             {categories.map((cat) => (
               <button 
@@ -123,12 +123,12 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
       </section>
 
       {/* Product Grid */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
+      <section className="editorial-container py-16">
         <AnimatePresence mode='wait'>
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {[1, 2, 4, 8].map(i => (
-                <div key={i} className="aspect-square bg-primary/5 animate-pulse rounded-2xl" />
+                <div key={i} className="aspect-[4/5] bg-primary/5 animate-pulse rounded-2xl" />
               ))}
             </div>
           ) : (
@@ -147,7 +147,7 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
                     key={item.id} 
                     className="bg-white rounded-2xl overflow-hidden shadow-md card-hover group"
                   >
-                    <div className="relative aspect-square overflow-hidden">
+                    <div className="relative aspect-[4/5] overflow-hidden">
                       <img src={item.image} className="w-full h-full object-cover grayscale transition-transform duration-700 group-hover:scale-110" alt={item.name} />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                       {item.isTrending && (

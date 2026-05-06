@@ -8,8 +8,8 @@ import { Mail, Phone, MapPin, Instagram, Twitter, Facebook } from 'lucide-react'
 
 export default function ContactScreen() {
   return (
-    <div className="min-h-screen pt-32 pb-20 px-6 lg:px-20 bg-surface">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen pt-32 pb-20 bg-surface">
+      <div className="editorial-container">
         <header className="mb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

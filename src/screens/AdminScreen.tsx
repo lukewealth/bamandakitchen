@@ -12,8 +12,10 @@ import {
 import { MenuItem, Order, BlogPost, OrderStatus, BlogLayout, MenuCategory } from '../types';
 import { MENU_ITEMS } from '../data';
 import { formatStatusUpdateMessage, getWhatsAppUrl } from '../lib/order';
+import { useToast } from '../lib/toast-context';
 
 export default function AdminScreen() {
+  const { showToast } = useToast();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -73,13 +75,15 @@ export default function AdminScreen() {
     if (email === (import.meta.env.VITE_ADMIN_EMAIL || 'admin@bamanda.com') && 
         password === (import.meta.env.VITE_ADMIN_PASSWORD || 'heritage2026')) {
       setIsAuthenticated(true);
+      showToast('Welcome back, Curator.', 'success');
     } else {
-      alert('Invalid credentials.');
+      showToast('The sanctuary remains closed. Invalid credentials.', 'error');
     }
   };
 
   const updateOrderStatus = (orderId: string, newStatus: OrderStatus) => {
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+    showToast(`Order status updated to ${newStatus}.`, 'success');
   };
 
   const handleNotifyCustomer = (order: Order) => {
@@ -91,6 +95,7 @@ export default function AdminScreen() {
   const deleteOrder = (orderId: string) => {
     if (window.confirm('Are you sure you want to remove this curation from history?')) {
       setOrders(prev => prev.filter(o => o.id !== orderId));
+      showToast('Curation archived from records.', 'info');
     }
   };
 
@@ -100,6 +105,7 @@ export default function AdminScreen() {
 
     if (editingPost.id) {
       setPosts(prev => prev.map(p => p.id === editingPost.id ? (editingPost as BlogPost) : p));
+      showToast('Article manifestation updated.', 'success');
     } else {
       const newPost: BlogPost = {
         ...editingPost,
@@ -108,6 +114,7 @@ export default function AdminScreen() {
         author: 'Heritage Curator',
       } as BlogPost;
       setPosts(prev => [newPost, ...prev]);
+      showToast('New article manifested in the Gazette.', 'success');
     }
     setEditingPost(null);
   };
@@ -115,6 +122,7 @@ export default function AdminScreen() {
   const handleDeletePost = (id: string) => {
     if (window.confirm('Delete this article?')) {
       setPosts(prev => prev.filter(p => p.id !== id));
+      showToast('Article archived from the Gazette.', 'info');
     }
   };
 
@@ -124,6 +132,7 @@ export default function AdminScreen() {
 
     if (editingMenuItem.id) {
       setMenu(prev => prev.map(item => item.id === editingMenuItem.id ? (editingMenuItem as MenuItem) : item));
+      showToast('Inventory curation updated.', 'success');
     } else {
       const newItem: MenuItem = {
         ...editingMenuItem,
@@ -133,6 +142,7 @@ export default function AdminScreen() {
         tags: [],
       } as MenuItem;
       setMenu(prev => [newItem, ...prev]);
+      showToast('New dish added to the sanctuary inventory.', 'success');
     }
     setEditingMenuItem(null);
   };

@@ -10,12 +10,12 @@ export default function AboutScreen() {
   return (
     <div className="pt-24 min-h-screen pb-32">
       {/* Hero Section */}
-      <section className="px-10 max-w-screen-2xl mx-auto mb-24">
+      <section className="editorial-container mb-24">
         <div className="relative h-[600px] flex items-center editorial-border overflow-hidden bg-primary">
           <img 
             src="/MD.png" 
             alt="Kitchen Manager" 
-            className="absolute inset-0 w-full h-full object-cover grayscale brightness-75 hover:grayscale-0 transition-all duration-1000"
+            className="absolute inset-0 w-full h-full object-cover object-center grayscale brightness-75 hover:grayscale-0 transition-all duration-1000"
             referrerPolicy="no-referrer"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/40 to-transparent" />
@@ -40,7 +40,7 @@ export default function AboutScreen() {
       </section>
 
       {/* Core Values */}
-      <section className="px-10 max-w-screen-2xl mx-auto mb-32">
+      <section className="editorial-container mb-32">
         <div className="editorial-label mb-16 text-center">Our Core Values</div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-px bg-on-surface/10 border border-on-surface/10">
           {[
@@ -77,7 +77,7 @@ export default function AboutScreen() {
       </section>
 
       {/* Briefing Section */}
-      <section className="px-10 max-w-screen-2xl mx-auto">
+      <section className="editorial-container">
         <div className="max-w-4xl mx-auto space-y-16">
           <div className="space-y-8">
             <h2 className="font-serif text-5xl md:text-7xl text-on-surface tracking-tighter italic text-center">

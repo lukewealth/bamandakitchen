@@ -26,7 +26,7 @@ export default function BlogScreen() {
         return (
           <section key={post.id} className="py-32 bg-primary text-white overflow-hidden relative border-y border-accent/20">
             <div className="absolute inset-0 opacity-10 wood-texture" />
-            <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className="editorial-container relative z-10">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
                 <div className="lg:col-span-5 space-y-8">
                   <div className="editorial-label text-accent font-black tracking-[0.5em]">{post.category}</div>
@@ -124,7 +124,7 @@ export default function BlogScreen() {
 
       default: // editorial
         return (
-          <section key={post.id} className="py-32 px-6 max-w-7xl mx-auto">
+          <section key={post.id} className="py-32 editorial-container">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
               <div className="space-y-12">
                 <div className="editorial-label text-accent tracking-[0.4em]">{post.category}</div>
@@ -156,7 +156,7 @@ export default function BlogScreen() {
   return (
     <div className="pt-20 min-h-screen bg-cream text-charcoal overflow-x-hidden">
       {/* Editorial Header */}
-      <header className="py-24 px-6 max-w-7xl mx-auto text-center border-b border-primary/10">
+      <header className="py-24 editorial-container text-center border-b border-primary/10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
