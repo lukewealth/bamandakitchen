@@ -66,7 +66,7 @@ export default function App() {
       }];
       localStorage.setItem('bamanda_posts', JSON.stringify(initialPosts));
     }
-  }, []); // Run only once on mount
+  }, [currentScreen]); // Re-sync on screen changes to pick up Admin updates
 
   // Theme effect
   useEffect(() => {
@@ -147,10 +147,10 @@ export default function App() {
 
       <main className={cn(currentScreen !== 'admin' && "pt-20")}>
         {currentScreen === 'home' && (
-          <HomeScreen onNavigateToMenu={handleNavigateToMenu} onAddToCart={handleAddToCart} />
+          <HomeScreen onNavigateToMenu={handleNavigateToMenu} onAddToCart={handleAddToCart} trendingDishes={menu.filter(item => item.isTrending)} />
         )}
         {currentScreen === 'menu' && (
-          <MenuScreen onAddToCart={handleAddToCart} initialFilter={menuFilter} />
+          <MenuScreen menuItems={menu} onAddToCart={handleAddToCart} initialFilter={menuFilter} />
         )}
         {currentScreen === 'about' && (
           <AboutScreen />

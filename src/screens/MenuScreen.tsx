@@ -14,14 +14,14 @@ import { patronTracker } from "../lib/security";
 import { cn } from "../lib/utils";
 
 interface MenuScreenProps {
+  menuItems: MenuItem[];
   onAddToCart: (item: MenuItem) => void;
   initialFilter?: string;
 }
 
 const MEAL_TIMES = ["All Day", "Breakfast", "Lunch", "Dinner"];
 
-export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenProps) {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+export default function MenuScreen({ menuItems, onAddToCart, initialFilter }: MenuScreenProps) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeMealTime, setActiveMealTime] = useState(initialFilter || "All Day");
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,13 +29,6 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
   const [patronFavorites, setPatronFavorites] = useState<any[]>([]);
 
   useEffect(() => {
-    const savedMenu = localStorage.getItem("bamanda_menu");
-    if (savedMenu) {
-      setMenuItems(JSON.parse(savedMenu));
-    } else {
-      setMenuItems(MENU_ITEMS);
-    }
-    
     // Load patron insights
     setPatronFavorites(patronTracker.getFavorites());
     

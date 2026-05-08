@@ -60,7 +60,7 @@ const MenuCard = memo(({ item, onAddToCart }: MenuCardProps) => {
         className="mt-8 w-full py-4 border border-on-surface/10 text-on-surface font-sans uppercase tracking-[0.3em] text-[9px] font-bold hover:bg-white hover:text-black hover:border-white transition-all duration-500 flex items-center justify-center gap-2"
       >
         <Plus className="w-3 h-3" />
-        Acquire Selection
+        Select Item
       </button>
     </motion.div>
   );

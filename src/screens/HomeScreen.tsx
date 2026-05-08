@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from "react";
 import { ArrowRight, Utensils, Globe, Martini, ShoppingBag, Heart, Star } from "lucide-react";
 import { motion } from "motion/react";
 import { MenuItem } from "../types";
@@ -13,19 +12,10 @@ import OptimizedImage from "../components/OptimizedImage";
 interface HomeScreenProps {
   onNavigateToMenu: (filter?: string) => void;
   onAddToCart: (item: MenuItem) => void;
+  trendingDishes: MenuItem[];
 }
 
-export default function HomeScreen({ onNavigateToMenu, onAddToCart }: HomeScreenProps) {
-  const [trendingDishes, setTrendingDishes] = useState<MenuItem[]>([]);
-
-  useEffect(() => {
-    const savedMenu = localStorage.getItem("bamanda_menu");
-    if (savedMenu) {
-      const menu: MenuItem[] = JSON.parse(savedMenu);
-      setTrendingDishes(menu.filter(item => item.isTrending));
-    }
-  }, []);
-
+export default function HomeScreen({ onNavigateToMenu, onAddToCart, trendingDishes }: HomeScreenProps) {
   const mealTimes = [
     { name: "Breakfast", icon: "🍳", image: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&q=80&w=800" },
     { name: "Lunch", icon: "🍛", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800" },
