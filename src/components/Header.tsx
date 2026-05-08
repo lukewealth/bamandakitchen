@@ -3,18 +3,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from 'react';
-import { ShoppingBag, Sun, Moon, ChevronDown, BookOpen, Settings, Menu, X } from 'lucide-react';
-import { cn } from '../lib/utils';
-import { Screen } from '../types';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState } from "react";
+import { ShoppingBag, Sun, Moon, ChevronDown, BookOpen, Settings, Menu, X } from "lucide-react";
+import { cn } from "../lib/utils";
+import { Screen } from "../types";
+import { motion, AnimatePresence } from "motion/react";
 
 interface HeaderProps {
   currentScreen: Screen;
   onNavigate: (screen: Screen) => void;
   onOpenCart: () => void;
   cartCount: number;
-  theme: 'night' | 'day';
+  theme: "night" | "day";
   onToggleTheme: () => void;
   isLoading: boolean;
 }
@@ -32,10 +32,10 @@ export default function Header({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { id: 'menu', label: 'Store' },
-    { id: 'about', label: 'About' },
-    { id: 'blog', label: 'Journal' },
-    { id: 'contact', label: 'Contact' },
+    { id: "menu", label: "Store" },
+    { id: "about", label: "About" },
+    { id: "blog", label: "Journal" },
+    { id: "contact", label: "Contact" },
   ];
 
   const handleNavigate = (id: Screen) => {
@@ -50,6 +50,19 @@ export default function Header({
     )}>
       <div className="flex justify-between items-center px-6 lg:px-10 h-full w-full max-w-screen-2xl mx-auto">
         <div className="flex items-center space-x-4 lg:space-x-6">
+          {/* Cart Icon - Moved to Left */}
+          <button 
+            onClick={onOpenCart}
+            className="text-on-surface hover:text-accent transition-all relative p-2 group"
+          >
+            <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform duration-500" />
+            {cartCount > 0 && (
+              <span className="absolute top-0 right-0 text-[10px] font-bold text-accent animate-pulse">
+                ({cartCount})
+              </span>
+            )}
+          </button>
+
           {/* Mobile Menu Toggle */}
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -60,7 +73,7 @@ export default function Header({
 
           <div className="flex items-center space-x-4">
             <button 
-              onClick={() => handleNavigate('home')}
+              onClick={() => handleNavigate("home")}
               className="flex items-center space-x-3 lg:space-x-4 group"
             >
               <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full overflow-hidden border-2 border-accent/20 group-hover:border-accent transition-colors">
@@ -100,7 +113,7 @@ export default function Header({
                       From the smoke-filled kitchens of ancient empires to the modern sanctuary of Bamanda, our journey is one of reclamation. Each dish is a chapter, each flavor a whisper from the past.
                     </p>
                     <button 
-                      onClick={() => handleNavigate('blog')}
+                      onClick={() => handleNavigate("blog")}
                       className="group flex items-center space-x-3 text-accent hover:text-on-surface transition-colors"
                     >
                       <BookOpen className="w-4 h-4" />
@@ -135,10 +148,10 @@ export default function Header({
         <div className="flex items-center space-x-4 lg:space-x-8">
           {/* Admin Access */}
           <button 
-            onClick={() => handleNavigate('admin')}
+            onClick={() => handleNavigate("admin")}
             className={cn(
               "text-on-surface/60 hover:text-accent transition-all duration-500 hidden sm:block",
-              currentScreen === 'admin' && "text-accent"
+              currentScreen === "admin" && "text-accent"
             )}
             title="Curator Access"
           >
@@ -149,21 +162,9 @@ export default function Header({
           <button 
             onClick={onToggleTheme}
             className="text-on-surface/60 hover:text-on-surface transition-all duration-500"
-            title={`Switch to ${theme === 'night' ? 'Day' : 'Night'} Mode`}
+            title={`Switch to ${theme === "night" ? "Day" : "Night"} Mode`}
           >
-            {theme === 'night' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-
-          <button 
-            onClick={onOpenCart}
-            className="text-on-surface hover:text-accent transition-all relative p-2 group"
-          >
-            <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform duration-500" />
-            {cartCount > 0 && (
-              <span className="absolute top-0 right-0 text-[10px] font-bold text-accent animate-pulse">
-                ({cartCount})
-              </span>
-            )}
+            {theme === "night" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
         </div>
       </div>
@@ -172,10 +173,10 @@ export default function Header({
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, x: '-100%' }}
+            initial={{ opacity: 0, x: "-100%" }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '-100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            exit={{ opacity: 0, x: "-100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed inset-0 top-20 bg-surface z-40 md:hidden overflow-y-auto"
           >
             <div className="p-8 space-y-12">
@@ -205,7 +206,7 @@ export default function Header({
                     Manifesting centuries of culinary alchemy from the smoke-filled kitchens of ancient empires.
                   </p>
                   <button 
-                    onClick={() => handleNavigate('blog')}
+                    onClick={() => handleNavigate("blog")}
                     className="flex items-center space-x-3 text-accent font-bold uppercase tracking-widest text-[10px]"
                   >
                     <BookOpen className="w-4 h-4" />
@@ -216,7 +217,7 @@ export default function Header({
 
               <div className="pt-8 flex items-center justify-between">
                 <button 
-                  onClick={() => handleNavigate('admin')}
+                  onClick={() => handleNavigate("admin")}
                   className="flex items-center space-x-2 text-on-surface/60 text-[10px] font-bold uppercase tracking-widest"
                 >
                   <Settings className="w-4 h-4" />
