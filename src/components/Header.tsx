@@ -45,19 +45,12 @@ export default function Header({
 
   return (
     <header className={cn(
-      "fixed top-0 w-full z-50 glass-nav transition-all duration-500 h-20",
-      isLoading && "opacity-60"
+      "fixed top-0 w-full z-[100] glass-nav transition-all duration-500 h-20",
+      isLoading && "opacity-60",
+      isMobileMenuOpen && "z-[150]"
     )}>
-      <div className="flex justify-between items-center px-6 lg:px-10 h-full w-full max-w-screen-2xl mx-auto">
-        <div className="flex items-center space-x-4 lg:space-x-6">
-          {/* Mobile Menu Toggle */}
-          <button 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-on-surface hover:text-accent transition-colors"
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-
+      <div className="flex justify-between items-center px-4 lg:px-10 h-full w-full max-w-screen-2xl mx-auto">
+        <div className="flex items-center space-x-2 lg:space-x-8">
           <div className="flex items-center space-x-4">
             <button 
               onClick={() => handleNavigate("home")}
@@ -179,12 +172,15 @@ export default function Header({
             {theme === "night" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
-          {/* Mobile Menu Toggle - Moved to right */}
+          {/* Mobile Menu Toggle - Elevated z-index */}
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-on-surface hover:text-accent transition-all duration-300 p-2 z-[60]"
+            className={cn(
+              "md:hidden transition-all duration-500 p-2 z-[200] relative rounded-full",
+              isMobileMenuOpen ? "bg-accent text-white rotate-90 shadow-lg" : "text-on-surface hover:text-accent"
+            )}
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
@@ -193,34 +189,34 @@ export default function Header({
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
-            {/* Backdrop */}
+            {/* Backdrop - Increased depth */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[50] md:hidden"
+              className="fixed inset-0 bg-primary/60 backdrop-blur-md z-[160] md:hidden"
             />
             
-            {/* Side Drawer */}
+            {/* Side Drawer - Solid surface and refined padding */}
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-surface z-[55] md:hidden shadow-2xl flex flex-col"
+              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-surface z-[170] md:hidden shadow-[0_0_50px_rgba(0,0,0,0.3)] flex flex-col border-l border-on-surface/5"
             >
               <div className="p-8 pt-24 space-y-10 flex-1 overflow-y-auto no-scrollbar">
-                <div className="space-y-8">
+                <div className="space-y-6">
                   <motion.div 
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="editorial-label text-accent/40"
+                    className="editorial-label text-accent opacity-60"
                   >
                     Navigation
                   </motion.div>
-                  <nav className="flex flex-col space-y-4">
+                  <nav className="flex flex-col space-y-2">
                     {navItems.map((item, i) => (
                       <motion.button
                         key={item.id}
@@ -229,8 +225,8 @@ export default function Header({
                         transition={{ delay: 0.1 + i * 0.1 }}
                         onClick={() => handleNavigate(item.id as Screen)}
                         className={cn(
-                          "text-left font-serif text-4xl italic transition-colors py-2",
-                          currentScreen === item.id ? "text-accent" : "text-on-surface"
+                          "text-left font-serif text-4xl italic transition-all py-3 hover:pl-4 hover:text-accent",
+                          currentScreen === item.id ? "text-accent pl-4" : "text-on-surface"
                         )}
                       >
                         {item.label}
@@ -249,19 +245,19 @@ export default function Header({
                     onClick={() => {
                       handleNavigate("track-order");
                     }}
-                    className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-3xl border border-accent/10 group"
+                    className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-3xl border border-primary/5 hover:border-accent/30 transition-all group"
                   >
                     <Truck className="w-6 h-6 text-accent mb-2 group-hover:scale-110 transition-transform" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Track</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface/60 group-hover:text-accent">Track</span>
                   </button>
                   <button 
                     onClick={() => {
                       handleNavigate("admin");
                     }}
-                    className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-3xl border border-accent/10 group"
+                    className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-3xl border border-primary/5 hover:border-accent/30 transition-all group"
                   >
-                    <Settings className="w-6 h-6 text-on-surface/60 mb-2 group-hover:scale-110 transition-transform" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface/60">Curator</span>
+                    <Settings className="w-6 h-6 text-on-surface/40 mb-2 group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface/60 group-hover:text-accent">Curator</span>
                   </button>
                 </motion.div>
 
@@ -269,20 +265,20 @@ export default function Header({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.7 }}
-                  className="pt-12 border-t border-on-surface/5 space-y-8"
+                  className="pt-10 border-t border-on-surface/5 space-y-6"
                 >
-                  <div className="editorial-label text-accent/40">The Narrative</div>
+                  <div className="editorial-label text-accent opacity-60">The Narrative</div>
                   <div className="space-y-4">
                     <h4 className="font-serif italic text-2xl text-on-surface">Our Storyline</h4>
-                    <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+                    <p className="font-sans text-xs text-on-surface-variant leading-relaxed opacity-70">
                       Manifesting centuries of culinary alchemy from the smoke-filled kitchens of ancient empires.
                     </p>
                     <button 
                       onClick={() => handleNavigate("blog")}
-                      className="flex items-center space-x-3 text-accent font-bold uppercase tracking-widest text-[10px]"
+                      className="flex items-center space-x-3 text-accent font-bold uppercase tracking-[0.2em] text-[10px] hover:translate-x-2 transition-transform"
                     >
                       <BookOpen className="w-4 h-4" />
-                      <span>Explore the Gazette</span>
+                      <span>Explore Gazette</span>
                     </button>
                   </div>
                 </motion.div>
@@ -294,10 +290,10 @@ export default function Header({
                 transition={{ delay: 0.8 }}
                 className="p-8 border-t border-on-surface/5 bg-on-surface/5 flex items-center justify-between"
               >
-                 <div className="text-[9px] font-bold uppercase tracking-[0.3em] opacity-40">© 2026 Bamanda</div>
+                 <div className="text-[9px] font-bold uppercase tracking-[0.3em] opacity-30">© 2026 Bamanda</div>
                  <button 
                    onClick={onToggleTheme}
-                   className="p-3 bg-surface rounded-full shadow-lg text-accent"
+                   className="p-4 bg-surface rounded-2xl shadow-xl text-accent border border-on-surface/5 active:scale-95 transition-transform"
                  >
                    {theme === "night" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                  </button>
