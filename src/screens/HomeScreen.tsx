@@ -35,7 +35,7 @@ export default function HomeScreen({ onNavigateToMenu, onAddToCart }: HomeScreen
   return (
     <div className="w-full pt-20 bg-cream">
       {/* Hero Section */}
-      <HeroSlider onNavigateToMenu={() => onNavigateToMenu()} />
+      <HeroSlider onNavigate={onNavigateToMenu} />
 
       {/* Meal Time Segments */}
       <section className="py-24 editorial-container">
