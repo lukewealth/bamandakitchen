@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from "react";
-import { Search, ShoppingBag, Heart, Filter, Star } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Search, ShoppingBag, Heart, Filter, Star, History } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { MENU_ITEMS } from "../data";
 import { MenuItem } from "../types";
 import MenuCard from "../components/MenuCard";
+import SkeletonLoader from "../components/SkeletonLoader";
+import { patronTracker } from "../lib/security";
+import { cn } from "../lib/utils";
 
 interface MenuScreenProps {
   onAddToCart: (item: MenuItem) => void;
@@ -23,6 +26,7 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
   const [activeMealTime, setActiveMealTime] = useState(initialFilter || "All Day");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [patronFavorites, setPatronFavorites] = useState<any[]>([]);
 
   useEffect(() => {
     const savedMenu = localStorage.getItem("bamanda_menu");
@@ -31,7 +35,13 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
     } else {
       setMenuItems(MENU_ITEMS);
     }
-    setIsLoading(false);
+    
+    // Load patron insights
+    setPatronFavorites(patronTracker.getFavorites());
+    
+    // Simulate loading for UX
+    const timer = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(timer);
   }, []);
 
   // Memoized Categories
@@ -44,6 +54,11 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
       setActiveCategory(initialFilter);
     }
   }, [initialFilter, categories]);
+
+  const handleAddToCart = (item: MenuItem) => {
+    onAddToCart(item);
+    patronTracker.trackView(item.id);
+  };
 
   // Memoized Filtered Items for Performance
   const filteredItems = useMemo(() => {
@@ -94,9 +109,10 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
               <button 
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-6 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap ${
+                className={cn(
+                  "px-6 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap",
                   activeCategory === cat ? "bg-accent text-white shadow-lg" : "bg-primary/5 text-on-surface-variant hover:bg-primary/10"
-                }`}
+                )}
               >
                 {cat}
               </button>
@@ -110,9 +126,10 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
                  <button
                    key={time}
                    onClick={() => setActiveMealTime(time)}
-                   className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all ${
+                   className={cn(
+                     "px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all",
                      activeMealTime === time ? "bg-white text-accent shadow-sm" : "text-on-surface-variant hover:text-primary"
-                   }`}
+                   )}
                  >
                    {time}
                  </button>
@@ -122,13 +139,60 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
         </div>
       </section>
 
+      {/* Patron Favorites / Recommendations */}
+      {patronFavorites.length > 0 && searchQuery === "" && activeCategory === "All" && (
+        <section className="editorial-container pt-12">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-primary/5 rounded-[2rem] p-10 border border-primary/5"
+          >
+            <div className="flex items-center gap-3 mb-10">
+              <Star className="w-5 h-5 text-accent" />
+              <h2 className="font-serif italic text-3xl text-primary">Patron Favorites</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {patronFavorites.map((fav) => {
+                const item = menuItems.find(m => m.id === fav.id);
+                if (!item) return null;
+                return (
+                  <button 
+                    key={fav.id}
+                    onClick={() => handleAddToCart(item)}
+                    className="flex items-center gap-5 p-5 bg-white rounded-2xl border border-primary/5 hover:border-accent/30 transition-all text-left group shadow-sm hover:shadow-xl hover:-translate-y-1"
+                  >
+                    <div className="w-20 h-20 rounded-xl overflow-hidden shadow-md shrink-0">
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-serif text-primary italic text-base truncate">{item.name}</h4>
+                      <div className="flex items-center gap-2 mt-2">
+                        <History className="w-3 h-3 text-accent" />
+                        <p className="text-[9px] text-accent font-black uppercase tracking-widest">Order Again</p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        </section>
+      )}
+
       {/* Product Grid */}
       <section className="editorial-container py-16">
         <AnimatePresence mode="wait">
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 lg:gap-12">
-              {[1, 2, 4, 8].map(i => (
-                <div key={i} className="aspect-[4/5] bg-primary/5 animate-pulse rounded-2xl" />
+              {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                <div key={i} className="space-y-6">
+                  <SkeletonLoader className="aspect-[4/5] rounded-[2rem]" />
+                  <div className="space-y-3 px-2">
+                    <SkeletonLoader className="h-7 w-3/4" />
+                    <SkeletonLoader className="h-4 w-1/2 opacity-50" />
+                    <SkeletonLoader className="h-12 w-full mt-6" />
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
@@ -142,7 +206,7 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
                   <MenuCard 
                     key={item.id}
                     item={item}
-                    onAddToCart={onAddToCart}
+                    onAddToCart={handleAddToCart}
                   />
                 ))}
               </AnimatePresence>

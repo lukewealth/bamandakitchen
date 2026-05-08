@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from 'react';
-import { ArrowRight, Lock, Sparkles, CheckCircle2, MessageCircle } from 'lucide-react';
-import { motion } from 'motion/react';
+import { useState, useEffect } from 'react';
+import { ArrowRight, Lock, Sparkles, CheckCircle2, MessageCircle, History, Star } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { CartItem, Order } from '../types';
 import { generateOrderId, formatWhatsAppMessage, getWhatsAppUrl } from '../lib/order';
 import { useToast } from '../lib/toast-context';
+import { validateName, validatePhone, validateAddress, sanitizeInput, isThrottled, patronTracker } from '../lib/security';
 
 interface CheckoutScreenProps {
   items: CartItem[];
@@ -21,16 +22,52 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [notes, setNotes] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [patronHistory, setPatronHistory] = useState<Order[]>([]);
+
+  useEffect(() => {
+    const history = patronTracker.getHistory();
+    setPatronHistory(history);
+    if (history.length > 0) {
+      const lastOrder = history[0];
+      setName(lastOrder.customer.name);
+      setPhone(lastOrder.customer.phone);
+      setAddress(lastOrder.customer.address);
+    }
+  }, []);
   
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const deliveryFee = items.length > 0 ? 2500 : 0;
   const total = subtotal + deliveryFee;
 
   const handleWhatsAppOrder = () => {
-    if (!name || !phone || !address) {
-      showToast('The logistics are incomplete. Please provide your name, phone, and address.', 'warning');
+    // 1. Rate Limiting
+    if (isThrottled('order_submission', 10000)) {
+      showToast('Our curators are processing your previous request. Please wait a moment.', 'warning');
       return;
     }
+
+    // 2. Secured Validation
+    const sanitizedName = sanitizeInput(name);
+    const sanitizedPhone = sanitizeInput(phone);
+    const sanitizedAddress = sanitizeInput(address);
+
+    if (!validateName(sanitizedName)) {
+      showToast('Patron name is too short or contains unpermitted symbols.', 'error');
+      return;
+    }
+
+    if (!validatePhone(sanitizedPhone)) {
+      showToast('Please provide a valid Nigerian contact vector (e.g. 080... or +234...).', 'error');
+      return;
+    }
+
+    if (!validateAddress(sanitizedAddress)) {
+      showToast('The destination address is too vague for our navigators.', 'error');
+      return;
+    }
+
+    setIsSubmitting(true);
 
     const orderId = generateOrderId();
     const order: Order = {
@@ -38,8 +75,8 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
       items,
       total,
       status: 'pending',
-      customer: { name, phone, address },
-      notes,
+      customer: { name: sanitizedName, phone: sanitizedPhone, address: sanitizedAddress },
+      notes: sanitizeInput(notes),
       createdAt: new Date().toISOString(),
       estimatedDeliveryTime: 45,
       metadata: {
@@ -49,13 +86,17 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
       }
     };
 
+    // 3. Patron Tracking for reorders/recommendations
+    patronTracker.saveOrder(order);
+
     const message = formatWhatsAppMessage(order);
     const whatsappUrl = getWhatsAppUrl(message);
     
-    // Complete the order in the app state
-    onOrderComplete(order);
-
-    window.open(whatsappUrl, '_blank');
+    setTimeout(() => {
+      onOrderComplete(order);
+      window.open(whatsappUrl, '_blank');
+      setIsSubmitting(false);
+    }, 1500); // Artificial loading for UX
   };
 
   return (
@@ -76,6 +117,23 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
               "To maintain our commitment to heritage, every order is personally reviewed before dispatch."
             </p>
           </section>
+
+          {/* Patron Recognition Section */}
+          {patronHistory.length > 0 && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="p-8 bg-primary/5 rounded-3xl border border-primary/10 space-y-4"
+            >
+              <div className="flex items-center gap-3 text-primary">
+                <History className="w-5 h-5 text-accent" />
+                <h3 className="font-serif italic text-xl">Welcome back, Patron</h3>
+              </div>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                We've recognized your contact vector and pre-filled your curation details based on your last manifestation on {new Date(patronHistory[0].createdAt).toLocaleDateString()}.
+              </p>
+            </motion.div>
+          )}
 
           <div className="space-y-10">
             <div className="space-y-8">
@@ -149,14 +207,37 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
             <div className="pt-6">
               <button 
                 onClick={handleWhatsAppOrder}
-                disabled={items.length === 0}
-                className="group relative w-full bg-accent text-white py-6 px-10 rounded-2xl flex justify-between items-center transition-all shadow-2xl shadow-accent/30 hover:bg-accent/90 active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
+                disabled={items.length === 0 || isSubmitting}
+                className="group relative w-full bg-accent text-white py-6 px-10 rounded-2xl flex justify-between items-center transition-all shadow-2xl shadow-accent/30 hover:bg-accent/90 active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed overflow-hidden"
               >
-                <div className="flex items-center gap-4">
-                  <MessageCircle className="w-6 h-6" />
-                  <span className="font-sans text-sm uppercase tracking-[0.3em] font-bold">Dispatch Order via WhatsApp</span>
-                </div>
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-3 transition-transform" />
+                <AnimatePresence mode="wait">
+                  {isSubmitting ? (
+                    <motion.div 
+                      key="loading"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex items-center gap-4 w-full justify-center"
+                    >
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span className="font-sans text-sm uppercase tracking-[0.3em] font-bold">Reviewing Curation...</span>
+                    </motion.div>
+                  ) : (
+                    <motion.div 
+                      key="idle"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex justify-between items-center w-full"
+                    >
+                      <div className="flex items-center gap-4">
+                        <MessageCircle className="w-6 h-6" />
+                        <span className="font-sans text-sm uppercase tracking-[0.3em] font-bold">Dispatch Order via WhatsApp</span>
+                      </div>
+                      <ArrowRight className="w-6 h-6 group-hover:translate-x-3 transition-transform" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </button>
               <div className="flex items-center justify-center gap-3 mt-8 opacity-40">
                 <Lock className="w-3 h-3 text-primary" />

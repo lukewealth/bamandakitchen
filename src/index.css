@@ -76,6 +76,10 @@
   background: linear-gradient(rgba(107, 79, 58, 0.05), rgba(107, 79, 58, 0.05)), url('https://www.transparenttextures.com/patterns/wood-pattern.png');
 }
 
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
 @keyframes editorialLoading {
   0% { transform: scaleX(0); transform-origin: left; }
   50% { transform: scaleX(1); transform-origin: left; }
