@@ -116,7 +116,7 @@ export default function HeroSlider({ onNavigateToMenu }: HeroSliderProps) {
         </AnimatePresence>
 
         {/* Indicator dots */}
-        <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 flex gap-3">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3">
           {slides.map((_, i) => (
             <button
               key={i}

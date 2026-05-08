@@ -26,11 +26,11 @@ export default function FloatingCart({ items, onOpenCart }: FloatingCartProps) {
   };
 
   return (
-    <div className="fixed bottom-8 left-8 z-[100]">
+    <div className="fixed bottom-8 right-8 z-[100]">
       <motion.div
         initial={{ scale: 0, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        className="flex flex-col gap-3"
+        className="flex flex-col items-end gap-3"
       >
         {/* Floating Action Button */}
         <button
@@ -43,7 +43,7 @@ export default function FloatingCart({ items, onOpenCart }: FloatingCartProps) {
           </span>
           
           {/* Tooltip/Label */}
-          <div className="absolute left-full ml-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-surface border border-accent/20 px-4 py-2 rounded-lg shadow-xl pointer-events-none">
+          <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-surface border border-accent/20 px-4 py-2 rounded-lg shadow-xl pointer-events-none">
              <span className="editorial-label text-[10px] text-accent font-bold italic">
                View Cart • ₦{totalPrice.toLocaleString()}
              </span>
@@ -55,7 +55,7 @@ export default function FloatingCart({ items, onOpenCart }: FloatingCartProps) {
           onClick={handleWhatsAppCheckout}
           className="bg-primary border border-accent/30 text-accent px-4 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 hover:bg-accent hover:text-primary transition-all duration-500 group"
         >
-          <div className="flex flex-col items-start">
+          <div className="flex flex-col items-end">
             <span className="text-[8px] uppercase tracking-widest font-bold opacity-70">Checkout via</span>
             <span className="text-[10px] font-black uppercase tracking-wider">WhatsApp</span>
           </div>
