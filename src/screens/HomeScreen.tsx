@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
-import { ArrowRight, Utensils, Globe, Martini, ShoppingBag, Heart, Star } from 'lucide-react';
-import { motion } from 'motion/react';
-import { MenuItem } from '../types';
-import HeroSlider from '../components/HeroSlider';
+import { useState, useEffect } from "react";
+import { ArrowRight, Utensils, Globe, Martini, ShoppingBag, Heart, Star } from "lucide-react";
+import { motion } from "motion/react";
+import { MenuItem } from "../types";
+import HeroSlider from "../components/HeroSlider";
+import OptimizedImage from "../components/OptimizedImage";
 
 interface HomeScreenProps {
   onNavigateToMenu: (filter?: string) => void;
@@ -18,7 +19,7 @@ export default function HomeScreen({ onNavigateToMenu, onAddToCart }: HomeScreen
   const [trendingDishes, setTrendingDishes] = useState<MenuItem[]>([]);
 
   useEffect(() => {
-    const savedMenu = localStorage.getItem('bamanda_menu');
+    const savedMenu = localStorage.getItem("bamanda_menu");
     if (savedMenu) {
       const menu: MenuItem[] = JSON.parse(savedMenu);
       setTrendingDishes(menu.filter(item => item.isTrending));
@@ -26,9 +27,9 @@ export default function HomeScreen({ onNavigateToMenu, onAddToCart }: HomeScreen
   }, []);
 
   const mealTimes = [
-    { name: 'Breakfast', icon: '🍳', image: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&q=80&w=800' },
-    { name: 'Lunch', icon: '🍛', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800' },
-    { name: 'Dinner', icon: '🍽️', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800' },
+    { name: "Breakfast", icon: "🍳", image: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&q=80&w=800" },
+    { name: "Lunch", icon: "🍛", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800" },
+    { name: "Dinner", icon: "🍽️", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800" },
   ];
 
   return (
@@ -49,13 +50,15 @@ export default function HomeScreen({ onNavigateToMenu, onAddToCart }: HomeScreen
               onClick={() => onNavigateToMenu(meal.name)}
               className="group cursor-pointer relative aspect-[4/5] overflow-hidden rounded-xl shadow-xl"
             >
-              <img 
+              <OptimizedImage 
                 src={meal.image} 
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                containerClassName="absolute inset-0 w-full h-full"
+                className="transition-transform duration-1000 group-hover:scale-110 group-hover:brightness-110"
                 alt={meal.name}
+                aspectRatio="h-full w-full"
               />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-              <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors z-10 pointer-events-none" />
+              <div className="absolute bottom-0 left-0 right-0 p-8 text-white z-20">
                 <div className="text-4xl mb-4">{meal.icon}</div>
                 <h3 className="font-serif text-3xl mb-2">{meal.name}</h3>
                 <div className="flex items-center text-accent font-bold uppercase tracking-widest text-xs opacity-0 group-hover:opacity-100 transition-opacity">
@@ -89,11 +92,16 @@ export default function HomeScreen({ onNavigateToMenu, onAddToCart }: HomeScreen
                 <motion.div 
                   layout
                   key={dish.id} 
-                  className="bg-white rounded-2xl overflow-hidden shadow-lg card-hover flex flex-col"
+                  className="bg-white rounded-2xl overflow-hidden shadow-lg card-hover flex flex-col group"
                 >
-                  <div className="relative aspect-[4/5]">
-                    <img src={dish.image} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" alt={dish.name} />
-                    <div className="absolute top-4 left-4 flex gap-2">
+                  <div className="relative aspect-[4/5] overflow-hidden">
+                    <OptimizedImage 
+                      src={dish.image} 
+                      className="grayscale transition-transform duration-1000 group-hover:scale-110 group-hover:grayscale-0 group-hover:brightness-110" 
+                      alt={dish.name} 
+                      aspectRatio="h-full w-full"
+                    />
+                    <div className="absolute top-4 left-4 flex gap-2 z-20">
                       <div className="bg-accent text-white px-4 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg">
                         Trending
                       </div>
@@ -103,13 +111,13 @@ export default function HomeScreen({ onNavigateToMenu, onAddToCart }: HomeScreen
                         </div>
                       )}
                     </div>
-                    <button className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-md rounded-full text-primary hover:text-accent transition-colors shadow-lg">
+                    <button className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-md rounded-full text-primary hover:text-accent transition-colors shadow-lg z-20">
                       <Heart className="w-5 h-5" />
                     </button>
                   </div>
                   <div className="p-8 flex-1 flex flex-col">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-serif text-xl text-primary">{dish.name}</h3>
+                      <h3 className="font-serif text-xl text-primary group-hover:text-accent transition-colors duration-500">{dish.name}</h3>
                       <span className="font-bold text-accent">₦{dish.price.toLocaleString()}</span>
                     </div>
                     <p className="text-sm text-on-surface-variant mb-6 line-clamp-2 italic">{dish.description}</p>
@@ -150,21 +158,21 @@ export default function HomeScreen({ onNavigateToMenu, onAddToCart }: HomeScreen
       {/* Cuisine Categories (Quick Access) */}
       <section className="py-24 editorial-container">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-          <div className="group cursor-pointer" onClick={() => onNavigateToMenu('African Dishes')}>
+          <div className="group cursor-pointer" onClick={() => onNavigateToMenu("African Dishes")}>
             <div className="w-24 h-24 bg-accent/10 text-accent rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-accent group-hover:text-white transition-all shadow-sm">
               <Utensils className="w-10 h-10" />
             </div>
             <h3 className="font-serif text-2xl text-primary mb-2">African Dishes</h3>
             <p className="text-sm text-on-surface-variant italic">Rooted in tradition</p>
           </div>
-          <div className="group cursor-pointer" onClick={() => onNavigateToMenu('Intercontinental')}>
+          <div className="group cursor-pointer" onClick={() => onNavigateToMenu("Intercontinental")}>
             <div className="w-24 h-24 bg-accent/10 text-accent rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-accent group-hover:text-white transition-all shadow-sm">
               <Globe className="w-10 h-10" />
             </div>
             <h3 className="font-serif text-2xl text-primary mb-2">Intercontinental</h3>
             <p className="text-sm text-on-surface-variant italic">Global flavors, local soul</p>
           </div>
-          <div className="group cursor-pointer" onClick={() => onNavigateToMenu('Drinks')}>
+          <div className="group cursor-pointer" onClick={() => onNavigateToMenu("Drinks")}>
             <div className="w-24 h-24 bg-accent/10 text-accent rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-accent group-hover:text-white transition-all shadow-sm">
               <Martini className="w-10 h-10" />
             </div>

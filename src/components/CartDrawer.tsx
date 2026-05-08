@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { X, Minus, Plus, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
-import { CartItem } from '../types';
+import { X, Minus, Plus, ShoppingBag, Trash2, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { CartItem } from "../types";
+import OptimizedImage from "./OptimizedImage";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -32,7 +33,6 @@ export default function CartDrawer({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -41,15 +41,13 @@ export default function CartDrawer({
             className="fixed inset-0 bg-primary/60 z-[60] backdrop-blur-md"
           />
 
-          {/* Drawer */}
           <motion.aside
-            initial={{ x: '100%' }}
+            initial={{ x: "100%" }}
             animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
             className="fixed right-0 top-0 h-full w-full md:w-[500px] bg-cream z-[70] shadow-2xl flex flex-col"
           >
-            {/* Header */}
             <div className="p-8 flex items-center justify-between bg-primary text-white relative">
               <div className="flex items-center gap-4">
                 <div className="relative">
@@ -63,7 +61,7 @@ export default function CartDrawer({
                 <div>
                   <h2 className="font-serif text-2xl leading-tight">Your Cart</h2>
                   <div className="editorial-label text-accent opacity-80 mt-1">
-                    {items.length} {items.length === 1 ? 'Item' : 'Items'} Ready
+                    {items.length} {items.length === 1 ? "Item" : "Items"} Ready
                   </div>
                 </div>
               </div>
@@ -75,7 +73,6 @@ export default function CartDrawer({
               </button>
             </div>
 
-            {/* Items List */}
             <div className="flex-1 overflow-y-auto px-8 py-10 space-y-10 no-scrollbar">
               {items.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-12">
@@ -100,11 +97,13 @@ export default function CartDrawer({
                     key={item.id} 
                     className="flex gap-6 group"
                   >
-                    <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-xl shadow-lg">
-                      <img 
+                    <div className="w-24 h-24 flex-shrink-0">
+                      <OptimizedImage 
                         src={item.image} 
                         alt={item.name} 
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                        containerClassName="rounded-xl shadow-lg"
+                        className="group-hover:scale-110 transition-transform duration-700" 
+                        aspectRatio="h-full w-full"
                       />
                     </div>
                     <div className="flex-1 flex flex-col justify-between py-1">
@@ -149,7 +148,6 @@ export default function CartDrawer({
               )}
             </div>
 
-            {/* Footer Summary */}
             {items.length > 0 && (
               <div className="p-8 bg-white border-t border-primary/10 shadow-[0_-20px_50px_rgba(0,0,0,0.05)]">
                 <div className="space-y-4 mb-8">

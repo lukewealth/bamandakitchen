@@ -3,33 +3,34 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
-import { Search, ShoppingBag, Heart, Filter, Star } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
-import { MENU_ITEMS } from '../data';
-import { MenuItem } from '../types';
+import { useState, useEffect } from "react";
+import { Search, ShoppingBag, Heart, Filter, Star } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { MENU_ITEMS } from "../data";
+import { MenuItem } from "../types";
+import OptimizedImage from "../components/OptimizedImage";
 
 interface MenuScreenProps {
   onAddToCart: (item: MenuItem) => void;
   initialFilter?: string;
 }
 
-const MEAL_TIMES = ['All Day', 'Breakfast', 'Lunch', 'Dinner'];
+const MEAL_TIMES = ["All Day", "Breakfast", "Lunch", "Dinner"];
 
 export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenProps) {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [activeMealTime, setActiveMealTime] = useState(initialFilter || 'All Day');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeMealTime, setActiveMealTime] = useState(initialFilter || "All Day");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   // Dynamic Categories from Data
-  const categories = ['All', ...Array.from(new Set(menuItems.map(item => item.category)))];
+  const categories = ["All", ...Array.from(new Set(menuItems.map(item => item.category)))];
 
   useEffect(() => {
     const loadMenu = () => {
       setIsLoading(true);
-      const savedMenu = localStorage.getItem('bamanda_menu');
+      const savedMenu = localStorage.getItem("bamanda_menu");
       if (savedMenu) {
         setMenuItems(JSON.parse(savedMenu));
       } else {
@@ -49,8 +50,8 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
   }, [initialFilter, menuItems]);
 
   const filteredItems = menuItems.filter(item => {
-    const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
-    const matchesMealTime = activeMealTime === 'All Day' || item.mealTime.includes(activeMealTime as any);
+    const matchesCategory = activeCategory === "All" || item.category === activeCategory;
+    const matchesMealTime = activeMealTime === "All Day" || item.mealTime.includes(activeMealTime as any);
     const matchesSearch = 
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
       item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -95,7 +96,7 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={`px-6 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap ${
-                  activeCategory === cat ? 'bg-accent text-white shadow-lg' : 'bg-primary/5 text-on-surface-variant hover:bg-primary/10'
+                  activeCategory === cat ? "bg-accent text-white shadow-lg" : "bg-primary/5 text-on-surface-variant hover:bg-primary/10"
                 }`}
               >
                 {cat}
@@ -111,7 +112,7 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
                    key={time}
                    onClick={() => setActiveMealTime(time)}
                    className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all ${
-                     activeMealTime === time ? 'bg-white text-accent shadow-sm' : 'text-on-surface-variant hover:text-primary'
+                     activeMealTime === time ? "bg-white text-accent shadow-sm" : "text-on-surface-variant hover:text-primary"
                    }`}
                  >
                    {time}
@@ -124,7 +125,7 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
 
       {/* Product Grid */}
       <section className="editorial-container py-16">
-        <AnimatePresence mode='wait'>
+        <AnimatePresence mode="wait">
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {[1, 2, 4, 8].map(i => (
@@ -137,7 +138,7 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
               animate={{ opacity: 1 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
             >
-              <AnimatePresence mode='popLayout'>
+              <AnimatePresence mode="popLayout">
                 {filteredItems.map((item) => (
                   <motion.div 
                     layout
@@ -148,20 +149,25 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
                     className="bg-white rounded-2xl overflow-hidden shadow-md card-hover group"
                   >
                     <div className="relative aspect-[4/5] overflow-hidden">
-                      <img src={item.image} className="w-full h-full object-cover grayscale transition-transform duration-700 group-hover:scale-110" alt={item.name} />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                      <OptimizedImage 
+                        src={item.image} 
+                        className="grayscale transition-transform duration-1000 group-hover:scale-110 group-hover:grayscale-0 group-hover:brightness-110" 
+                        alt={item.name} 
+                        aspectRatio="h-full w-full"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors z-10 pointer-events-none" />
                       {item.isTrending && (
-                        <div className="absolute top-4 left-4 bg-accent text-white px-3 py-1 rounded-full text-[8px] font-bold uppercase tracking-widest shadow-lg flex items-center gap-1">
+                        <div className="absolute top-4 left-4 bg-accent text-white px-3 py-1 rounded-full text-[8px] font-bold uppercase tracking-widest shadow-lg flex items-center gap-1 z-20">
                           <Star className="w-2 h-2 fill-current" /> Trending
                         </div>
                       )}
-                      <button className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-md rounded-full text-primary hover:text-accent transition-colors shadow-lg translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all">
+                      <button className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-md rounded-full text-primary hover:text-accent transition-colors shadow-lg translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all z-20">
                         <Heart className="w-5 h-5" />
                       </button>
                     </div>
                     <div className="p-6">
                       <div className="flex justify-between items-start mb-1">
-                        <h3 className="font-serif text-lg text-primary">{item.name}</h3>
+                        <h3 className="font-serif text-lg text-primary group-hover:text-accent transition-colors duration-500">{item.name}</h3>
                         <span className="font-bold text-accent">₦{item.price.toLocaleString()}</span>
                       </div>
                       <div className="text-[10px] text-on-surface-variant font-bold uppercase tracking-[0.1em] mb-4">

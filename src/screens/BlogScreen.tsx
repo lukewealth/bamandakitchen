@@ -3,16 +3,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
-import { BookOpen, Calendar, Clock, Share2, Bookmark, ArrowRight } from 'lucide-react';
-import { BlogPost } from '../types';
+import { useState, useEffect } from "react";
+import { motion } from "motion/react";
+import { BookOpen, Calendar, Clock, Share2, Bookmark, ArrowRight } from "lucide-react";
+import { BlogPost } from "../types";
+import OptimizedImage from "../components/OptimizedImage";
 
 export default function BlogScreen() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
 
   useEffect(() => {
-    const savedPosts = localStorage.getItem('bamanda_posts');
+    const savedPosts = localStorage.getItem("bamanda_posts");
     if (savedPosts) {
       setPosts(JSON.parse(savedPosts));
     }
@@ -22,7 +23,7 @@ export default function BlogScreen() {
     const isEven = index % 2 === 0;
 
     switch (post.layout) {
-      case 'luxury':
+      case "luxury":
         return (
           <section key={post.id} className="py-20 md:py-32 bg-primary text-white overflow-hidden relative border-y border-accent/20">
             <div className="absolute inset-0 opacity-10 wood-texture" />
@@ -43,8 +44,13 @@ export default function BlogScreen() {
                   </div>
                 </div>
                 <div className="lg:col-span-7">
-                  <div className="aspect-[16/9] rounded-3xl overflow-hidden border-4 md:border-8 border-accent/10 shadow-2xl grayscale hover:grayscale-0 transition-all duration-1000">
-                    <img src={post.image} className="w-full h-full object-cover" alt={post.title} />
+                  <div className="aspect-[16/9] rounded-3xl overflow-hidden border-4 md:border-8 border-accent/10 shadow-2xl">
+                    <OptimizedImage 
+                      src={post.image} 
+                      className="grayscale hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" 
+                      alt={post.title} 
+                      aspectRatio="h-full w-full"
+                    />
                   </div>
                 </div>
               </div>
@@ -52,13 +58,18 @@ export default function BlogScreen() {
           </section>
         );
 
-      case 'minimal':
+      case "minimal":
         return (
           <section key={post.id} className="py-20 md:py-32 px-6 max-w-4xl mx-auto text-center space-y-12">
             <div className="editorial-label text-primary/30 tracking-widest">{post.category} — {post.date}</div>
             <h2 className="font-serif text-4xl sm:text-5xl md:text-7xl text-primary">{post.title}</h2>
-            <div className="aspect-video rounded-2xl overflow-hidden shadow-sm grayscale brightness-110">
-              <img src={post.image} className="w-full h-full object-cover" alt={post.title} />
+            <div className="aspect-video rounded-2xl overflow-hidden shadow-sm">
+              <OptimizedImage 
+                src={post.image} 
+                className="grayscale brightness-110 hover:grayscale-0 transition-all duration-1000" 
+                alt={post.title} 
+                aspectRatio="h-full w-full"
+              />
             </div>
             <p className="font-sans text-base md:text-lg leading-loose text-on-surface-variant max-w-2xl mx-auto whitespace-pre-line">
               {post.content}
@@ -67,11 +78,11 @@ export default function BlogScreen() {
           </section>
         );
 
-      case 'narrative':
+      case "narrative":
         return (
           <section key={post.id} className="py-20 md:py-32 px-6 max-w-7xl mx-auto">
              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
-                <div className={`space-y-8 ${isEven ? 'lg:order-1' : 'lg:order-2'}`}>
+                <div className={`space-y-8 ${isEven ? "lg:order-1" : "lg:order-2"}`}>
                   <div className="editorial-label text-accent">{post.topic}</div>
                   <h2 className="font-serif text-4xl sm:text-5xl md:text-7xl leading-tight text-primary italic">
                     {post.title}
@@ -84,9 +95,14 @@ export default function BlogScreen() {
                     Explore This Chapter <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
-                <div className={`relative ${isEven ? 'lg:order-2' : 'lg:order-1'}`}>
-                  <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl grayscale contrast-125">
-                    <img src={post.image} className="w-full h-full object-cover" alt={post.title} />
+                <div className={`relative ${isEven ? "lg:order-2" : "lg:order-1"}`}>
+                  <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
+                    <OptimizedImage 
+                      src={post.image} 
+                      className="grayscale contrast-125 hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" 
+                      alt={post.title} 
+                      aspectRatio="h-full w-full"
+                    />
                   </div>
                   <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-accent/10 rounded-full blur-3xl -z-10" />
                 </div>
@@ -94,7 +110,7 @@ export default function BlogScreen() {
           </section>
         );
 
-      case 'journal':
+      case "journal":
         return (
           <section key={post.id} className="py-20 md:py-32 px-6 max-w-7xl mx-auto border-b border-primary/5">
             <div className="flex flex-col md:flex-row gap-12 md:gap-16">
@@ -111,8 +127,13 @@ export default function BlogScreen() {
               </div>
               <div className="md:w-3/4 space-y-10">
                 <h2 className="font-serif text-4xl sm:text-5xl md:text-7xl text-primary leading-tight">{post.title}</h2>
-                <div className="aspect-[21/9] rounded-xl overflow-hidden shadow-lg grayscale">
-                  <img src={post.image} className="w-full h-full object-cover" alt={post.title} />
+                <div className="aspect-[21/9] rounded-xl overflow-hidden shadow-lg">
+                  <OptimizedImage 
+                    src={post.image} 
+                    className="grayscale hover:grayscale-0 transition-all duration-1000" 
+                    alt={post.title} 
+                    aspectRatio="h-full w-full"
+                  />
                 </div>
                 <p className="font-serif text-xl md:text-2xl text-on-surface-variant leading-relaxed italic">
                   {post.content}
@@ -129,8 +150,8 @@ export default function BlogScreen() {
               <div className="space-y-12">
                 <div className="editorial-label text-accent tracking-[0.4em]">{post.category}</div>
                 <h2 className="font-serif text-5xl sm:text-6xl md:text-9xl leading-none tracking-tighter text-primary">
-                  {post.title.split(' ').map((word, i) => (
-                    <span key={i} className={i % 2 === 1 ? 'italic text-accent' : ''}>{word} </span>
+                  {post.title.split(" ").map((word, i) => (
+                    <span key={i} className={i % 2 === 1 ? "italic text-accent" : ""}>{word} </span>
                   ))}
                 </h2>
                 <div className="space-y-6 text-lg md:text-xl leading-relaxed text-on-surface-variant font-sans whitespace-pre-line first-letter:text-7xl md:first-letter:text-8xl first-letter:font-serif first-letter:text-accent first-letter:mr-4 first-letter:float-left first-letter:leading-[0.8]">
@@ -139,8 +160,13 @@ export default function BlogScreen() {
               </div>
               <div className="lg:sticky lg:top-32">
                 <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl relative group">
-                   <img src={post.image} className="w-full h-full object-cover grayscale brightness-90 group-hover:grayscale-0 transition-all duration-1000" alt={post.title} />
-                   <div className="absolute inset-0 bg-primary/20 group-hover:bg-transparent transition-colors" />
+                   <OptimizedImage 
+                     src={post.image} 
+                     className="grayscale brightness-90 group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" 
+                     alt={post.title} 
+                     aspectRatio="h-full w-full"
+                   />
+                   <div className="absolute inset-0 bg-primary/20 group-hover:bg-transparent transition-colors pointer-events-none" />
                 </div>
                 <div className="mt-8 flex justify-between items-center px-4">
                   <p className="text-[10px] uppercase font-bold tracking-widest opacity-40">Archive Reference {post.id.slice(-4)}</p>
@@ -197,4 +223,3 @@ export default function BlogScreen() {
     </div>
   );
 }
-

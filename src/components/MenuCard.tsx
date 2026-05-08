@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Plus, Heart } from 'lucide-react';
-import { MenuItem } from '../types';
-import { motion } from 'motion/react';
+import { Plus, Heart } from "lucide-react";
+import { MenuItem } from "../types";
+import { motion } from "motion/react";
+import OptimizedImage from "./OptimizedImage";
 
 interface MenuCardProps {
   item: MenuItem;
@@ -21,18 +22,19 @@ export default function MenuCard({ item, onAddToCart }: MenuCardProps) {
       className="group"
     >
       <div className="relative overflow-hidden bg-surface-variant aspect-[4/5] mb-8 border border-on-surface/5">
-        <img 
+        <OptimizedImage 
           src={item.image} 
           alt={item.name} 
           referrerPolicy="no-referrer"
-          className="w-full h-full object-cover grayscale brightness-90 transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
+          aspectRatio="h-full w-full"
+          className="grayscale transition-transform duration-1000 group-hover:grayscale-0 group-hover:scale-110 group-hover:brightness-110"
         />
-        <button className="absolute top-4 right-4 w-10 h-10 border border-white/20 bg-black/20 backdrop-blur-md flex items-center justify-center text-white hover:text-accent transition-colors">
+        <button className="absolute top-4 right-4 w-10 h-10 border border-white/20 bg-black/20 backdrop-blur-md flex items-center justify-center text-white hover:text-accent transition-colors z-20">
           <Heart className="w-5 h-5" />
         </button>
         
         {item.tag && (
-          <div className="absolute top-4 left-4 bg-accent px-3 py-1 text-[9px] font-bold uppercase tracking-widest text-primary">
+          <div className="absolute top-4 left-4 bg-accent px-3 py-1 text-[9px] font-bold uppercase tracking-widest text-primary z-20">
             {item.tag}
           </div>
         )}
@@ -40,10 +42,10 @@ export default function MenuCard({ item, onAddToCart }: MenuCardProps) {
 
       <div className="space-y-4">
         <div className="flex justify-between items-start">
-          <h3 className="font-serif text-3xl italic text-on-surface leading-tight group-hover:text-accent transition-colors">
+          <h3 className="font-serif text-3xl italic text-on-surface leading-tight group-hover:text-accent transition-colors duration-500">
             {item.name}
           </h3>
-          <span className="font-sans text-accent font-bold text-xs pt-2">
+          <span className="font-bold text-accent font-sans text-xs pt-2">
             ₦ {item.price.toLocaleString()}
           </span>
         </div>

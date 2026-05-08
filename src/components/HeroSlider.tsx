@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import OptimizedImage from "./OptimizedImage";
 
 const slides = [
   {
@@ -70,12 +71,15 @@ export default function HeroSlider({ onNavigateToMenu }: HeroSliderProps) {
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="absolute inset-0"
         >
-          <img 
+          <OptimizedImage 
             src={slides[current].image} 
-            className="w-full h-full object-cover brightness-[0.5]"
+            containerClassName="w-full h-full"
+            className="brightness-[0.5]"
             alt={slides[current].title}
+            aspectRatio="h-full w-full"
+            priority={true}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/60 via-transparent to-primary/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/60 via-transparent to-primary/40 z-[5]" />
         </motion.div>
       </AnimatePresence>
       
@@ -92,8 +96,8 @@ export default function HeroSlider({ onNavigateToMenu }: HeroSliderProps) {
               {slides[current].highlight}
             </div>
             <h1 className="font-serif text-[clamp(3rem,8vw,6.5rem)] text-white leading-[0.95] tracking-tight mb-8 drop-shadow-2xl">
-              {slides[current].title.split(' ')[0]} <br />
-              <span className="italic text-accent">{slides[current].title.split(' ').slice(1).join(' ')}</span>
+              {slides[current].title.split(" ")[0]} <br />
+              <span className="italic text-accent">{slides[current].title.split(" ").slice(1).join(" ")}</span>
             </h1>
             <p className="text-white/80 text-lg md:text-xl mb-10 max-w-2xl mx-auto font-light tracking-wide">
               {slides[current].subtitle}
@@ -122,7 +126,7 @@ export default function HeroSlider({ onNavigateToMenu }: HeroSliderProps) {
               key={i}
               onClick={() => setCurrent(i)}
               className={`h-1.5 transition-all duration-500 rounded-full ${
-                i === current ? 'w-12 bg-accent' : 'w-4 bg-white/30 hover:bg-white/50'
+                i === current ? "w-12 bg-accent" : "w-4 bg-white/30 hover:bg-white/50"
               }`}
               aria-label={`Go to slide ${i + 1}`}
             />

@@ -3,44 +3,48 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { motion } from 'motion/react';
-import { ShieldCheck, Heart, Star, Users } from 'lucide-react';
+import { motion } from "motion/react";
+import { ShieldCheck, Heart, Star, Users } from "lucide-react";
+import OptimizedImage from "../components/OptimizedImage";
 
 export default function AboutScreen() {
   return (
-    <div className="pt-24 min-h-screen pb-32">
-      {/* Hero Section */}
-      <section className="editorial-container mb-24">
-        <div className="relative min-h-[500px] md:h-[600px] flex items-center editorial-border overflow-hidden bg-primary rounded-3xl">
-          <img 
+    <div className="min-h-screen pb-32 overflow-x-hidden">
+      {/* Hero Section - Truly Full Width */}
+      <section className="relative w-screen h-[80vh] md:h-screen mb-24 left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+        <div className="relative w-full h-full flex items-center overflow-hidden bg-primary">
+          <OptimizedImage 
             src="/MD.png" 
             alt="Kitchen Manager" 
-            className="absolute inset-0 w-full h-full object-cover object-center grayscale brightness-75 hover:grayscale-0 transition-all duration-1000"
+            containerClassName="absolute inset-0 w-full h-full"
+            className="object-cover object-center brightness-75 hover:brightness-100 transition-all duration-1000"
+            aspectRatio="h-full w-full"
+            priority={true}
             referrerPolicy="no-referrer"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/40 to-transparent" />
-          <div className="relative z-10 px-8 md:px-24 max-w-3xl">
+          <div className="relative z-10 px-6 md:px-24 max-w-4xl">
             <div className="editorial-label mb-8 text-accent">The Curator</div>
             <motion.h1 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="font-serif text-5xl sm:text-6xl md:text-8xl text-on-surface mb-8 tracking-tighter leading-[0.9]"
+              className="font-serif text-5xl sm:text-6xl md:text-9xl text-on-surface mb-8 tracking-tighter leading-[0.85]"
             >
               Mastering the <span className="italic text-accent">Art</span> of Heritage
             </motion.h1>
-            <p className="font-sans text-on-surface-variant text-lg md:text-xl font-light italic leading-relaxed">
+            <p className="font-sans text-on-surface-variant text-lg md:text-2xl font-light italic leading-relaxed max-w-2xl">
               "At Bamanda, our kitchen is more than a place of preparation—it is a sanctuary where we honor our ancestors through every flame and spice."
             </p>
-            <div className="mt-12">
+            <div className="mt-16">
               <span className="editorial-label text-[10px] block mb-2 opacity-60">Kitchen Manager</span>
-              <h4 className="font-serif text-2xl md:text-3xl italic">Michael David</h4>
+              <h4 className="font-serif text-3xl md:text-4xl italic text-white">Michael David</h4>
             </div>
           </div>
         </div>
       </section>
 
       {/* Core Values */}
-      <section className="editorial-container mb-32">
+      <section className="editorial-container mb-32 pt-10">
         <div className="editorial-label mb-16 text-center">Our Core Values</div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-px bg-on-surface/10 border border-on-surface/10">
           {[
