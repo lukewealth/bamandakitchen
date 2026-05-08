@@ -173,10 +173,18 @@ export default function Header({
           {/* Theme Toggle */}
           <button 
             onClick={onToggleTheme}
-            className="text-on-surface/60 hover:text-on-surface transition-all duration-500"
+            className="text-on-surface/60 hover:text-on-surface transition-all duration-500 hidden sm:block"
             title={`Switch to ${theme === "night" ? "Day" : "Night"} Mode`}
           >
             {theme === "night" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+
+          {/* Mobile Menu Toggle - Moved to right */}
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden text-on-surface hover:text-accent transition-all duration-300 p-2 z-[60]"
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
@@ -184,91 +192,118 @@ export default function Header({
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: "-100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "-100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 top-20 bg-surface z-40 md:hidden overflow-y-auto"
-          >
-            <div className="p-8 space-y-12">
-              <div className="space-y-8">
-                <div className="editorial-label text-accent/40">Navigation</div>
-                <nav className="flex flex-col space-y-6">
-                  {navItems.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => handleNavigate(item.id as Screen)}
-                      className={cn(
-                        "text-left font-serif text-4xl italic transition-colors",
-                        currentScreen === item.id ? "text-accent" : "text-on-surface"
-                      )}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </nav>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <button 
-                  onClick={() => {
-                    onOpenCart();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-3xl border border-accent/10 group"
-                >
-                  <ShoppingBag className="w-6 h-6 text-accent mb-2 group-hover:scale-110 transition-transform" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Cart</span>
-                  {cartCount > 0 && <span className="mt-1 text-accent font-black text-xs">({cartCount})</span>}
-                </button>
-                <button 
-                  onClick={() => {
-                    handleNavigate("track-order");
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-3xl border border-accent/10 group"
-                >
-                  <Truck className="w-6 h-6 text-accent mb-2 group-hover:scale-110 transition-transform" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Track</span>
-                </button>
-                <button 
-                  onClick={() => {
-                    handleNavigate("admin");
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-3xl border border-accent/10 group"
-                >
-                  <Settings className="w-6 h-6 text-on-surface/60 mb-2 group-hover:scale-110 transition-transform" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface/60">Curator</span>
-                </button>
-              </div>
-
-              <div className="pt-12 border-t border-on-surface/5 space-y-8">
-                <div className="editorial-label text-accent/40">The Narrative</div>
-                <div className="space-y-4">
-                  <h4 className="font-serif italic text-2xl text-on-surface">Our Storyline</h4>
-                  <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-                    Manifesting centuries of culinary alchemy from the smoke-filled kitchens of ancient empires.
-                  </p>
-                  <button 
-                    onClick={() => handleNavigate("blog")}
-                    className="flex items-center space-x-3 text-accent font-bold uppercase tracking-widest text-[10px]"
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[50] md:hidden"
+            />
+            
+            {/* Side Drawer */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-surface z-[55] md:hidden shadow-2xl flex flex-col"
+            >
+              <div className="p-8 pt-24 space-y-10 flex-1 overflow-y-auto no-scrollbar">
+                <div className="space-y-8">
+                  <motion.div 
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="editorial-label text-accent/40"
                   >
-                    <BookOpen className="w-4 h-4" />
-                    <span>Explore the Gazette</span>
-                  </button>
+                    Navigation
+                  </motion.div>
+                  <nav className="flex flex-col space-y-4">
+                    {navItems.map((item, i) => (
+                      <motion.button
+                        key={item.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 + i * 0.1 }}
+                        onClick={() => handleNavigate(item.id as Screen)}
+                        className={cn(
+                          "text-left font-serif text-4xl italic transition-colors py-2",
+                          currentScreen === item.id ? "text-accent" : "text-on-surface"
+                        )}
+                      >
+                        {item.label}
+                      </motion.button>
+                    ))}
+                  </nav>
                 </div>
+
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="grid grid-cols-2 gap-4"
+                >
+                  <button 
+                    onClick={() => {
+                      handleNavigate("track-order");
+                    }}
+                    className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-3xl border border-accent/10 group"
+                  >
+                    <Truck className="w-6 h-6 text-accent mb-2 group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Track</span>
+                  </button>
+                  <button 
+                    onClick={() => {
+                      handleNavigate("admin");
+                    }}
+                    className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-3xl border border-accent/10 group"
+                  >
+                    <Settings className="w-6 h-6 text-on-surface/60 mb-2 group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface/60">Curator</span>
+                  </button>
+                </motion.div>
+
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.7 }}
+                  className="pt-12 border-t border-on-surface/5 space-y-8"
+                >
+                  <div className="editorial-label text-accent/40">The Narrative</div>
+                  <div className="space-y-4">
+                    <h4 className="font-serif italic text-2xl text-on-surface">Our Storyline</h4>
+                    <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
+                      Manifesting centuries of culinary alchemy from the smoke-filled kitchens of ancient empires.
+                    </p>
+                    <button 
+                      onClick={() => handleNavigate("blog")}
+                      className="flex items-center space-x-3 text-accent font-bold uppercase tracking-widest text-[10px]"
+                    >
+                      <BookOpen className="w-4 h-4" />
+                      <span>Explore the Gazette</span>
+                    </button>
+                  </div>
+                </motion.div>
               </div>
 
-              <div className="pt-8 flex items-center justify-between opacity-40">
-                 <div className="text-[9px] font-bold uppercase tracking-[0.3em]">Bamanda Kitchen © 2026</div>
-                 <button onClick={onToggleTheme}>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                className="p-8 border-t border-on-surface/5 bg-on-surface/5 flex items-center justify-between"
+              >
+                 <div className="text-[9px] font-bold uppercase tracking-[0.3em] opacity-40">© 2026 Bamanda</div>
+                 <button 
+                   onClick={onToggleTheme}
+                   className="p-3 bg-surface rounded-full shadow-lg text-accent"
+                 >
                    {theme === "night" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                  </button>
-              </div>
-            </div>
-          </motion.div>
+              </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </header>
