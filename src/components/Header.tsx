@@ -206,68 +206,62 @@ export default function Header({
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
               className="fixed top-0 right-0 h-full w-full bg-surface z-[170] md:hidden shadow-2xl flex flex-col"
             >
-              <div className="p-8 pt-24 space-y-10 flex-1 overflow-y-auto no-scrollbar">
-                <div className="space-y-6">
-                  <motion.div 
+              <div className="p-8 pt-24 space-y-12 flex-1 overflow-y-auto no-scrollbar">
+                <div className="grid grid-cols-2 gap-4">
+                  {navItems.map((item, i) => (
+                    <motion.button
+                      key={item.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 + i * 0.1 }}
+                      onClick={() => handleNavigate(item.id as Screen)}
+                      className={cn(
+                        "text-left aspect-square flex flex-col justify-end p-6 rounded-3xl transition-all group border border-on-surface/5",
+                        currentScreen === item.id ? "bg-accent text-white border-accent shadow-xl" : "bg-primary/5 text-on-surface hover:bg-primary/10"
+                      )}
+                    >
+                      <span className="font-serif text-2xl italic mb-1">{item.label}</span>
+                      <span className={cn(
+                        "text-[8px] uppercase tracking-[0.2em] font-bold",
+                        currentScreen === item.id ? "text-white/60" : "text-accent"
+                      )}>Explore</span>
+                    </motion.button>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <motion.button 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 }}
+                    onClick={() => {
+                      handleNavigate("track-order");
+                    }}
+                    className="flex flex-col items-center justify-center p-8 bg-primary/5 rounded-3xl border border-primary/5 hover:border-accent/30 transition-all group"
+                  >
+                    <Truck className="w-6 h-6 text-accent mb-2 group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface/60 group-hover:text-accent">Track</span>
+                  </motion.button>
+                  <motion.button 
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="editorial-label text-accent opacity-60"
+                    transition={{ delay: 0.5 }}
+                    onClick={() => {
+                      handleNavigate("admin");
+                    }}
+                    className="flex flex-col items-center justify-center p-8 bg-primary/5 rounded-3xl border border-primary/5 hover:border-accent/30 transition-all group"
                   >
-                    Navigation
-                  </motion.div>
-                  <nav className="flex flex-col space-y-2">
-                    {navItems.map((item, i) => (
-                      <motion.button
-                        key={item.id}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 + i * 0.1 }}
-                        onClick={() => handleNavigate(item.id as Screen)}
-                        className={cn(
-                          "text-left font-serif text-4xl italic transition-all py-3 hover:pl-4 hover:text-accent",
-                          currentScreen === item.id ? "text-accent pl-4" : "text-on-surface"
-                        )}
-                      >
-                        {item.label}
-                      </motion.button>
-                    ))}
-                  </nav>
+                    <Settings className="w-6 h-6 text-on-surface/40 mb-2 group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface/60 group-hover:text-accent">Curator</span>
+                  </motion.button>
                 </div>
 
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="grid grid-cols-2 gap-4"
-                >
-                  <button 
-                    onClick={() => {
-                      handleNavigate("track-order");
-                    }}
-                    className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-3xl border border-primary/5 hover:border-accent/30 transition-all group"
-                  >
-                    <Truck className="w-6 h-6 text-accent mb-2 group-hover:scale-110 transition-transform" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface/60 group-hover:text-accent">Track</span>
-                  </button>
-                  <button 
-                    onClick={() => {
-                      handleNavigate("admin");
-                    }}
-                    className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-3xl border border-primary/5 hover:border-accent/30 transition-all group"
-                  >
-                    <Settings className="w-6 h-6 text-on-surface/40 mb-2 group-hover:scale-110 transition-transform" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface/60 group-hover:text-accent">Curator</span>
-                  </button>
-                </motion.div>
-
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
                   transition={{ delay: 0.7 }}
                   className="pt-10 border-t border-on-surface/5 space-y-6"
                 >
-                  <div className="editorial-label text-accent opacity-60">The Narrative</div>
                   <div className="space-y-4">
                     <h4 className="font-serif italic text-2xl text-on-surface">Our Storyline</h4>
                     <p className="font-sans text-xs text-on-surface-variant leading-relaxed opacity-70">
