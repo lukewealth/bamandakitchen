@@ -3,12 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import BrandLoader from "./BrandLoader";
 import { cn } from "../lib/utils";
 
 interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+  src?: string;
+  alt?: string;
+  className?: string;
+  referrerPolicy?: string;
   containerClassName?: string;
   grayscaleOnHover?: boolean;
   colorOnHover?: boolean;

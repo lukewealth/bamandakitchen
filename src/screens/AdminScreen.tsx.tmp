@@ -1,8 +1,0 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-/// <reference types="vite/client" />
-import React, { validateOrder } from './utils'; // Dummy insert
-export default function Test() { return null; }

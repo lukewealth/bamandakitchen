@@ -70,6 +70,15 @@ export const formatQuickWhatsAppMessage = (items: CartItem[], totalPrice: number
 };
 
 export const getWhatsAppUrl = (message: string, phone: string = '2349024084911') => {
-  const cleanPhone = phone.replace(/\D/g, '');
+  let cleanPhone = phone.replace(/\D/g, '');
+  
+  // Handle Nigerian number formatting
+  if (cleanPhone.startsWith('0')) {
+    cleanPhone = '234' + cleanPhone.substring(1);
+  } else if (!cleanPhone.startsWith('234') && cleanPhone.length === 10) {
+    // Case where they enter 902... without 0
+    cleanPhone = '234' + cleanPhone;
+  }
+  
   return `https://wa.me/${cleanPhone}?text=${message}`;
 };

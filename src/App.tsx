@@ -37,9 +37,13 @@ export default function App() {
   // Initial Data Load & Sync
   useEffect(() => {
     // Sync Menu
-    // Force sync built-in menu items to update paths and trending status
-    localStorage.setItem('bamanda_menu', JSON.stringify(MENU_ITEMS));
-    setMenu(MENU_ITEMS);
+    const savedMenu = localStorage.getItem('bamanda_menu');
+    if (savedMenu) {
+      setMenu(JSON.parse(savedMenu));
+    } else {
+      localStorage.setItem('bamanda_menu', JSON.stringify(MENU_ITEMS));
+      setMenu(MENU_ITEMS);
+    }
 
     // Sync Blog Posts
     const savedPosts = localStorage.getItem('bamanda_posts');

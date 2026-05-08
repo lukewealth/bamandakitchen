@@ -170,35 +170,38 @@ export default function AdminScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-cream flex">
-      <aside className="w-64 bg-primary text-white p-8 space-y-8 h-screen sticky top-0 overflow-y-auto">
-        <h2 className="font-serif italic text-2xl text-accent">Bamanda</h2>
-        <nav className="space-y-4">
+    <div className="min-h-screen bg-cream flex flex-col lg:flex-row">
+      <aside className="w-full lg:w-64 bg-primary text-white p-6 lg:p-8 space-y-8 lg:h-screen lg:sticky lg:top-0 overflow-y-auto z-40">
+        <div className="flex items-center justify-between lg:block space-y-0 lg:space-y-8">
+          <h2 className="font-serif italic text-2xl text-accent">Bamanda</h2>
+          <button onClick={() => setIsAuthenticated(false)} className="lg:hidden flex items-center gap-2 p-2 opacity-60 hover:opacity-100 text-xs uppercase tracking-widest font-bold border border-white/10 rounded-lg"><LogOut className="w-4 h-4" /> Exit</button>
+        </div>
+        <nav className="flex lg:flex-col gap-2 lg:gap-4 overflow-x-auto lg:overflow-visible no-scrollbar pb-2 lg:pb-0">
           <button 
             onClick={() => setActiveTab('orders')} 
-            className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all ${activeTab === 'orders' ? 'bg-white/10 opacity-100' : 'opacity-60 hover:opacity-100'}`}
+            className={`flex-1 lg:w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl transition-all whitespace-nowrap ${activeTab === 'orders' ? 'bg-white/10 opacity-100' : 'opacity-60 hover:opacity-100'}`}
           >
-            <ShoppingBag className="w-5 h-5" /> Orders
+            <ShoppingBag className="w-5 h-5" /> <span className="text-xs font-bold uppercase tracking-widest">Orders</span>
           </button>
           <button 
             onClick={() => setActiveTab('menu')} 
-            className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all ${activeTab === 'menu' ? 'bg-white/10 opacity-100' : 'opacity-60 hover:opacity-100'}`}
+            className={`flex-1 lg:w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl transition-all whitespace-nowrap ${activeTab === 'menu' ? 'bg-white/10 opacity-100' : 'opacity-60 hover:opacity-100'}`}
           >
-            <Utensils className="w-5 h-5" /> Menu DB
+            <Utensils className="w-5 h-5" /> <span className="text-xs font-bold uppercase tracking-widest">Menu DB</span>
           </button>
           <button 
             onClick={() => setActiveTab('blog')} 
-            className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all ${activeTab === 'blog' ? 'bg-white/10 opacity-100' : 'opacity-60 hover:opacity-100'}`}
+            className={`flex-1 lg:w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl transition-all whitespace-nowrap ${activeTab === 'blog' ? 'bg-white/10 opacity-100' : 'opacity-60 hover:opacity-100'}`}
           >
-            <BookOpen className="w-5 h-5" /> Gazette CMS
+            <BookOpen className="w-5 h-5" /> <span className="text-xs font-bold uppercase tracking-widest">Gazette</span>
           </button>
         </nav>
-        <button onClick={() => setIsAuthenticated(false)} className="flex items-center gap-4 p-4 opacity-40 hover:opacity-100"><LogOut className="w-5 h-5" /> Exit</button>
+        <button onClick={() => setIsAuthenticated(false)} className="hidden lg:flex items-center gap-4 p-4 opacity-40 hover:opacity-100"><LogOut className="w-5 h-5" /> Exit</button>
       </aside>
       
-      <main className="flex-1 p-10 overflow-x-hidden">
-        <header className="flex justify-between items-center mb-12">
-          <h1 className="font-serif text-5xl text-primary capitalize italic">{activeTab} Curation</h1>
+      <main className="flex-1 p-6 lg:p-10 overflow-x-hidden">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 lg:mb-12">
+          <h1 className="font-serif text-3xl lg:text-5xl text-primary capitalize italic">{activeTab} Curation</h1>
           <div className="flex items-center gap-4">
             <div className="bg-white px-4 py-2 rounded-full border border-primary/10 flex items-center gap-2 shadow-sm">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
@@ -214,21 +217,21 @@ export default function AdminScreen() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="grid grid-cols-1 gap-8"
+              className="grid grid-cols-1 gap-6 lg:gap-8"
             >
               {orders.length === 0 ? (
-                <div className="bg-white p-20 rounded-3xl border border-primary/5 flex flex-col items-center justify-center text-center">
+                <div className="bg-white p-12 lg:p-20 rounded-3xl border border-primary/5 flex flex-col items-center justify-center text-center">
                   <ShoppingBag className="w-12 h-12 text-primary/10 mb-6" />
-                  <p className="font-serif italic text-2xl text-primary opacity-20">No active curations recorded.</p>
+                  <p className="font-serif italic text-xl lg:text-2xl text-primary opacity-20">No active curations recorded.</p>
                 </div>
               ) : (
                 orders.map(order => (
-                  <div key={order.id} className="bg-white p-8 rounded-3xl shadow-sm border border-primary/5 overflow-hidden">
-                    <div className="flex flex-col lg:flex-row justify-between gap-8">
+                  <div key={order.id} className="bg-white p-6 lg:p-8 rounded-3xl shadow-sm border border-primary/5 overflow-hidden">
+                    <div className="flex flex-col xl:flex-row justify-between gap-8">
                       <div className="flex-1 space-y-6">
                         <div className="flex items-center justify-between">
-                          <div className="editorial-label text-accent">Order #{order.id}</div>
-                          <div className={`px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                          <div className="editorial-label text-accent text-[9px]">Order #{order.id}</div>
+                          <div className={`px-4 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${
                             order.status === 'delivered' ? 'bg-green-100 text-green-700' :
                             order.status === 'on-the-way' ? 'bg-blue-100 text-blue-700' :
                             order.status === 'preparing' ? 'bg-orange-100 text-orange-700' :
@@ -237,17 +240,17 @@ export default function AdminScreen() {
                             {order.status}
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                           <div>
-                            <h4 className="text-[10px] uppercase font-bold text-primary/40 mb-1">Patron</h4>
-                            <p className="font-serif italic text-lg">{order.customer.name}</p>
-                            <p className="text-xs text-primary/60">{order.customer.phone}</p>
+                            <h4 className="text-[9px] uppercase font-bold text-primary/40 mb-2 tracking-widest">Patron</h4>
+                            <p className="font-serif italic text-lg leading-tight">{order.customer.name}</p>
+                            <p className="text-xs text-primary/60 mt-1">{order.customer.phone}</p>
                             <p className="text-xs text-primary/60">{order.customer.address}</p>
                           </div>
                           <div>
-                            <h4 className="text-[10px] uppercase font-bold text-primary/40 mb-1">Financials</h4>
+                            <h4 className="text-[9px] uppercase font-bold text-primary/40 mb-2 tracking-widest">Financials</h4>
                             <p className="font-sans font-bold text-xl">₦{order.total.toLocaleString()}</p>
-                            <p className="text-xs text-primary/60">{new Date(order.createdAt).toLocaleString()}</p>
+                            <p className="text-[10px] text-primary/60 mt-1 uppercase tracking-widest">{new Date(order.createdAt).toLocaleString()}</p>
                           </div>
                         </div>
                         {order.notes && (
@@ -257,23 +260,25 @@ export default function AdminScreen() {
                         )}
                         <div className="flex flex-wrap gap-2 pt-4 border-t border-primary/5">
                           {order.items.map(item => (
-                            <span key={item.id} className="bg-primary/5 px-2 py-1 rounded text-[10px] font-bold">
+                            <span key={item.id} className="bg-primary/5 px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider">
                               {item.quantity}x {item.name}
                             </span>
                           ))}
                         </div>
                       </div>
-                      <div className="lg:w-48 space-y-2 lg:border-l border-primary/5 lg:pl-8 flex flex-col justify-center">
-                        <button onClick={() => updateOrderStatus(order.id, 'preparing')} className="w-full bg-primary/5 hover:bg-orange-50 text-[10px] font-bold py-3 rounded-xl transition-colors">PREPARE</button>
-                        <button onClick={() => updateOrderStatus(order.id, 'on-the-way')} className="w-full bg-primary/5 hover:bg-blue-50 text-[10px] font-bold py-3 rounded-xl transition-all">SHIP</button>
-                        <button onClick={() => updateOrderStatus(order.id, 'delivered')} className="w-full bg-primary/5 hover:bg-green-50 text-[10px] font-bold py-3 rounded-xl transition-all">DELIVER</button>
+                      <div className="xl:w-64 space-y-3 xl:border-l border-primary/5 xl:pl-8 flex flex-col justify-center">
+                        <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
+                          <button onClick={() => updateOrderStatus(order.id, 'preparing')} className="w-full bg-primary/5 hover:bg-orange-50 text-[10px] font-bold py-4 rounded-xl transition-colors tracking-widest uppercase">PREPARE</button>
+                          <button onClick={() => updateOrderStatus(order.id, 'on-the-way')} className="w-full bg-primary/5 hover:bg-blue-50 text-[10px] font-bold py-4 rounded-xl transition-all tracking-widest uppercase">SHIP</button>
+                        </div>
+                        <button onClick={() => updateOrderStatus(order.id, 'delivered')} className="w-full bg-primary/5 hover:bg-green-50 text-[10px] font-bold py-4 rounded-xl transition-all tracking-widest uppercase">DELIVER</button>
                         <button 
                           onClick={() => handleNotifyCustomer(order)}
-                          className="w-full bg-accent/10 hover:bg-accent hover:text-white text-accent text-[10px] font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+                          className="w-full bg-accent/10 hover:bg-accent hover:text-white text-accent text-[10px] font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 tracking-widest uppercase"
                         >
-                          <MessageCircle className="w-3 h-3" /> NOTIFY PATRON
+                          <MessageCircle className="w-4 h-4" /> NOTIFY PATRON
                         </button>
-                        <button onClick={() => deleteOrder(order.id)} className="w-full text-red-500 text-[10px] font-bold py-3 hover:bg-red-50 rounded-xl mt-4">ARCHIVE</button>
+                        <button onClick={() => deleteOrder(order.id)} className="w-full text-red-500 text-[10px] font-bold py-3 hover:bg-red-50 rounded-xl mt-2 tracking-widest uppercase">ARCHIVE RECORD</button>
                       </div>
                     </div>
                   </div>
