@@ -29,6 +29,7 @@ export default function App() {
   const [theme, setTheme] = useState<'night' | 'day'>('night');
   const [isLoading, setIsLoading] = useState(false);
   const [activeOrder, setActiveOrder] = useState<Order | null>(null);
+  const [showTrackingPopup, setShowTrackingPopup] = useState(false);
   
   // Dynamic Data
   const [menu, setMenu] = useState<MenuItem[]>([]);
@@ -113,7 +114,9 @@ export default function App() {
     localStorage.setItem('bamanda_orders', JSON.stringify([order, ...orders]));
     
     setCart([]);
-    setCurrentScreen('track-order');
+    
+    // Show tracking popup for every purchase as requested
+    setShowTrackingPopup(true);
   };
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);

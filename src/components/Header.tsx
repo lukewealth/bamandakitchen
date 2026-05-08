@@ -198,6 +198,29 @@ export default function Header({
                 </nav>
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <button 
+                  onClick={() => {
+                    onOpenCart();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-3xl border border-accent/10 group"
+                >
+                  <ShoppingBag className="w-6 h-6 text-accent mb-2 group-hover:scale-110 transition-transform" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Your Cart</span>
+                  {cartCount > 0 && <span className="mt-1 text-accent font-black text-xs">({cartCount})</span>}
+                </button>
+                <button 
+                  onClick={() => {
+                    handleNavigate("admin");
+                  }}
+                  className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-3xl border border-accent/10 group"
+                >
+                  <Settings className="w-6 h-6 text-on-surface/60 mb-2 group-hover:scale-110 transition-transform" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface/60">Curator</span>
+                </button>
+              </div>
+
               <div className="pt-12 border-t border-on-surface/5 space-y-8">
                 <div className="editorial-label text-accent/40">The Narrative</div>
                 <div className="space-y-4">
@@ -215,14 +238,11 @@ export default function Header({
                 </div>
               </div>
 
-              <div className="pt-8 flex items-center justify-between">
-                <button 
-                  onClick={() => handleNavigate("admin")}
-                  className="flex items-center space-x-2 text-on-surface/60 text-[10px] font-bold uppercase tracking-widest"
-                >
-                  <Settings className="w-4 h-4" />
-                  <span>Curator Access</span>
-                </button>
+              <div className="pt-8 flex items-center justify-between opacity-40">
+                 <div className="text-[9px] font-bold uppercase tracking-[0.3em]">Bamanda Kitchen © 2026</div>
+                 <button onClick={onToggleTheme}>
+                   {theme === "night" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                 </button>
               </div>
             </div>
           </motion.div>

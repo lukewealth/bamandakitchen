@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Package, ChefHat, Truck, CheckCircle2, Clock, MapPin, Phone, ArrowLeft, MessageCircle } from 'lucide-react';
+import { Package, ChefHat, Truck, CheckCircle2, Clock, MapPin, Phone, ArrowLeft, MessageCircle, Bike, Car } from 'lucide-react';
 import { Order, OrderStatus } from '../types';
 import { getWhatsAppUrl } from '../lib/order';
 
@@ -16,6 +16,7 @@ interface TrackOrderScreenProps {
 
 export default function TrackOrderScreen({ order, onBack }: TrackOrderScreenProps) {
   const [timeLeft, setTimeLeft] = useState(order?.estimatedDeliveryTime || 30 * 60); // In seconds
+  const [vehicle, setVehicle] = useState<'bike' | 'car'>('bike');
 
   useEffect(() => {
     if (!order || timeLeft <= 0) return;
@@ -119,7 +120,25 @@ export default function TrackOrderScreen({ order, onBack }: TrackOrderScreenProp
                </div>
 
                <div className="pt-8">
+                 <div className="editorial-label text-[8px] opacity-40 mb-4 uppercase tracking-[0.2em]">Select Courier Preference</div>
+                 <div className="flex bg-primary/5 p-1 rounded-2xl w-fit mb-8">
+                    <button 
+                      onClick={() => setVehicle('bike')}
+                      className={`flex items-center gap-3 px-6 py-3 rounded-xl transition-all ${vehicle === 'bike' ? 'bg-white text-accent shadow-lg' : 'text-on-surface-variant hover:text-primary'}`}
+                    >
+                      <Bike className="w-4 h-4" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Motorbike</span>
+                    </button>
+                    <button 
+                      onClick={() => setVehicle('car')}
+                      className={`flex items-center gap-3 px-6 py-3 rounded-xl transition-all ${vehicle === 'car' ? 'bg-white text-accent shadow-lg' : 'text-on-surface-variant hover:text-primary'}`}
+                    >
+                      <Car className="w-4 h-4" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Vehicle</span>
+                    </button>
+                 </div>
                  <button 
+
                    onClick={handleContactKitchen}
                    className="w-full bg-accent text-white py-5 px-8 rounded-2xl flex justify-between items-center transition-all shadow-xl shadow-accent/20 hover:scale-[1.02] active:scale-[0.98]"
                  >
@@ -160,7 +179,7 @@ export default function TrackOrderScreen({ order, onBack }: TrackOrderScreenProp
                     className="flex flex-col items-center"
                   >
                     <div className="relative mb-8">
-                       <Truck className="w-32 h-32 text-accent" />
+                       {vehicle === 'bike' ? <Bike className="w-32 h-32 text-accent" /> : <Car className="w-32 h-32 text-accent" />}
                        <motion.div 
                          animate={{ x: [-20, 20, -20] }}
                          transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
@@ -168,7 +187,7 @@ export default function TrackOrderScreen({ order, onBack }: TrackOrderScreenProp
                        />
                     </div>
                     <h3 className="font-serif italic text-3xl text-primary">Your food is on the way!</h3>
-                    <p className="text-on-surface-variant text-sm mt-4 text-center max-w-xs">Our courier is currently navigating the Lekki expressway to reach your sanctuary.</p>
+                    <p className="text-on-surface-variant text-sm mt-4 text-center max-w-xs">Our {vehicle === 'bike' ? 'dispatch rider' : 'delivery pilot'} is currently navigating the Lekki expressway to reach your sanctuary.</p>
                   </motion.div>
                 ) : (
                   <motion.div 
