@@ -19,7 +19,8 @@ export const MENU_ITEMS: MenuItem[] = [
     image: '/images/meals/ofada_rice.png',
     portion: 'full',
     tags: ['african', 'spicy', 'classic'],
-    available: true
+    available: true,
+    isTrending: true,
   },
   {
     id: 'biryani_full',
