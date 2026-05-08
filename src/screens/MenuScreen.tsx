@@ -8,7 +8,7 @@ import { Search, ShoppingBag, Heart, Filter, Star } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { MENU_ITEMS } from "../data";
 import { MenuItem } from "../types";
-import OptimizedImage from "../components/OptimizedImage";
+import MenuCard from "../components/MenuCard";
 
 interface MenuScreenProps {
   onAddToCart: (item: MenuItem) => void;
@@ -24,22 +24,18 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Dynamic Categories from Data
-  const categories = ["All", ...Array.from(new Set(menuItems.map(item => item.category)))];
-
   useEffect(() => {
-    const loadMenu = () => {
-      setIsLoading(true);
-      const savedMenu = localStorage.getItem("bamanda_menu");
-      if (savedMenu) {
-        setMenuItems(JSON.parse(savedMenu));
-      } else {
-        setMenuItems(MENU_ITEMS);
-      }
-      setIsLoading(false);
-    };
-    loadMenu();
+    const savedMenu = localStorage.getItem("bamanda_menu");
+    if (savedMenu) {
+      setMenuItems(JSON.parse(savedMenu));
+    } else {
+      setMenuItems(MENU_ITEMS);
+    }
+    setIsLoading(false);
   }, []);
+
+  // Memoized Categories
+  const categories = useMemo(() => ["All", ...Array.from(new Set(menuItems.map(item => item.category)))], [menuItems]);
 
   useEffect(() => {
     if (initialFilter && MEAL_TIMES.includes(initialFilter)) {
@@ -47,18 +43,21 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
     } else if (initialFilter && categories.includes(initialFilter)) {
       setActiveCategory(initialFilter);
     }
-  }, [initialFilter, menuItems]);
+  }, [initialFilter, categories]);
 
-  const filteredItems = menuItems.filter(item => {
-    const matchesCategory = activeCategory === "All" || item.category === activeCategory;
-    const matchesMealTime = activeMealTime === "All Day" || item.mealTime.includes(activeMealTime as any);
-    const matchesSearch = 
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    return matchesCategory && matchesMealTime && matchesSearch && item.available;
-  });
+  // Memoized Filtered Items for Performance
+  const filteredItems = useMemo(() => {
+    return menuItems.filter(item => {
+      const matchesCategory = activeCategory === "All" || item.category === activeCategory;
+      const matchesMealTime = activeMealTime === "All Day" || item.mealTime.includes(activeMealTime as any);
+      const matchesSearch = 
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      return matchesCategory && matchesMealTime && matchesSearch && item.available;
+    });
+  }, [menuItems, activeCategory, activeMealTime, searchQuery]);
 
   return (
     <div className="pt-20 min-h-screen bg-cream">
@@ -127,7 +126,7 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
       <section className="editorial-container py-16">
         <AnimatePresence mode="wait">
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 lg:gap-12">
               {[1, 2, 4, 8].map(i => (
                 <div key={i} className="aspect-[4/5] bg-primary/5 animate-pulse rounded-2xl" />
               ))}
@@ -136,54 +135,15 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 lg:gap-12"
             >
               <AnimatePresence mode="popLayout">
                 {filteredItems.map((item) => (
-                  <motion.div 
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    key={item.id} 
-                    className="bg-white rounded-2xl overflow-hidden shadow-md card-hover group"
-                  >
-                    <div className="relative aspect-[4/5] overflow-hidden">
-                      <OptimizedImage 
-                        src={item.image} 
-                        className="grayscale transition-transform duration-1000 group-hover:scale-110 group-hover:grayscale-0 group-hover:brightness-110" 
-                        alt={item.name} 
-                        aspectRatio="h-full w-full"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors z-10 pointer-events-none" />
-                      {item.isTrending && (
-                        <div className="absolute top-4 left-4 bg-accent text-white px-3 py-1 rounded-full text-[8px] font-bold uppercase tracking-widest shadow-lg flex items-center gap-1 z-20">
-                          <Star className="w-2 h-2 fill-current" /> Trending
-                        </div>
-                      )}
-                      <button className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-md rounded-full text-primary hover:text-accent transition-colors shadow-lg translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all z-20">
-                        <Heart className="w-5 h-5" />
-                      </button>
-                    </div>
-                    <div className="p-6">
-                      <div className="flex justify-between items-start mb-1">
-                        <h3 className="font-serif text-lg text-primary group-hover:text-accent transition-colors duration-500">{item.name}</h3>
-                        <span className="font-bold text-accent">₦{item.price.toLocaleString()}</span>
-                      </div>
-                      <div className="text-[10px] text-on-surface-variant font-bold uppercase tracking-[0.1em] mb-4">
-                        {item.category} {item.portion && `• ${item.portion} portion`}
-                      </div>
-                      <p className="text-xs text-on-surface-variant mb-6 line-clamp-2 leading-relaxed h-8">
-                        {item.description}
-                      </p>
-                      <button 
-                        onClick={() => onAddToCart(item)}
-                        className="w-full flex items-center justify-center gap-2 bg-accent text-white px-6 py-3 rounded-xl font-bold hover:bg-accent/90 transition-all shadow-lg shadow-accent/20 active:scale-95 text-xs uppercase tracking-widest"
-                      >
-                        <ShoppingBag className="w-4 h-4" /> Add to Cart
-                      </button>
-                    </div>
-                  </motion.div>
+                  <MenuCard 
+                    key={item.id}
+                    item={item}
+                    onAddToCart={onAddToCart}
+                  />
                 ))}
               </AnimatePresence>
             </motion.div>

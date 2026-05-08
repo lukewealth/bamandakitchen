@@ -39,7 +39,11 @@ export default function App() {
     // Sync Menu
     const savedMenu = localStorage.getItem('bamanda_menu');
     if (savedMenu) {
-      setMenu(JSON.parse(savedMenu));
+      try {
+        setMenu(JSON.parse(savedMenu));
+      } catch (e) {
+        setMenu(MENU_ITEMS);
+      }
     } else {
       localStorage.setItem('bamanda_menu', JSON.stringify(MENU_ITEMS));
       setMenu(MENU_ITEMS);
@@ -61,20 +65,20 @@ export default function App() {
       }];
       localStorage.setItem('bamanda_posts', JSON.stringify(initialPosts));
     }
-  }, [currentScreen]); // Re-sync on screen changes to pick up Admin updates
+  }, []); // Run only once on mount
 
   // Theme effect
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
-  // Screen change effect with loading simulation
+  // Screen change effect with loading simulation - Speeded up to 400ms
   useEffect(() => {
     setIsLoading(true);
     window.scrollTo(0, 0);
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 800);
+    }, 400);
     return () => clearTimeout(timer);
   }, [currentScreen]);
 
@@ -128,17 +132,19 @@ export default function App() {
   return (
     <ToastProvider>
       <div className="min-h-screen bg-surface selection:bg-accent/30 overflow-x-hidden">
-      <Header 
-        currentScreen={currentScreen} 
-        onNavigate={setCurrentScreen} 
-        onOpenCart={() => setIsCartOpen(true)}
-        cartCount={cartCount}
-        theme={theme}
-        onToggleTheme={() => setTheme(prev => prev === 'night' ? 'day' : 'night')}
-        isLoading={isLoading}
-      />
+      {currentScreen !== 'admin' && (
+        <Header 
+          currentScreen={currentScreen} 
+          onNavigate={setCurrentScreen} 
+          onOpenCart={() => setIsCartOpen(true)}
+          cartCount={cartCount}
+          theme={theme}
+          onToggleTheme={() => setTheme(prev => prev === 'night' ? 'day' : 'night')}
+          isLoading={isLoading}
+        />
+      )}
 
-      <main>
+      <main className={cn(currentScreen !== 'admin' && "pt-20")}>
         {currentScreen === 'home' && (
           <HomeScreen onNavigateToMenu={handleNavigateToMenu} onAddToCart={handleAddToCart} />
         )}

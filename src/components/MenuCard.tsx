@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import React, { memo } from "react";
 import { Plus, Heart } from "lucide-react";
 import { MenuItem } from "../types";
 import { motion } from "motion/react";
@@ -14,7 +15,7 @@ interface MenuCardProps {
   key?: string | number;
 }
 
-export default function MenuCard({ item, onAddToCart }: MenuCardProps) {
+const MenuCard = memo(({ item, onAddToCart }: MenuCardProps) => {
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -63,4 +64,6 @@ export default function MenuCard({ item, onAddToCart }: MenuCardProps) {
       </button>
     </motion.div>
   );
-}
+});
+
+export default MenuCard;

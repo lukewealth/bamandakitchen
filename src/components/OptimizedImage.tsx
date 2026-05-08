@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import BrandLoader from "./BrandLoader";
 import { cn } from "../lib/utils";
@@ -20,7 +20,7 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   priority?: boolean;
 }
 
-export default function OptimizedImage({ 
+const OptimizedImage = memo(({ 
   src, 
   alt, 
   className, 
@@ -30,7 +30,7 @@ export default function OptimizedImage({
   aspectRatio = "aspect-square",
   priority = false,
   ...props 
-}: OptimizedImageProps) {
+}: OptimizedImageProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
 
@@ -100,4 +100,6 @@ export default function OptimizedImage({
       )}
     </div>
   );
-}
+});
+
+export default OptimizedImage;

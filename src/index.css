@@ -65,11 +65,11 @@
 }
 
 @utility editorial-container {
-  @apply max-w-7xl mx-auto px-6 lg:px-10;
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-10;
 }
 
 @utility glass-nav {
-  @apply bg-surface/80 backdrop-blur-xl editorial-border-b;
+  @apply bg-surface/95 md:bg-surface/80 backdrop-blur-xl editorial-border-b;
 }
 
 @utility wood-texture {

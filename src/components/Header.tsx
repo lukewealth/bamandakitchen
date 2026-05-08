@@ -46,10 +46,10 @@ export default function Header({
   return (
     <header className={cn(
       "fixed top-0 w-full z-[100] glass-nav transition-all duration-500 h-20",
-      isLoading && "opacity-60",
-      isMobileMenuOpen && "z-[150]"
+      isLoading && "opacity-80 md:opacity-60",
+      isMobileMenuOpen && "z-[200]"
     )}>
-      <div className="flex justify-between items-center px-4 lg:px-10 h-full w-full max-w-screen-2xl mx-auto">
+      <div className="flex justify-between items-center px-6 lg:px-10 h-full w-full max-w-screen-2xl mx-auto relative z-[165]">
         <div className="flex items-center space-x-2 lg:space-x-8">
           <div className="flex items-center space-x-4">
             <button 

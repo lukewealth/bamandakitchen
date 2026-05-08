@@ -55,6 +55,14 @@ interface HeroSliderProps {
 export default function HeroSlider({ onNavigate }: HeroSliderProps) {
   const [current, setCurrent] = useState(0);
 
+  // Pre-fetch all hero images for instant transitions
+  useEffect(() => {
+    slides.forEach((slide) => {
+      const img = new Image();
+      img.src = slide.image;
+    });
+  }, []);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);

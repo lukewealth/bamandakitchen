@@ -171,36 +171,36 @@ export default function AdminScreen() {
 
   return (
     <div className="min-h-screen bg-cream flex flex-col lg:flex-row">
-      <aside className="w-full lg:w-64 bg-primary text-white p-6 lg:p-8 space-y-8 lg:h-screen lg:sticky lg:top-0 overflow-y-auto z-40">
+      <aside className="w-full lg:w-64 bg-primary text-white p-6 lg:p-8 space-y-8 lg:h-screen sticky top-0 lg:sticky overflow-y-auto z-[60] shadow-xl">
         <div className="flex items-center justify-between lg:block space-y-0 lg:space-y-8">
           <h2 className="font-serif italic text-2xl text-accent">Bamanda</h2>
-          <button onClick={() => setIsAuthenticated(false)} className="lg:hidden flex items-center gap-2 p-2 opacity-60 hover:opacity-100 text-xs uppercase tracking-widest font-bold border border-white/10 rounded-lg"><LogOut className="w-4 h-4" /> Exit</button>
+          <button onClick={() => setIsAuthenticated(false)} className="lg:hidden flex items-center gap-2 p-2 px-4 opacity-60 hover:opacity-100 text-[10px] uppercase tracking-widest font-bold border border-white/20 rounded-xl bg-white/5 active:scale-95 transition-all"><LogOut className="w-4 h-4" /> Exit</button>
         </div>
         <nav className="flex lg:flex-col gap-2 lg:gap-4 overflow-x-auto lg:overflow-visible no-scrollbar pb-2 lg:pb-0">
           <button 
             onClick={() => setActiveTab('orders')} 
-            className={`flex-1 lg:w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl transition-all whitespace-nowrap ${activeTab === 'orders' ? 'bg-white/10 opacity-100' : 'opacity-60 hover:opacity-100'}`}
+            className={`flex-1 lg:w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl transition-all whitespace-nowrap ${activeTab === 'orders' ? 'bg-white/10 opacity-100 border border-white/10 shadow-inner' : 'opacity-60 hover:opacity-100 border border-transparent'}`}
           >
-            <ShoppingBag className="w-5 h-5" /> <span className="text-xs font-bold uppercase tracking-widest">Orders</span>
+            <ShoppingBag className="w-5 h-5 text-accent" /> <span className="text-[10px] font-bold uppercase tracking-widest">Orders</span>
           </button>
           <button 
             onClick={() => setActiveTab('menu')} 
-            className={`flex-1 lg:w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl transition-all whitespace-nowrap ${activeTab === 'menu' ? 'bg-white/10 opacity-100' : 'opacity-60 hover:opacity-100'}`}
+            className={`flex-1 lg:w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl transition-all whitespace-nowrap ${activeTab === 'menu' ? 'bg-white/10 opacity-100 border border-white/10 shadow-inner' : 'opacity-60 hover:opacity-100 border border-transparent'}`}
           >
-            <Utensils className="w-5 h-5" /> <span className="text-xs font-bold uppercase tracking-widest">Menu DB</span>
+            <Utensils className="w-5 h-5 text-accent" /> <span className="text-[10px] font-bold uppercase tracking-widest">Menu DB</span>
           </button>
           <button 
             onClick={() => setActiveTab('blog')} 
-            className={`flex-1 lg:w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl transition-all whitespace-nowrap ${activeTab === 'blog' ? 'bg-white/10 opacity-100' : 'opacity-60 hover:opacity-100'}`}
+            className={`flex-1 lg:w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl transition-all whitespace-nowrap ${activeTab === 'blog' ? 'bg-white/10 opacity-100 border border-white/10 shadow-inner' : 'opacity-60 hover:opacity-100 border border-transparent'}`}
           >
-            <BookOpen className="w-5 h-5" /> <span className="text-xs font-bold uppercase tracking-widest">Gazette</span>
+            <BookOpen className="w-5 h-5 text-accent" /> <span className="text-[10px] font-bold uppercase tracking-widest">Gazette</span>
           </button>
         </nav>
-        <button onClick={() => setIsAuthenticated(false)} className="hidden lg:flex items-center gap-4 p-4 opacity-40 hover:opacity-100"><LogOut className="w-5 h-5" /> Exit</button>
+        <button onClick={() => setIsAuthenticated(false)} className="hidden lg:flex items-center gap-4 p-4 opacity-40 hover:opacity-100 hover:text-accent transition-colors"><LogOut className="w-5 h-5" /> Exit</button>
       </aside>
       
-      <main className="flex-1 p-6 lg:p-10 overflow-x-hidden">
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 lg:mb-12">
+      <main className="flex-1 p-6 lg:p-12 overflow-x-hidden">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-10 lg:mb-16">
           <h1 className="font-serif text-3xl lg:text-5xl text-primary capitalize italic">{activeTab} Curation</h1>
           <div className="flex items-center gap-4">
             <div className="bg-white px-4 py-2 rounded-full border border-primary/10 flex items-center gap-2 shadow-sm">

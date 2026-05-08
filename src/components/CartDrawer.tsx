@@ -38,7 +38,7 @@ export default function CartDrawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-primary/60 z-[60] backdrop-blur-md"
+            className="fixed inset-0 bg-primary/60 z-[210] backdrop-blur-md"
           />
 
           <motion.aside
@@ -46,7 +46,7 @@ export default function CartDrawer({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 h-full w-full md:w-[500px] bg-cream z-[70] shadow-2xl flex flex-col"
+            className="fixed right-0 top-0 h-full w-full md:w-[500px] bg-cream z-[220] shadow-2xl flex flex-col"
           >
             <div className="p-8 flex items-center justify-between bg-primary text-white relative">
               <div className="flex items-center gap-4">
