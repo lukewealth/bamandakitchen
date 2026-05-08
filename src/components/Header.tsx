@@ -50,19 +50,6 @@ export default function Header({
     )}>
       <div className="flex justify-between items-center px-6 lg:px-10 h-full w-full max-w-screen-2xl mx-auto">
         <div className="flex items-center space-x-4 lg:space-x-6">
-          {/* Cart Icon - Moved to Left */}
-          <button 
-            onClick={onOpenCart}
-            className="text-on-surface hover:text-accent transition-all relative p-2 group"
-          >
-            <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform duration-500" />
-            {cartCount > 0 && (
-              <span className="absolute top-0 right-0 text-[10px] font-bold text-accent animate-pulse">
-                ({cartCount})
-              </span>
-            )}
-          </button>
-
           {/* Mobile Menu Toggle */}
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -146,7 +133,20 @@ export default function Header({
         </nav>
 
         <div className="flex items-center space-x-4 lg:space-x-8">
-          {/* Admin Access */}
+          {/* Cart Icon - Moved back to Right, before Admin/Login icon */}
+          <button 
+            onClick={onOpenCart}
+            className="text-on-surface hover:text-accent transition-all relative p-2 group"
+          >
+            <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform duration-500" />
+            {cartCount > 0 && (
+              <span className="absolute top-0 right-0 text-[10px] font-bold text-accent animate-pulse">
+                ({cartCount})
+              </span>
+            )}
+          </button>
+
+          {/* Admin Access / Login Icon */}
           <button 
             onClick={() => handleNavigate("admin")}
             className={cn(
