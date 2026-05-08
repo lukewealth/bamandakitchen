@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { cn } from '../lib/utils';
 import { 
   Lock, LogOut, ShoppingBag, Utensils, BookOpen, X, Star, Edit, Trash2, Plus, 
   CheckCircle2, Clock, Truck, Image as ImageIcon, Layout, Save, AlertCircle, MessageCircle,
