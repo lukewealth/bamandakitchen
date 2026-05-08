@@ -8,10 +8,17 @@
       "description": "Aromatic brown rice served with the iconic spicy, bleached-oil pepper sauce and assorted meats in a rustic wooden bowl.",
       "price": 6000,
       "category": "Rice Dishes",
-      "mealTime": ["Lunch", "Dinner"],
-      "image": "/images/meals/Ofada_Rice.png",
+      "mealTime": [
+        "Lunch",
+        "Dinner"
+      ],
+      "image": "/images/meals/ofada_rice.png",
       "portion": "full",
-      "tags": ["african", "spicy", "classic"],
+      "tags": [
+        "african",
+        "spicy",
+        "classic"
+      ],
       "available": true
     },
     {
@@ -20,23 +27,36 @@
       "description": "Fragrant basmati rice cooked with spiced chicken, caramelized onions, and fresh herbs on a ceramic plate.",
       "price": 5000,
       "category": "Rice Dishes",
-      "mealTime": ["Lunch", "Dinner"],
+      "mealTime": [
+        "Lunch",
+        "Dinner"
+      ],
       "image": "/images/meals/biryani.png",
       "portion": "full",
-      "tags": ["intercontinental", "fragrant"],
+      "tags": [
+        "intercontinental",
+        "fragrant"
+      ],
       "available": true
     },
     {
       "id": "jollof_smokey_full",
       "name": "Smokey Jollof",
-      "description": "The legendary West African party favorite—rice cooked in a rich, smokey tomato base, served with grilled chicken on a dark plate.",
+      "description": "The legendary West African party favorite\u2014rice cooked in a rich, smokey tomato base, served with grilled chicken on a dark plate.",
       "price": 2500,
       "category": "Rice Dishes",
-      "mealTime": ["Lunch", "Dinner"],
+      "mealTime": [
+        "Lunch",
+        "Dinner"
+      ],
       "image": "/images/meals/jollof_smokey.png",
       "tag": "Signature",
       "portion": "full",
-      "tags": ["popular", "spicy", "african"],
+      "tags": [
+        "popular",
+        "spicy",
+        "african"
+      ],
       "available": true
     },
     {
@@ -45,10 +65,16 @@
       "description": "Fluffy steamed white rice served in a minimalist bowl, paired with a small sauce bowl.",
       "price": 2000,
       "category": "Rice Dishes",
-      "mealTime": ["Lunch", "Dinner"],
+      "mealTime": [
+        "Lunch",
+        "Dinner"
+      ],
       "image": "/images/meals/white_rice.png",
       "portion": "full",
-      "tags": ["basic", "clean"],
+      "tags": [
+        "basic",
+        "clean"
+      ],
       "available": true
     },
     {
@@ -57,9 +83,15 @@
       "description": "Succulent grilled turkey meat with crispy, glazed skin, served on a wooden platter.",
       "price": 6000,
       "category": "Proteins",
-      "mealTime": ["Lunch", "Dinner"],
+      "mealTime": [
+        "Lunch",
+        "Dinner"
+      ],
       "image": "/images/meals/turkey.png",
-      "tags": ["meat", "grilled"],
+      "tags": [
+        "meat",
+        "grilled"
+      ],
       "available": true
     },
     {
@@ -68,9 +100,15 @@
       "description": "Peppered goat meat chunks in a rich dark sauce, glossy finish, served in a rustic bowl.",
       "price": 4000,
       "category": "Proteins",
-      "mealTime": ["Lunch", "Dinner"],
+      "mealTime": [
+        "Lunch",
+        "Dinner"
+      ],
       "image": "/images/meals/goat_meat.png",
-      "tags": ["meat", "african"],
+      "tags": [
+        "meat",
+        "african"
+      ],
       "available": true
     },
     {
@@ -79,9 +117,16 @@
       "description": "Large African peppered snails, glossy sauce coating, served elegantly on a dark ceramic dish.",
       "price": 4000,
       "category": "Proteins",
-      "mealTime": ["Lunch", "Dinner"],
+      "mealTime": [
+        "Lunch",
+        "Dinner"
+      ],
       "image": "/images/meals/peppered_snail.jpg",
-      "tags": ["delicacy", "african", "spicy"],
+      "tags": [
+        "delicacy",
+        "african",
+        "spicy"
+      ],
       "available": true
     },
     {
@@ -90,9 +135,15 @@
       "description": "Crispy fried chicken wings with golden texture and slight oil sheen, served with dipping sauce.",
       "price": 2000,
       "category": "Proteins",
-      "mealTime": ["Lunch", "Dinner"],
+      "mealTime": [
+        "Lunch",
+        "Dinner"
+      ],
       "image": "/images/meals/chicken_wings.jpg",
-      "tags": ["chicken", "crispy"],
+      "tags": [
+        "chicken",
+        "crispy"
+      ],
       "available": true
     },
     {
@@ -101,9 +152,16 @@
       "description": "Luxury seafood pasta with shrimp, mussels, and creamy sauce on a white ceramic plate.",
       "price": 14000,
       "category": "Pasta & Noodles",
-      "mealTime": ["Lunch", "Dinner"],
+      "mealTime": [
+        "Lunch",
+        "Dinner"
+      ],
       "image": "/images/meals/seafood_pasta.png",
-      "tags": ["luxury", "seafood", "intercontinental"],
+      "tags": [
+        "luxury",
+        "seafood",
+        "intercontinental"
+      ],
       "available": true
     },
     {
@@ -112,9 +170,15 @@
       "description": "Stir-fried noodles with sliced chicken, vegetables, and glossy sauce in a modern bowl.",
       "price": 6500,
       "category": "Pasta & Noodles",
-      "mealTime": ["Breakfast", "Lunch"],
+      "mealTime": [
+        "Breakfast",
+        "Lunch"
+      ],
       "image": "/images/meals/chicken_noodles.png",
-      "tags": ["quick", "asian"],
+      "tags": [
+        "quick",
+        "asian"
+      ],
       "available": true
     },
     {
@@ -123,9 +187,15 @@
       "description": "Spaghetti cooked in rich jollof sauce, deep red color, served on a modern plate.",
       "price": 2500,
       "category": "Pasta & Noodles",
-      "mealTime": ["Lunch", "Dinner"],
+      "mealTime": [
+        "Lunch",
+        "Dinner"
+      ],
       "image": "/images/meals/spaghetti_jollof.png",
-      "tags": ["classic", "african"],
+      "tags": [
+        "classic",
+        "african"
+      ],
       "available": true
     },
     {
@@ -134,9 +204,17 @@
       "description": "Double-wrapped pita with spiced chicken, creamy garlic spread, sliced open to show filling.",
       "price": 6000,
       "category": "Snacks",
-      "mealTime": ["Breakfast", "Lunch", "Dinner"],
+      "mealTime": [
+        "Breakfast",
+        "Lunch",
+        "Dinner"
+      ],
       "image": "/images/meals/chicken_shawarma.png",
-      "tags": ["popular", "quick", "street-food"],
+      "tags": [
+        "popular",
+        "quick",
+        "street-food"
+      ],
       "available": true
     },
     {
@@ -145,9 +223,15 @@
       "description": "Premium chicken burger with melted cheese, lettuce, tomato, served stacked with fries.",
       "price": 12000,
       "category": "Snacks",
-      "mealTime": ["Lunch", "Dinner"],
+      "mealTime": [
+        "Lunch",
+        "Dinner"
+      ],
       "image": "/images/meals/burger.png",
-      "tags": ["gourmet", "fastfood"],
+      "tags": [
+        "gourmet",
+        "fastfood"
+      ],
       "available": true
     },
     {
@@ -156,9 +240,16 @@
       "description": "Steamed bean pudding sliced open showing egg and fish filling, served in a traditional wrap.",
       "price": 1000,
       "category": "Snacks",
-      "mealTime": ["Breakfast", "Lunch"],
+      "mealTime": [
+        "Breakfast",
+        "Lunch"
+      ],
       "image": "/images/meals/moi_moi.png",
-      "tags": ["traditional", "healthy", "protein"],
+      "tags": [
+        "traditional",
+        "healthy",
+        "protein"
+      ],
       "available": true
     },
     {
@@ -167,9 +258,15 @@
       "description": "Hot spicy goat meat soup in a deep bowl, rich broth with steam rising.",
       "price": 8000,
       "category": "African Dishes",
-      "mealTime": ["Dinner"],
+      "mealTime": [
+        "Dinner"
+      ],
       "image": "/images/meals/goat_peppersoup.webp",
-      "tags": ["spicy", "african", "comfort"],
+      "tags": [
+        "spicy",
+        "african",
+        "comfort"
+      ],
       "available": true
     },
     {
@@ -178,9 +275,15 @@
       "description": "Spicy chicken broth with herbs floating, served in a rustic bowl with steam effect.",
       "price": 8000,
       "category": "African Dishes",
-      "mealTime": ["Lunch", "Dinner"],
+      "mealTime": [
+        "Lunch",
+        "Dinner"
+      ],
       "image": "/images/meals/chicken_peppersoup.jpg",
-      "tags": ["spicy", "soup"],
+      "tags": [
+        "spicy",
+        "soup"
+      ],
       "available": true
     },
     {
@@ -189,9 +292,15 @@
       "description": "Turkey pepper soup with rich broth and visible spices in a premium bowl.",
       "price": 7000,
       "category": "African Dishes",
-      "mealTime": ["Lunch", "Dinner"],
+      "mealTime": [
+        "Lunch",
+        "Dinner"
+      ],
       "image": "/images/meals/turkey_peppersoup.jpg",
-      "tags": ["spicy", "protein"],
+      "tags": [
+        "spicy",
+        "protein"
+      ],
       "available": true
     },
     {
@@ -200,9 +309,16 @@
       "description": "Chilled bottle of Coca-Cola with condensation droplets on a wooden table.",
       "price": 800,
       "category": "Drinks",
-      "mealTime": ["Breakfast", "Lunch", "Dinner"],
+      "mealTime": [
+        "Breakfast",
+        "Lunch",
+        "Dinner"
+      ],
       "image": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=800",
-      "tags": ["soft", "cold"],
+      "tags": [
+        "soft",
+        "cold"
+      ],
       "available": true
     },
     {
@@ -211,20 +327,34 @@
       "description": "Cold Fanta bottle with bright orange color and condensation droplets.",
       "price": 800,
       "category": "Drinks",
-      "mealTime": ["Breakfast", "Lunch", "Dinner"],
+      "mealTime": [
+        "Breakfast",
+        "Lunch",
+        "Dinner"
+      ],
       "image": "https://images.unsplash.com/photo-1624517452488-04869289c4ca?auto=format&fit=crop&q=80&w=800",
-      "tags": ["soft", "orange"],
+      "tags": [
+        "soft",
+        "orange"
+      ],
       "available": true
     },
     {
       "id": "water",
       "name": "Bottle Water",
-      "description: "Premium bottled water with condensation, minimal clean aesthetic.",
+      "description": "Premium bottled water with condensation, minimal clean aesthetic.",
       "price": 500,
       "category": "Drinks",
-      "mealTime": ["Breakfast", "Lunch", "Dinner"],
+      "mealTime": [
+        "Breakfast",
+        "Lunch",
+        "Dinner"
+      ],
       "image": "/images/meals/water.png",
-      "tags": ["basic", "hydration"],
+      "tags": [
+        "basic",
+        "hydration"
+      ],
       "available": true
     }
   ]

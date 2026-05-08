@@ -16,7 +16,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 6000,
     category: 'Rice Dishes',
     mealTime: ['Lunch', 'Dinner'],
-    image: '/images/meals/Ofada_Rice.png',
+    image: '/images/meals/ofada_rice.png',
     portion: 'full',
     tags: ['african', 'spicy', 'classic'],
     available: true
