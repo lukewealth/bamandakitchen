@@ -89,7 +89,7 @@ export default function MenuScreen({ onAddToCart, initialFilter }: MenuScreenPro
       {/* Filter Bar */}
       <section className="sticky top-20 z-40 bg-white/80 backdrop-blur-xl editorial-border-b shadow-sm">
         <div className="editorial-container py-4 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-2 md:pb-0">
+          <div className="flex flex-wrap items-center gap-2 pb-2 md:pb-0">
             {categories.map((cat) => (
               <button 
                 key={cat}

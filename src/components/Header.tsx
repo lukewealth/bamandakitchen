@@ -198,13 +198,13 @@ export default function Header({
               className="fixed inset-0 bg-primary/60 backdrop-blur-md z-[160] md:hidden"
             />
             
-            {/* Side Drawer - Solid surface and refined padding */}
+            {/* Side Drawer - Full screen and refined padding */}
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-surface z-[170] md:hidden shadow-[0_0_50px_rgba(0,0,0,0.3)] flex flex-col border-l border-on-surface/5"
+              className="fixed top-0 right-0 h-full w-full bg-surface z-[170] md:hidden shadow-2xl flex flex-col"
             >
               <div className="p-8 pt-24 space-y-10 flex-1 overflow-y-auto no-scrollbar">
                 <div className="space-y-6">

@@ -7,7 +7,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Lock, LogOut, ShoppingBag, Utensils, BookOpen, X, Star, Edit, Trash2, Plus, 
-  CheckCircle2, Clock, Truck, Image as ImageIcon, Layout, Save, AlertCircle, MessageCircle
+  CheckCircle2, Clock, Truck, Image as ImageIcon, Layout, Save, AlertCircle, MessageCircle,
+  Menu as MenuIcon
 } from 'lucide-react';
 import { MenuItem, Order, BlogPost, OrderStatus, BlogLayout, MenuCategory } from '../types';
 import { MENU_ITEMS } from '../data';
@@ -20,6 +21,7 @@ export default function AdminScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'blog'>('orders');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const [orders, setOrders] = useState<Order[]>([]);
   const [menu, setMenu] = useState<MenuItem[]>([]);
@@ -171,32 +173,56 @@ export default function AdminScreen() {
 
   return (
     <div className="min-h-screen bg-cream flex flex-col lg:flex-row">
-      <aside className="w-full lg:w-64 bg-primary text-white p-6 lg:p-8 space-y-8 lg:h-screen sticky top-0 lg:sticky overflow-y-auto z-[60] shadow-xl">
+      <aside className={cn(
+        "w-full lg:w-64 bg-primary text-white p-6 lg:p-8 lg:h-screen sticky top-0 lg:sticky overflow-y-auto z-[60] shadow-xl transition-all duration-500",
+        isMobileMenuOpen ? "h-screen bg-primary" : "h-auto"
+      )}>
         <div className="flex items-center justify-between lg:block space-y-0 lg:space-y-8">
           <h2 className="font-serif italic text-2xl text-accent">Bamanda</h2>
-          <button onClick={() => setIsAuthenticated(false)} className="lg:hidden flex items-center gap-2 p-2 px-4 opacity-60 hover:opacity-100 text-[10px] uppercase tracking-widest font-bold border border-white/20 rounded-xl bg-white/5 active:scale-95 transition-all"><LogOut className="w-4 h-4" /> Exit</button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-3 bg-white/5 rounded-xl border border-white/10 text-white active:scale-95 transition-all"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
+            </button>
+            <button onClick={() => setIsAuthenticated(false)} className="flex items-center gap-2 p-3 px-4 opacity-60 hover:opacity-100 text-[10px] uppercase tracking-widest font-bold border border-white/20 rounded-xl bg-white/5 active:scale-95 transition-all">
+              <LogOut className="w-4 h-4" /> 
+              <span className="hidden sm:inline">Exit</span>
+            </button>
+          </div>
         </div>
-        <nav className="flex lg:flex-col gap-2 lg:gap-4 overflow-x-auto lg:overflow-visible no-scrollbar pb-2 lg:pb-0">
-          <button 
-            onClick={() => setActiveTab('orders')} 
-            className={`flex-1 lg:w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl transition-all whitespace-nowrap ${activeTab === 'orders' ? 'bg-white/10 opacity-100 border border-white/10 shadow-inner' : 'opacity-60 hover:opacity-100 border border-transparent'}`}
-          >
-            <ShoppingBag className="w-5 h-5 text-accent" /> <span className="text-[10px] font-bold uppercase tracking-widest">Orders</span>
+
+        <div className={cn(
+          "lg:flex lg:flex-col gap-2 lg:gap-4 lg:mt-8",
+          isMobileMenuOpen ? "flex flex-col mt-8" : "hidden"
+        )}>
+          {[
+            { id: 'orders', label: 'Orders', icon: ShoppingBag },
+            { id: 'menu', label: 'Menu DB', icon: Utensils },
+            { id: 'blog', label: 'Gazette', icon: BookOpen },
+          ].map((tab) => (
+            <button 
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id as any);
+                setIsMobileMenuOpen(false);
+              }} 
+              className={`w-full flex items-center justify-start gap-4 p-5 rounded-2xl transition-all ${activeTab === tab.id ? 'bg-white text-primary shadow-xl scale-[1.02]' : 'bg-white/5 opacity-60 hover:opacity-100 border border-white/5'}`}
+            >
+              <tab.icon className={cn("w-5 h-5", activeTab === tab.id ? "text-accent" : "text-white")} /> 
+              <span className="text-xs font-bold uppercase tracking-[0.2em]">{tab.label}</span>
+            </button>
+          ))}
+          
+          <button onClick={() => setIsAuthenticated(false)} className="lg:hidden flex items-center gap-4 p-5 opacity-40 hover:opacity-100 hover:text-accent transition-colors">
+            <LogOut className="w-5 h-5" /> Exit
           </button>
-          <button 
-            onClick={() => setActiveTab('menu')} 
-            className={`flex-1 lg:w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl transition-all whitespace-nowrap ${activeTab === 'menu' ? 'bg-white/10 opacity-100 border border-white/10 shadow-inner' : 'opacity-60 hover:opacity-100 border border-transparent'}`}
-          >
-            <Utensils className="w-5 h-5 text-accent" /> <span className="text-[10px] font-bold uppercase tracking-widest">Menu DB</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('blog')} 
-            className={`flex-1 lg:w-full flex items-center justify-center lg:justify-start gap-4 p-4 rounded-xl transition-all whitespace-nowrap ${activeTab === 'blog' ? 'bg-white/10 opacity-100 border border-white/10 shadow-inner' : 'opacity-60 hover:opacity-100 border border-transparent'}`}
-          >
-            <BookOpen className="w-5 h-5 text-accent" /> <span className="text-[10px] font-bold uppercase tracking-widest">Gazette</span>
-          </button>
-        </nav>
-        <button onClick={() => setIsAuthenticated(false)} className="hidden lg:flex items-center gap-4 p-4 opacity-40 hover:opacity-100 hover:text-accent transition-colors"><LogOut className="w-5 h-5" /> Exit</button>
+        </div>
+        
+        <button onClick={() => setIsAuthenticated(false)} className="hidden lg:flex items-center gap-4 p-4 mt-8 opacity-40 hover:opacity-100 hover:text-accent transition-colors">
+          <LogOut className="w-5 h-5" /> Exit
+        </button>
       </aside>
       
       <main className="flex-1 p-6 lg:p-12 overflow-x-hidden">
