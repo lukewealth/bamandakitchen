@@ -31,7 +31,7 @@ import {
 } from 'firebase/firestore';
 
 export default function AdminScreen() {
-  const { showToast } = useToast();
+  const { showToast, confirm } = useToast();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -72,6 +72,7 @@ export default function AdminScreen() {
         }
       }, (err) => {
         console.error('Admin menu subscription failed:', err);
+        showToast('Access restricted: Menu records could not be synchronized.', 'error');
       });
 
       const unsubOrders = onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), (snapshot) => {
@@ -79,6 +80,7 @@ export default function AdminScreen() {
         setOrders(items);
       }, (err) => {
         console.error('Admin orders subscription failed:', err);
+        showToast('Access restricted: Order logs are currently secured.', 'error');
       });
 
       const unsubBlog = onSnapshot(query(collection(db, 'blog'), orderBy('date', 'desc')), (snapshot) => {
@@ -87,12 +89,14 @@ export default function AdminScreen() {
         localStorage.setItem('bamanda_blog_cache', JSON.stringify(items));
       }, (err) => {
         console.error('Admin blog subscription failed:', err);
+        showToast('Access restricted: Gazette manuscripts are secured.', 'error');
       });
 
       const unsubStaff = onSnapshot(query(collection(db, 'staff'), orderBy('name')), (snapshot) => {
         setStaff(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as StaffAccount)));
       }, (err) => {
         console.error('Admin staff subscription failed:', err);
+        showToast('Access restricted: Curator credentials are secured by the sanctuary rules.', 'error');
       });
 
       return () => {
@@ -128,30 +132,41 @@ export default function AdminScreen() {
       return;
     }
 
-    if (!window.confirm('This will seed the cloud database with current local menu items. Continue?')) return;
-    setIsMigrating(true);
-    try {
-      const batch = writeBatch(db);
-      menu.forEach(item => {
-        const docRef = doc(db, 'menu', item.id);
-        batch.set(docRef, { ...item, updatedAt: serverTimestamp() });
-      });
-      await batch.commit();
-      showToast('Sanctuary inventory successfully migrated to the cloud.', 'success');
-    } catch (error) {
-      console.error('Migration failed:', error);
-      showToast('Migration encountered a spiritual blockage.', 'error');
-    } finally {
-      setIsMigrating(false);
-    }
+    confirm({
+      title: "Cloud Manifestation",
+      message: "This will synchronize your local heritage items with the cloud sanctuary. Proceed?",
+      confirmLabel: "Manifest to Cloud",
+      onConfirm: async () => {
+        setIsMigrating(true);
+        try {
+          const batch = writeBatch(db);
+          menu.forEach(item => {
+            const docRef = doc(db, 'menu', item.id);
+            batch.set(docRef, { ...item, updatedAt: serverTimestamp() });
+          });
+          await batch.commit();
+          showToast('Sanctuary inventory successfully migrated to the cloud.', 'success');
+        } catch (error) {
+          console.error('Migration failed:', error);
+          showToast('Cloud synchronization encountered a spiritual blockage.', 'error');
+        } finally {
+          setIsMigrating(false);
+        }
+      }
+    });
   };
 
   const restoreFromStatic = () => {
-    if (window.confirm('Restore menu items from static heritage data? Current changes will be overwritten.')) {
-      setMenu(MENU_ITEMS);
-      localStorage.setItem('bamanda_menu_cache', JSON.stringify(MENU_ITEMS));
-      showToast('Restored from ancestral records.', 'info');
-    }
+    confirm({
+      title: "Restore Heritage",
+      message: "Reset your local menu to the ancestral records? This will overwrite recent local changes.",
+      confirmLabel: "Restore Records",
+      onConfirm: () => {
+        setMenu(MENU_ITEMS);
+        localStorage.setItem('bamanda_menu_cache', JSON.stringify(MENU_ITEMS));
+        showToast('Restored from ancestral records.', 'info');
+      }
+    });
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -188,21 +203,27 @@ export default function AdminScreen() {
   };
 
   const deleteOrder = async (orderId: string) => {
-    if (window.confirm('Are you sure you want to remove this curation from history?')) {
-      if (db) {
-        try {
-          await deleteDoc(doc(db, 'orders', orderId));
-          showToast('Curation archived from cloud records.', 'info');
-        } catch (err) {
-          console.error('Cloud delete failed:', err);
+    confirm({
+      title: "Archive Curation",
+      message: "Are you sure you want to remove this record from the active curation logs?",
+      type: "danger",
+      confirmLabel: "Archive Record",
+      onConfirm: async () => {
+        if (db) {
+          try {
+            await deleteDoc(doc(db, 'orders', orderId));
+            showToast('Curation archived from cloud records.', 'info');
+          } catch (err) {
+            console.error('Cloud delete failed:', err);
+            setOrders(prev => prev.filter(o => o.id !== orderId));
+            showToast('Curation archived from local view.', 'info');
+          }
+        } else {
           setOrders(prev => prev.filter(o => o.id !== orderId));
-          showToast('Curation archived from local view.', 'info');
+          showToast('Curation archived from records.', 'info');
         }
-      } else {
-        setOrders(prev => prev.filter(o => o.id !== orderId));
-        showToast('Curation archived from records.', 'info');
       }
-    }
+    });
   };
 
   // Blog Actions
@@ -248,21 +269,27 @@ export default function AdminScreen() {
   };
 
   const handleDeletePost = async (id: string) => {
-    if (window.confirm('Delete this article?')) {
-      if (db) {
-        try {
-          await deleteDoc(doc(db, 'blog', id));
-          showToast('Article archived from cloud.', 'info');
-        } catch (err) {
-          console.error('Cloud blog delete failed:', err);
+    confirm({
+      title: "Archive Article",
+      message: "Manifest this article into the digital archives? It will be removed from the Gazette.",
+      type: "danger",
+      confirmLabel: "Archive Article",
+      onConfirm: async () => {
+        if (db) {
+          try {
+            await deleteDoc(doc(db, 'blog', id));
+            showToast('Article archived from cloud.', 'info');
+          } catch (err) {
+            console.error('Cloud blog delete failed:', err);
+            setPosts(prev => prev.filter(p => p.id !== id));
+            showToast('Article archived from local view.', 'info');
+          }
+        } else {
           setPosts(prev => prev.filter(p => p.id !== id));
-          showToast('Article archived from local view.', 'info');
+          showToast('Article archived from the Gazette.', 'info');
         }
-      } else {
-        setPosts(prev => prev.filter(p => p.id !== id));
-        showToast('Article archived from the Gazette.', 'info');
       }
-    }
+    });
   };
 
   // Menu Actions
@@ -336,7 +363,7 @@ export default function AdminScreen() {
         }
       } catch (err) {
         console.error('Cloud staff save failed:', err);
-        showToast('Cloud sync failed. Record remains local.', 'warning');
+        showToast('Cloud synchronization restricted for staff records.', 'error');
       }
     } else {
       if (editingStaff.id) {
@@ -356,21 +383,27 @@ export default function AdminScreen() {
   };
 
   const deleteStaff = async (id: string) => {
-    if (window.confirm('Remove this staff member from the sanctuary records?')) {
-      if (db) {
-        try {
-          await deleteDoc(doc(db, 'staff', id));
-          showToast('Staff records archived from cloud.', 'info');
-        } catch (err) {
-          console.error('Cloud staff delete failed:', err);
+    confirm({
+      title: "Remove Staff",
+      message: "Are you sure you want to remove this curator from the sanctuary records?",
+      type: "danger",
+      confirmLabel: "Remove Member",
+      onConfirm: async () => {
+        if (db) {
+          try {
+            await deleteDoc(doc(db, 'staff', id));
+            showToast('Staff records archived from cloud.', 'info');
+          } catch (err) {
+            console.error('Cloud staff delete failed:', err);
+            setStaff(prev => prev.filter(s => s.id !== id));
+            showToast('Staff archived from local view.', 'info');
+          }
+        } else {
           setStaff(prev => prev.filter(s => s.id !== id));
-          showToast('Staff archived from local view.', 'info');
+          showToast('Staff records archived.', 'info');
         }
-      } else {
-        setStaff(prev => prev.filter(s => s.id !== id));
-        showToast('Staff records archived.', 'info');
       }
-    }
+    });
   };
 
   const toggleTrending = async (id: string) => {
@@ -645,11 +678,20 @@ export default function AdminScreen() {
                         </button>
                         <div className="flex gap-4">
                           <button onClick={() => setEditingMenuItem(item)} className="text-primary/40 hover:text-accent"><Edit className="w-4 h-4" /></button>
-                          <button onClick={() => setMenu(prev => {
-                            const updated = prev.filter(m => m.id !== item.id);
-                            localStorage.setItem('bamanda_menu_cache', JSON.stringify(updated));
-                            return updated;
-                          })} className="text-primary/40 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                          <button onClick={() => {
+                            confirm({
+                              title: "Purge Selection",
+                              message: "Are you sure you want to remove this item from the active curation?",
+                              type: "danger",
+                              onConfirm: () => {
+                                setMenu(prev => {
+                                  const updated = prev.filter(m => m.id !== item.id);
+                                  localStorage.setItem('bamanda_menu_cache', JSON.stringify(updated));
+                                  return updated;
+                                });
+                              }
+                            });
+                          }} className="text-primary/40 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
                         </div>
                       </div>
                     </div>

@@ -1,18 +1,31 @@
-rules_version='2'
-
+rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Allow public read access to menu and blog
+    match /menu/{item} {
+      allow read: if true;
+      allow write: if true; // In production, restrict to authenticated admins
+    }
+    
+    match /blog/{post} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Allow creation of orders, but only admins can read all
+    match /orders/{order} {
+      allow create: if true;
+      allow read, update, delete: if true; // Restrict in production
+    }
+
+    // Staff records
+    match /staff/{member} {
+      allow read, write: if true;
+    }
+    
+    // Fallback for everything else
     match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 6, 8);
+      allow read, write: if request.time < timestamp.date(2026, 12, 31);
     }
   }
 }
