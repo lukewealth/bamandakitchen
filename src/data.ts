@@ -936,7 +936,7 @@ export const MENU_ITEMS: MenuItem[] = [
   // 🍲 SIGNATURE SOUPS
   // ========================
   {
-    id: 'goat_pepper_soup_standard',
+    id: 'goat_meat_peppersoup',
     name: 'Goat meat pepper soup',
     description: 'Hot spicy goat meat soup with traditional healing herbs.',
     price: 8000,
@@ -948,7 +948,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isTrending: true
   },
   {
-    id: 'chicken_pepper_soup_standard',
+    id: 'chicken_pepper_soup',
     name: 'Chicken pepper soup',
     description: 'Spicy chicken broth with heritage herbs.',
     price: 8000,
@@ -959,7 +959,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'turkey_pepper_soup_standard',
+    id: 'turkey_pepper_soup',
     name: 'Turkey pepper soup',
     description: 'Turkey pepper soup with rich broth and visible heritage spices.',
     price: 7000,
