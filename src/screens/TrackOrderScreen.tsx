@@ -14,17 +14,57 @@ interface TrackOrderScreenProps {
   onBack: () => void;
 }
 
-export default function TrackOrderScreen({ order, onBack }: TrackOrderScreenProps) {
-  const [timeLeft, setTimeLeft] = useState(order?.estimatedDeliveryTime || 30 * 60); // In seconds
+export default function TrackOrderScreen({ order: initialOrder, onBack }: TrackOrderScreenProps) {
+  const [activeOrder, setActiveOrder] = useState<Order | null>(initialOrder);
+  const [searchId, setSearchId] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [history, setHistory] = useState<Order[]>([]);
+  const [timeLeft, setTimeLeft] = useState(30 * 60); // Default 30 mins
   const [vehicle, setVehicle] = useState<'bike' | 'car'>('bike');
 
   useEffect(() => {
-    if (!order || timeLeft <= 0) return;
+    // Load local history
+    const saved = localStorage.getItem('bamanda_orders');
+    if (saved) {
+      try {
+        setHistory(JSON.parse(saved));
+      } catch (e) {
+        setHistory([]);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeOrder) {
+      setTimeLeft(activeOrder.estimatedDeliveryTime || 30 * 60);
+    }
+  }, [activeOrder?.id]);
+
+  useEffect(() => {
+    if (!activeOrder || timeLeft <= 0) return;
     const timer = setInterval(() => {
       setTimeLeft(prev => Math.max(0, prev - 1));
     }, 1000);
     return () => clearInterval(timer);
-  }, [order, timeLeft]);
+  }, [activeOrder, timeLeft]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSearching(true);
+
+    // Simulate lookup
+    setTimeout(() => {
+      const allOrders = JSON.parse(localStorage.getItem('bamanda_orders') || '[]');
+      const found = allOrders.find((o: Order) => o.id.toUpperCase() === searchId.toUpperCase());
+
+      if (found) {
+        setActiveOrder(found);
+      } else {
+        alert("Order sequence not found in our archives.");
+      }
+      setIsSearching(false);
+    }, 1000);
+  };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -37,30 +77,91 @@ export default function TrackOrderScreen({ order, onBack }: TrackOrderScreenProp
     return steps.indexOf(status);
   };
 
-  const currentStep = order ? getStatusIndex(order.status) : 0;
+  const currentStep = activeOrder ? getStatusIndex(activeOrder.status) : 0;
 
   const handleContactKitchen = () => {
-    if (!order) return;
-    const message = encodeURIComponent(`Hello Bamanda Kitchen! I'm inquiring about my order #${order.id}. Current status is: ${order.status.toUpperCase()}.`);
+    if (!activeOrder) return;
+    const message = encodeURIComponent(`Hello Bamanda Kitchen! I'm inquiring about my order #${activeOrder.id}. Current status is: ${activeOrder.status.toUpperCase()}.`);
     window.open(getWhatsAppUrl(message), '_blank');
   };
 
-  if (!order) {
+  if (!activeOrder) {
     return (
-      <div className="min-h-screen pt-32 flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-24 h-24 bg-accent/10 rounded-full flex items-center justify-center mb-8 animate-pulse">
-          <Clock className="w-10 h-10 text-accent" />
+      <div className="min-h-screen pt-32 pb-24 px-6 lg:px-20 bg-cream">
+        <div className="max-w-4xl mx-auto space-y-16">
+          <div className="text-center space-y-6">
+            <div className="editorial-label text-accent tracking-[0.4em]">Order Archives</div>
+            <h1 className="font-serif text-5xl md:text-7xl text-primary italic leading-tight">Access Your <br />Curation History</h1>
+            <p className="font-sans text-on-surface-variant max-w-xl mx-auto opacity-70 italic">
+              "Every order is a unique manuscript of taste. Enter your unique identifier to trace its manifestation."
+            </p>
+          </div>
+
+          {/* Search Portal */}
+          <motion.form 
+            onSubmit={handleSearch}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative max-w-2xl mx-auto"
+          >
+            <div className="bg-white rounded-3xl p-4 shadow-2xl shadow-primary/10 border border-primary/5 flex items-center gap-4">
+              <Package className="w-6 h-6 text-accent ml-4 shrink-0" />
+              <input 
+                type="text" 
+                placeholder="Enter Unique Order ID (e.g. BAM-XXXX-XXXX)"
+                value={searchId}
+                onChange={(e) => setSearchId(e.target.value)}
+                className="flex-1 bg-transparent border-none focus:ring-0 p-4 font-sans text-lg text-primary uppercase tracking-widest"
+                required
+              />
+              <button 
+                type="submit"
+                disabled={isSearching}
+                className="bg-primary text-white px-10 py-5 rounded-2xl font-bold uppercase tracking-widest text-[10px] hover:bg-accent transition-all flex items-center gap-3 active:scale-95 disabled:opacity-50"
+              >
+                {isSearching ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Truck className="w-4 h-4" />}
+                Track
+              </button>
+            </div>
+          </motion.form>
+
+          {/* History List */}
+          {history.length > 0 && (
+            <div className="space-y-8">
+              <div className="flex items-center gap-4 editorial-border-b pb-4">
+                <Clock className="w-4 h-4 text-accent" />
+                <h3 className="editorial-label text-xs tracking-widest">Recent Manifestations</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {history.slice(0, 4).map((h) => (
+                  <button 
+                    key={h.id}
+                    onClick={() => setActiveOrder(h)}
+                    className="flex items-center justify-between p-8 bg-white rounded-3xl border border-primary/5 hover:border-accent/30 transition-all text-left group shadow-sm hover:shadow-xl"
+                  >
+                    <div className="space-y-2">
+                      <div className="text-[9px] font-sans font-black uppercase tracking-widest text-accent">{h.id}</div>
+                      <div className="font-serif text-lg text-primary italic">{new Date(h.createdAt).toLocaleDateString()}</div>
+                      <div className="text-[10px] text-on-surface-variant font-medium uppercase tracking-[0.1em]">{h.items.length} Curated Items</div>
+                    </div>
+                    <div className="p-4 bg-primary/5 rounded-2xl group-hover:bg-accent group-hover:text-white transition-colors">
+                      <ArrowLeft className="w-4 h-4 rotate-180" />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="text-center pt-8">
+            <button 
+              onClick={onBack}
+              className="text-[10px] uppercase tracking-[0.3em] font-black text-primary opacity-40 hover:opacity-100 transition-opacity border-b border-primary/20 pb-1"
+            >
+              Return to Sanctuary
+            </button>
+          </div>
         </div>
-        <h2 className="font-serif text-3xl text-on-surface mb-4 italic">No Active Curation Found</h2>
-        <p className="font-sans text-on-surface-variant max-w-md opacity-60 mb-12">
-          It seems there are no orders currently being tracked. Please verify your order ID or return to the menu.
-        </p>
-        <button 
-          onClick={onBack}
-          className="editorial-label text-accent border-b border-accent py-2 hover:opacity-70 transition-opacity"
-        >
-          Return to Sanctuary
-        </button>
       </div>
     );
   }
@@ -68,32 +169,46 @@ export default function TrackOrderScreen({ order, onBack }: TrackOrderScreenProp
   return (
     <div className="min-h-screen pt-32 pb-20 px-6 lg:px-20 bg-surface">
       <div className="max-w-5xl mx-auto">
-        <button 
-          onClick={onBack}
-          className="flex items-center gap-3 text-on-surface-variant hover:text-accent transition-colors mb-12 group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-2 transition-transform" />
-          <span className="editorial-label text-[10px] uppercase tracking-widest">Back to Store</span>
-        </button>
+        <div className="flex justify-between items-center mb-12">
+          <button 
+            onClick={() => setActiveOrder(null)}
+            className="flex items-center gap-3 text-on-surface-variant hover:text-accent transition-colors group"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-2 transition-transform" />
+            <span className="editorial-label text-[10px] uppercase tracking-widest">Tracking Archives</span>
+          </button>
+
+          <button 
+            onClick={onBack}
+            className="text-[9px] font-black uppercase tracking-[0.3em] opacity-40 hover:opacity-100 hover:text-accent transition-all"
+          >
+            Exit to Store
+          </button>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           {/* Status Details */}
           <div className="space-y-12">
             <header>
-              <div className="editorial-label text-accent mb-4 tracking-[0.4em]">Tracking Order #{order.id}</div>
-              <h1 className="font-serif italic text-6xl text-on-surface">Your Feast is <br />Being Prepared</h1>
+              <div className="editorial-label text-accent mb-4 tracking-[0.4em]">Tracking Order #{activeOrder.id}</div>
+              <h1 className="font-serif italic text-6xl text-on-surface">Your Feast is <br />{activeOrder.status === 'delivered' ? 'Manifested' : 'Being Prepared'}</h1>
             </header>
 
             <div className="bg-primary p-10 rounded-3xl shadow-2xl relative overflow-hidden">
                <div className="absolute top-0 right-0 w-40 h-40 bg-accent/5 rounded-full blur-3xl -mr-20 -mt-20" />
                <div className="relative z-10 flex flex-col items-center text-center">
-                  <div className="editorial-label text-accent/50 text-[8px] mb-2">Estimated Arrival</div>
+                  <div className="editorial-label text-accent/50 text-[8px] mb-2">{activeOrder.status === 'delivered' ? 'Delivery Completed' : 'Estimated Arrival'}</div>
                   <div className="font-sans text-6xl font-black text-white tracking-tighter mb-4">
-                    {formatTime(timeLeft)}
+                    {activeOrder.status === 'delivered' ? '00:00' : formatTime(timeLeft)}
                   </div>
-                  <div className="flex items-center gap-3 text-accent animate-pulse">
-                    <Clock className="w-4 h-4" />
-                    <span className="font-sans text-[10px] uppercase tracking-widest font-bold">In Progress</span>
+                  <div className={cn(
+                    "flex items-center gap-3",
+                    activeOrder.status === 'delivered' ? "text-green-400" : "text-accent animate-pulse"
+                  )}>
+                    {activeOrder.status === 'delivered' ? <CheckCircle2 className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
+                    <span className="font-sans text-[10px] uppercase tracking-widest font-bold">
+                      {activeOrder.status.replace('-', ' ')}
+                    </span>
                   </div>
                </div>
             </div>
@@ -105,7 +220,7 @@ export default function TrackOrderScreen({ order, onBack }: TrackOrderScreenProp
                  </div>
                  <div>
                    <h3 className="editorial-label text-xs mb-2 opacity-40 uppercase tracking-widest">Destination</h3>
-                   <p className="font-serif italic text-xl text-on-surface">{order.customer.address}</p>
+                   <p className="font-serif italic text-xl text-on-surface">{activeOrder.customer.address}</p>
                  </div>
                </div>
 
@@ -115,7 +230,7 @@ export default function TrackOrderScreen({ order, onBack }: TrackOrderScreenProp
                  </div>
                  <div>
                    <h3 className="editorial-label text-xs mb-2 opacity-40 uppercase tracking-widest">Contact</h3>
-                   <p className="font-serif italic text-xl text-on-surface">{order.customer.phone}</p>
+                   <p className="font-serif italic text-xl text-on-surface">{activeOrder.customer.phone}</p>
                  </div>
                </div>
 
@@ -138,7 +253,6 @@ export default function TrackOrderScreen({ order, onBack }: TrackOrderScreenProp
                     </button>
                  </div>
                  <button 
-
                    onClick={handleContactKitchen}
                    className="w-full bg-accent text-white py-5 px-8 rounded-2xl flex justify-between items-center transition-all shadow-xl shadow-accent/20 hover:scale-[1.02] active:scale-[0.98]"
                  >
