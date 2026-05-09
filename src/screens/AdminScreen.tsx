@@ -49,7 +49,6 @@ export default function AdminScreen() {
   const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'blog' | 'staff'>('orders');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isTabLoading, setIsTabLoading] = useState(false);
   
   const [orders, setOrders] = useState<Order[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -189,17 +188,45 @@ export default function AdminScreen() {
 
   return (
     <div className="min-h-screen bg-cream flex flex-col lg:flex-row">
-      <aside className={cn(
-        "bg-primary text-white transition-all duration-500 z-[60] shadow-xl relative group flex flex-col",
-        isMobileMenuOpen ? "fixed inset-0 w-full h-screen" : (isSidebarCollapsed ? "w-0 lg:w-28 overflow-hidden" : "w-full lg:w-80")
-      )}>
-        <div className="flex flex-col h-full p-8 lg:p-10 space-y-12">
-          <div className="flex items-center justify-between">
-            <h2 className="font-serif italic text-3xl text-accent">Bamanda</h2>
-            <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="hidden lg:block opacity-40 hover:opacity-100 transition-opacity">
-              {isSidebarCollapsed ? <ChevronRight className="w-6 h-6" /> : <ChevronLeft className="w-6 h-6" />}
+      <motion.aside 
+        initial={false}
+        animate={{ width: isSidebarCollapsed ? 110 : 320 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className={cn(
+          "bg-primary text-white z-[60] shadow-2xl relative flex flex-col overflow-visible",
+          isMobileMenuOpen ? "fixed inset-0 w-full h-screen" : "hidden lg:flex"
+        )}
+      >
+        <div className="flex flex-col h-full p-8 lg:p-10 space-y-16">
+          <div className="flex items-center justify-between min-h-[40px]">
+            <AnimatePresence mode="wait">
+              {!isSidebarCollapsed && (
+                <motion.h2 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="font-serif italic text-3xl text-accent whitespace-nowrap"
+                >
+                  Bamanda
+                </motion.h2>
+              )}
+            </AnimatePresence>
+            <button 
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
+              className={cn(
+                "p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5",
+                isSidebarCollapsed && "mx-auto"
+              )}
+            >
+              <motion.div
+                animate={{ rotate: isSidebarCollapsed ? 0 : 180 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ChevronRight className={cn("w-5 h-5", isSidebarCollapsed ? "text-accent" : "opacity-40")} />
+              </motion.div>
             </button>
           </div>
+
           <nav className="flex-1 flex flex-col gap-4">
             {[
               { id: 'orders', label: 'Orders', icon: ShoppingBag },
@@ -207,27 +234,71 @@ export default function AdminScreen() {
               { id: 'blog', label: 'Gazette', icon: BookOpen },
               { id: 'staff', label: 'Staff', icon: Users },
             ].map((tab) => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={cn("flex items-center gap-5 p-5 rounded-[1.5rem] transition-all border border-transparent", activeTab === tab.id ? 'bg-white text-primary shadow-xl' : 'bg-white/5 opacity-60 hover:opacity-100 hover:border-white/10')}>
-                <tab.icon className="w-6 h-6 shrink-0" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap">{tab.label}</span>
+              <button 
+                key={tab.id} 
+                onClick={() => setActiveTab(tab.id as any)} 
+                className={cn(
+                  "flex items-center gap-5 p-5 rounded-[1.5rem] transition-all border border-transparent group relative",
+                  activeTab === tab.id ? 'bg-white text-primary shadow-xl scale-[1.02]' : 'bg-white/5 opacity-60 hover:opacity-100 hover:border-white/10 hover:bg-white/10',
+                  isSidebarCollapsed && "justify-center p-6"
+                )}
+              >
+                <tab.icon className={cn("w-6 h-6 shrink-0 transition-transform group-hover:scale-110", activeTab === tab.id && "text-accent")} />
+                {!isSidebarCollapsed && (
+                  <motion.span 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap"
+                  >
+                    {tab.label}
+                  </motion.span>
+                )}
+                
+                {isSidebarCollapsed && (
+                  <div className="absolute left-full ml-6 px-5 py-3 bg-primary text-white text-[9px] font-black uppercase tracking-[0.3em] rounded-2xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 whitespace-nowrap z-[100] shadow-2xl border border-white/10 after:content-[''] after:absolute after:right-full after:top-1/2 after:-translate-y-1/2 after:border-8 after:border-transparent after:border-r-primary">
+                    {tab.label}
+                  </div>
+                )}
               </button>
             ))}
           </nav>
-          <button onClick={() => setIsAuthenticated(false)} className="flex items-center gap-5 p-5 bg-white/5 rounded-2xl text-white/40 hover:text-accent transition-all">
-            <LogOut className="w-5 h-5 shrink-0" />
-            <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Sign Out</span>
+
+          <button 
+            onClick={() => setIsAuthenticated(false)} 
+            className={cn(
+              "flex items-center gap-5 p-5 bg-white/5 rounded-2xl text-white/40 hover:text-accent hover:bg-white/10 transition-all group relative",
+              isSidebarCollapsed && "justify-center"
+            )}
+          >
+            <LogOut className="w-5 h-5 shrink-0 group-hover:rotate-12 transition-transform" />
+            {!isSidebarCollapsed && (
+              <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Sign Out</span>
+            )}
+            {isSidebarCollapsed && (
+              <div className="absolute left-full ml-6 px-5 py-3 bg-red-600 text-white text-[9px] font-black uppercase tracking-[0.3em] rounded-2xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 whitespace-nowrap z-[100] shadow-2xl after:content-[''] after:absolute after:right-full after:top-1/2 after:-translate-y-1/2 after:border-8 after:border-transparent after:border-r-red-600">
+                Exit Sanctuary
+              </div>
+            )}
           </button>
         </div>
-      </aside>
+      </motion.aside>
       
       <main className="flex-1 p-8 lg:p-16 overflow-x-hidden">
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-8 mb-20">
-          <div className="space-y-2">
-            <h1 className="font-serif text-5xl lg:text-7xl text-primary italic capitalize tracking-tight">{activeTab} Curation</h1>
-            <p className="font-sans text-[10px] font-black uppercase tracking-[0.4em] text-primary/40">Managing the Digital Sanctuary</p>
+          <div className="flex items-center gap-6">
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden p-4 bg-primary text-white rounded-2xl shadow-xl active:scale-95 transition-all"
+            >
+              <MenuIcon className="w-6 h-6" />
+            </button>
+            <div className="space-y-2">
+              <h1 className="font-serif text-5xl lg:text-7xl text-primary italic capitalize tracking-tight">{activeTab} Curation</h1>
+              <p className="font-sans text-[10px] font-black uppercase tracking-[0.4em] text-primary/40">Managing the Digital Sanctuary</p>
+            </div>
           </div>
-          <div className="flex items-center gap-5">
-            <button onClick={handlePushToCloud} disabled={isCloudSyncing} className="flex items-center gap-4 px-8 py-4 rounded-full border-2 border-accent/20 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-accent hover:text-white transition-all disabled:opacity-50 active:scale-95">
+          <div className="flex items-center gap-5 w-full sm:w-auto">
+            <button onClick={handlePushToCloud} disabled={isCloudSyncing} className="flex-1 sm:flex-none flex items-center justify-center gap-4 px-8 py-4 rounded-full border-2 border-accent/20 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-accent hover:text-white transition-all disabled:opacity-50 active:scale-95">
               <RefreshCw className={cn("w-4 h-4", isCloudSyncing && "animate-spin")} />
               {isCloudSyncing ? 'Manifesting...' : 'Push to Cloud'}
             </button>
@@ -237,6 +308,59 @@ export default function AdminScreen() {
             </div>
           </div>
         </header>
+
+        {/* Mobile Sidebar Overlay */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[70] lg:hidden"
+              />
+              <motion.div 
+                initial={{ x: '-100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '-100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="fixed inset-y-0 left-0 w-80 bg-primary z-[80] lg:hidden p-10 flex flex-col"
+              >
+                <div className="flex items-center justify-between mb-16">
+                  <h2 className="font-serif italic text-3xl text-accent">Bamanda</h2>
+                  <button onClick={() => setIsMobileMenuOpen(false)} className="p-3 bg-white/5 rounded-xl">
+                    <X className="w-6 h-6 text-white" />
+                  </button>
+                </div>
+                <nav className="flex-1 flex flex-col gap-4">
+                  {[
+                    { id: 'orders', label: 'Orders', icon: ShoppingBag },
+                    { id: 'menu', label: 'Menu DB', icon: Utensils },
+                    { id: 'blog', label: 'Gazette', icon: BookOpen },
+                    { id: 'staff', label: 'Staff', icon: Users },
+                  ].map((tab) => (
+                    <button 
+                      key={tab.id} 
+                      onClick={() => { setActiveTab(tab.id as any); setIsMobileMenuOpen(false); }} 
+                      className={cn(
+                        "flex items-center gap-5 p-6 rounded-[1.5rem] transition-all border border-transparent",
+                        activeTab === tab.id ? 'bg-white text-primary shadow-xl' : 'bg-white/5 text-white/60'
+                      )}
+                    >
+                      <tab.icon className="w-6 h-6" />
+                      <span className="text-xs font-black uppercase tracking-widest">{tab.label}</span>
+                    </button>
+                  ))}
+                </nav>
+                <button onClick={() => setIsAuthenticated(false)} className="flex items-center gap-5 p-6 bg-white/5 rounded-2xl text-white/40 mt-auto">
+                  <LogOut className="w-5 h-5" />
+                  <span className="text-xs font-black uppercase tracking-widest">Sign Out</span>
+                </button>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
         <AnimatePresence mode="wait">
           {activeTab === 'menu' && (
