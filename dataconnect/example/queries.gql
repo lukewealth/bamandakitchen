@@ -1,0 +1,48 @@
+query ListAllCategories @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public as it only lists categories.") {
+  categories {
+    id
+    name
+    description
+  }
+}
+
+query GetFoodItemsByCategory($categoryId: UUID!) @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public as it retrieves food items based on category.") {
+  foodItems(where: {categoryId: {eq: $categoryId}, isAvailable: {eq: true}}) {
+    id
+    name
+    description
+    price
+    imageUrl
+  }
+}
+
+mutation CreateOrderForUser($userId: UUID!, $totalAmount: Float!, $status: String!, $deliveryAddress: String, $notes: String, $orderItems: [OrderItem_Data!]!) @auth(level: USER, insecureReason: "This operation is safe for logged-in users to create orders.") {
+  order_insert(data: {
+    userId: $userId,
+    orderDate_expr: "request.time",
+    totalAmount: $totalAmount,
+    status: $status,
+    deliveryAddress: $deliveryAddress,
+    notes: $notes,
+    orderItems_on_order: $orderItems
+  }) {
+    id
+  }
+}
+
+query GetMyOrders @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users, as it only retrieves orders for the authenticated user.") {
+  orders(where: {userId: {eq_expr: "auth.uid"}}, orderBy: [{orderDate: DESC}]) {
+    id
+    orderDate
+    totalAmount
+    status
+    orderItems_on_order {
+      quantity
+      unitPrice
+      foodItem {
+        name
+        price
+      }
+    }
+  }
+}

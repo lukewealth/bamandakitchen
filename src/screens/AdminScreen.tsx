@@ -9,12 +9,26 @@ import { cn } from '../lib/utils';
 import { 
   Lock, LogOut, ShoppingBag, Utensils, BookOpen, X, Star, Edit, Trash2, Plus, 
   CheckCircle2, Clock, Truck, Image as ImageIcon, Layout, Save, AlertCircle, MessageCircle,
-  Menu as MenuIcon, Users, ChevronLeft, ChevronRight, Loader2
+  Menu as MenuIcon, Users, ChevronLeft, ChevronRight, Loader2, RefreshCw
 } from 'lucide-react';
 import { MenuItem, Order, BlogPost, OrderStatus, BlogLayout, MenuCategory, StaffAccount } from '../types';
 import { MENU_ITEMS } from '../data';
 import { formatStatusUpdateMessage, getWhatsAppUrl } from '../lib/order';
 import { useToast } from '../lib/toast-context';
+import { db } from '../lib/firebase';
+import { 
+  collection, 
+  query, 
+  onSnapshot, 
+  doc, 
+  updateDoc, 
+  deleteDoc, 
+  setDoc, 
+  writeBatch,
+  orderBy,
+  serverTimestamp,
+  addDoc
+} from 'firebase/firestore';
 
 export default function AdminScreen() {
   const { showToast } = useToast();
@@ -25,6 +39,7 @@ export default function AdminScreen() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isTabLoading, setIsTabLoading] = useState(false);
+  const [isMigrating, setIsMigrating] = useState(false);
   
   const [orders, setOrders] = useState<Order[]>([]);
   const [menu, setMenu] = useState<MenuItem[]>([]);
@@ -36,58 +51,33 @@ export default function AdminScreen() {
   const [editingMenuItem, setEditingMenuItem] = useState<Partial<MenuItem> | null>(null);
   const [editingStaff, setEditingStaff] = useState<Partial<StaffAccount> | null>(null);
 
+  // Firestore Real-time Subscriptions
   useEffect(() => {
-    const savedOrders = localStorage.getItem('bamanda_orders');
-    const savedMenu = localStorage.getItem('bamanda_menu');
-    const savedPosts = localStorage.getItem('bamanda_posts');
-    
-    if (savedOrders) setOrders(JSON.parse(savedOrders));
-    
-    if (savedMenu) {
-      setMenu(JSON.parse(savedMenu));
-    } else {
-      setMenu(MENU_ITEMS);
-      localStorage.setItem('bamanda_menu', JSON.stringify(MENU_ITEMS));
-    }
-    
-    if (savedPosts) {
-      setPosts(JSON.parse(savedPosts));
-    } else {
-      const initialPosts: BlogPost[] = [{
-        id: '1',
-        title: 'The Ritual of Communal Dining',
-        topic: 'Heritage Rituals',
-        content: 'Understanding how the shared plate fosters community bonds and neurological connections through the act of communal dining...',
-        image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7bb7445?auto=format&fit=crop&q=80&w=1200',
-        date: 'May 2026',
-        author: 'Chef Amara',
-        layout: 'editorial',
-        category: 'Rituals'
-      }];
-      setPosts(initialPosts);
-      localStorage.setItem('bamanda_posts', JSON.stringify(initialPosts));
-    }
+    if (!isAuthenticated) return;
 
-    const savedStaff = localStorage.getItem('bamanda_staff');
-    if (savedStaff) {
-      setStaff(JSON.parse(savedStaff));
-    } else {
-      const initialStaff: StaffAccount[] = [
-        { id: '1', name: 'Admin Curator', email: 'admin@bamanda.com', role: 'admin', createdAt: new Date().toISOString() }
-      ];
-      setStaff(initialStaff);
-      localStorage.setItem('bamanda_staff', JSON.stringify(initialStaff));
-    }
-  }, []);
+    const unsubMenu = onSnapshot(query(collection(db, 'menu'), orderBy('name')), (snapshot) => {
+      setMenu(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as MenuItem)));
+    });
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      localStorage.setItem('bamanda_orders', JSON.stringify(orders));
-      localStorage.setItem('bamanda_menu', JSON.stringify(menu));
-      localStorage.setItem('bamanda_posts', JSON.stringify(posts));
-      localStorage.setItem('bamanda_staff', JSON.stringify(staff));
-    }
-  }, [orders, menu, posts, staff, isAuthenticated]);
+    const unsubOrders = onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), (snapshot) => {
+      setOrders(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Order)));
+    });
+
+    const unsubBlog = onSnapshot(query(collection(db, 'blog'), orderBy('date', 'desc')), (snapshot) => {
+      setPosts(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as BlogPost)));
+    });
+
+    const unsubStaff = onSnapshot(query(collection(db, 'staff'), orderBy('name')), (snapshot) => {
+      setStaff(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as StaffAccount)));
+    });
+
+    return () => {
+      unsubMenu();
+      unsubOrders();
+      unsubBlog();
+      unsubStaff();
+    };
+  }, [isAuthenticated]);
 
   // Sidebar Auto-collapse Logic
   useEffect(() => {
@@ -103,6 +93,25 @@ export default function AdminScreen() {
     setActiveTab(tab);
     setIsMobileMenuOpen(false);
     setTimeout(() => setIsTabLoading(false), 400); // Smooth async feel
+  };
+
+  const handleMigration = async () => {
+    if (!window.confirm('This will seed the cloud database with local heritage items. Continue?')) return;
+    setIsMigrating(true);
+    try {
+      const batch = writeBatch(db);
+      MENU_ITEMS.forEach(item => {
+        const docRef = doc(db, 'menu', item.id);
+        batch.set(docRef, { ...item, updatedAt: serverTimestamp() });
+      });
+      await batch.commit();
+      showToast('Sanctuary inventory successfully migrated to the cloud.', 'success');
+    } catch (error) {
+      console.error('Migration failed:', error);
+      showToast('Migration encountered a spiritual blockage.', 'error');
+    } finally {
+      setIsMigrating(false);
+    }
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -311,6 +320,17 @@ export default function AdminScreen() {
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-10 lg:mb-16">
           <h1 className="font-serif text-3xl lg:text-5xl text-primary capitalize italic">{activeTab} Curation</h1>
           <div className="flex items-center gap-4">
+            <button 
+              onClick={handleMigration}
+              disabled={isMigrating}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-full border border-accent/20 text-[10px] font-black uppercase tracking-widest transition-all",
+                isMigrating ? "opacity-50 cursor-not-allowed" : "hover:bg-accent hover:text-white"
+              )}
+            >
+              {isMigrating ? <RefreshCw className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+              {isMigrating ? 'Seeding...' : 'Seed Cloud'}
+            </button>
             <div className="bg-white px-4 py-2 rounded-full border border-primary/10 flex items-center gap-2 shadow-sm">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               <span className="text-[10px] uppercase tracking-widest font-bold text-primary opacity-60">System Online</span>

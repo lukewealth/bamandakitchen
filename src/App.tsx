@@ -21,6 +21,8 @@ import InfoScreen from './screens/InfoScreen';
 import { MenuItem, CartItem, Screen, Order, BlogPost } from './types';
 import { MENU_ITEMS } from './data';
 import { ToastProvider } from './lib/toast-context';
+import { db } from './lib/firebase';
+import { collection, query, onSnapshot, orderBy, setDoc, doc } from 'firebase/firestore';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
@@ -42,67 +44,26 @@ export default function App() {
   }, []);
   
   // Dynamic Data
-  const [menu, setMenu] = useState<MenuItem[]>(() => {
-    const saved = localStorage.getItem('bamanda_menu');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        return MENU_ITEMS;
-      }
-    }
-    return MENU_ITEMS;
-  });
+  const [menu, setMenu] = useState<MenuItem[]>([]);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
 
-  const [posts, setPosts] = useState<BlogPost[]>(() => {
-    const saved = localStorage.getItem('bamanda_posts');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        return [];
-      }
-    }
-    return [];
-  });
-
-  // Sync Data on Screen Change
+  // Firestore Real-time Menu & Blog
   useEffect(() => {
-    const savedMenu = localStorage.getItem('bamanda_menu');
-    if (savedMenu) {
-      try {
-        setMenu(JSON.parse(savedMenu));
-      } catch (e) {
-        setMenu(MENU_ITEMS);
-      }
-    } else {
-      localStorage.setItem('bamanda_menu', JSON.stringify(MENU_ITEMS));
-      setMenu(MENU_ITEMS);
-    }
+    const unsubMenu = onSnapshot(query(collection(db, 'menu'), orderBy('name')), (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as MenuItem));
+      setMenu(items.length > 0 ? items : MENU_ITEMS);
+    });
 
-    const savedPosts = localStorage.getItem('bamanda_posts');
-    if (savedPosts) {
-      try {
-        setPosts(JSON.parse(savedPosts));
-      } catch (e) {
-        // Fallback handled in initialization or default blog post
-      }
-    } else {
-      const initialPosts: BlogPost[] = [{
-        id: '1',
-        title: 'The Ritual of Communal Dining',
-        topic: 'Heritage Rituals',
-        content: 'Understanding how the shared plate fosters community bonds and neurological connections through the act of communal dining. In our heritage, a meal is never just food—it is a conversation between souls.',
-        image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7bb7445?auto=format&fit=crop&q=80&w=1200',
-        date: 'May 2026',
-        author: 'Chef Amara',
-        layout: 'editorial',
-        category: 'Rituals'
-      }];
-      localStorage.setItem('bamanda_posts', JSON.stringify(initialPosts));
-      setPosts(initialPosts);
-    }
-  }, [currentScreen]);
+    const unsubBlog = onSnapshot(query(collection(db, 'blog'), orderBy('date', 'desc')), (snapshot) => {
+      const articles = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as BlogPost));
+      setPosts(articles);
+    });
+
+    return () => {
+      unsubMenu();
+      unsubBlog();
+    };
+  }, []);
 
   // Theme effect
   useEffect(() => {
@@ -164,17 +125,20 @@ export default function App() {
     setCurrentScreen('checkout');
   };
 
-  const handleOrderComplete = (order: Order) => {
+  const handleOrderComplete = async (order: Order) => {
     setActiveOrder(order);
     
-    // Persist to localStorage for Admin Screen
-    const savedOrders = localStorage.getItem('bamanda_orders');
-    const orders = savedOrders ? JSON.parse(savedOrders) : [];
-    localStorage.setItem('bamanda_orders', JSON.stringify([order, ...orders]));
+    // Sync to Firestore
+    try {
+      await setDoc(doc(db, 'orders', order.id), {
+        ...order,
+        createdAt: new Date().toISOString()
+      });
+    } catch (err) {
+      console.error('Firestore order sync failed:', err);
+    }
     
     setCart([]);
-    
-    // Show tracking popup for every purchase as requested
     setShowTrackingPopup(true);
   };
 

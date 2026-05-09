@@ -1,0 +1,175 @@
+mutation CreateDemoData @transaction @auth(level: USER, insecureReason: "Seed data mutation for demo purposes. Requires authenticated user but does not use auth.uid in the mutation itself.") {
+  user_insertMany(data: [
+    {
+      id: "10000000-0000-4000-8000-000000000001",
+      username: "john.doe",
+      passwordHash: "hashed_password_john",
+      role: "customer",
+      email: "john.doe@example.com",
+      firstName: "John",
+      lastName: "Doe",
+      address: "123 Main St, Anytown",
+      phoneNumber: "555-1234",
+      createdAt: "2023-01-01T10:00:00Z"
+    },
+    {
+      id: "10000000-0000-4000-8000-000000000002",
+      username: "jane.smith",
+      passwordHash: "hashed_password_jane",
+      role: "customer",
+      email: "jane.smith@example.com",
+      firstName: "Jane",
+      lastName: "Smith",
+      address: "456 Oak Ave, Somewhere",
+      phoneNumber: "555-5678",
+      createdAt: "2023-01-02T11:00:00Z"
+    },
+    {
+      id: "10000000-0000-4000-8000-000000000003",
+      username: "admin.user",
+      passwordHash: "hashed_password_admin",
+      role: "admin",
+      email: "admin@example.com",
+      firstName: "Admin",
+      lastName: "User",
+      address: "789 Pine Ln, Metropolis",
+      phoneNumber: "555-9012",
+      createdAt: "2023-01-03T09:00:00Z"
+    }
+  ])
+  category_insertMany(data: [
+    {
+      id: "20000000-0000-4000-8000-000000000001",
+      name: "Appetizers",
+      description: "Starters to whet your appetite.",
+      createdAt: "2023-01-01T10:05:00Z"
+    },
+    {
+      id: "20000000-0000-4000-8000-000000000002",
+      name: "Main Courses",
+      description: "Delicious main dishes.",
+      createdAt: "2023-01-01T10:06:00Z"
+    },
+    {
+      id: "20000000-0000-4000-8000-000000000003",
+      name: "Desserts",
+      description: "Sweet treats to finish your meal.",
+      createdAt: "2023-01-01T10:07:00Z"
+    }
+  ])
+  foodItem_insertMany(data: [
+    {
+      id: "30000000-0000-4000-8000-000000000001",
+      name: "Spring Rolls",
+      price: 6.99,
+      description: "Crispy vegetable spring rolls with sweet chili sauce.",
+      categoryId: "20000000-0000-4000-8000-000000000001",
+      createdAt: "2023-01-04T12:00:00Z",
+      imageUrl: "https://example.com/springrolls.jpg",
+      isAvailable: true
+    },
+    {
+      id: "30000000-0000-4000-8000-000000000002",
+      name: "Pad Thai",
+      price: 14.50,
+      description: "Classic Thai stir-fried noodles with shrimp and peanuts.",
+      categoryId: "20000000-0000-4000-8000-000000000002",
+      createdAt: "2023-01-04T12:05:00Z",
+      imageUrl: "https://example.com/padthai.jpg",
+      isAvailable: true
+    },
+    {
+      id: "30000000-0000-4000-8000-000000000003",
+      name: "Chocolate Lava Cake",
+      price: 8.00,
+      description: "Warm chocolate cake with a molten chocolate center.",
+      categoryId: "20000000-0000-4000-8000-000000000003",
+      createdAt: "2023-01-04T12:10:00Z",
+      imageUrl: "https://example.com/lavacake.jpg",
+      isAvailable: true
+    },
+    {
+      id: "30000000-0000-4000-8000-000000000004",
+      name: "Chicken Satay",
+      price: 9.50,
+      description: "Grilled chicken skewers with peanut sauce.",
+      categoryId: "20000000-0000-4000-8000-000000000001",
+      createdAt: "2023-01-04T12:15:00Z",
+      imageUrl: "https://example.com/chickensatay.jpg",
+      isAvailable: true
+    },
+    {
+      id: "30000000-0000-4000-8000-000000000005",
+      name: "Green Curry",
+      price: 15.00,
+      description: "Spicy green curry with coconut milk and vegetables.",
+      categoryId: "20000000-0000-4000-8000-000000000002",
+      createdAt: "2023-01-04T12:20:00Z",
+      imageUrl: "https://example.com/greencurry.jpg",
+      isAvailable: true
+    }
+  ])
+  order_insertMany(data: [
+    {
+      id: "40000000-0000-4000-8000-000000000001",
+      userId: "10000000-0000-4000-8000-000000000001",
+      orderDate: "2023-01-05T18:30:00Z",
+      totalAmount: 21.49,
+      status: "completed",
+      createdAt: "2023-01-05T18:25:00Z",
+      deliveryAddress: "123 Main St, Anytown",
+      notes: "No peanuts in Pad Thai."
+    },
+    {
+      id: "40000000-0000-4000-8000-000000000002",
+      userId: "10000000-0000-4000-8000-000000000002",
+      orderDate: "2023-01-06T19:00:00Z",
+      totalAmount: 23.00,
+      status: "pending",
+      createdAt: "2023-01-06T18:55:00Z",
+      deliveryAddress: "456 Oak Ave, Somewhere"
+    }
+  ])
+  orderItem_insertMany(data: [
+    {
+      id: "50000000-0000-4000-8000-000000000001",
+      orderId: "40000000-0000-4000-8000-000000000001",
+      foodItemId: "30000000-0000-4000-8000-000000000001",
+      quantity: 1,
+      unitPrice: 6.99,
+      notes: ""
+    },
+    {
+      id: "50000000-0000-4000-8000-000000000002",
+      orderId: "40000000-0000-4000-8000-000000000001",
+      foodItemId: "30000000-0000-4000-8000-000000000002",
+      quantity: 1,
+      unitPrice: 14.50,
+      notes: "No peanuts"
+    },
+    {
+      id: "50000000-0000-4000-8000-000000000003",
+      orderId: "40000000-0000-4000-8000-000000000002",
+      foodItemId: "30000000-0000-4000-8000-000000000003",
+      quantity: 1,
+      unitPrice: 8.00,
+      notes: ""
+    },
+    {
+      id: "50000000-0000-4000-8000-000000000004",
+      orderId: "40000000-0000-4000-8000-000000000002",
+      foodItemId: "30000000-0000-4000-8000-000000000004",
+      quantity: 1,
+      unitPrice: 9.50,
+      notes: "Extra peanut sauce"
+    },
+    {
+      id: "50000000-0000-4000-8000-000000000005",
+      orderId: "40000000-0000-4000-8000-000000000002",
+      foodItemId: "30000000-0000-4000-8000-000000000005",
+      quantity: 1,
+      unitPrice: 15.00,
+      notes: "Mild spicy"
+    }
+  ])
+}
