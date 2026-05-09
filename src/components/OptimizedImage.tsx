@@ -7,6 +7,7 @@ import React, { useState, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import BrandLoader from "./BrandLoader";
 import { cn } from "../lib/utils";
+import { Utensils } from "lucide-react";
 
 interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src?: string;
@@ -32,11 +33,17 @@ const OptimizedImage = memo(({
   ...props 
 }: OptimizedImageProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(!src);
 
   useEffect(() => {
-    if (!src) return;
+    if (!src) {
+      setError(true);
+      return;
+    }
     
+    setError(false);
+    setIsLoaded(false);
+
     if (priority) {
       const link = document.createElement("link");
       link.rel = "preload";
@@ -74,28 +81,37 @@ const OptimizedImage = memo(({
         )}
       </AnimatePresence>
 
-      <motion.img
-        src={src}
-        alt={alt}
-        initial={{ opacity: 0, scale: 1.05 }}
-        animate={{ 
-          opacity: isLoaded ? 1 : 0, 
-          scale: isLoaded ? 1 : 1.05 
-        }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className={cn(
-          "w-full h-full object-cover transition-all duration-700",
-          grayscaleOnHover && "grayscale hover:grayscale-0",
-          colorOnHover && "grayscale hover:grayscale-0",
-          !isLoaded && "invisible",
-          className
-        )}
-        {...props}
-      />
+      {src && !error && (
+        <motion.img
+          src={src}
+          alt={alt}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ 
+            opacity: isLoaded ? 1 : 0, 
+            scale: isLoaded ? 1 : 1.05 
+          }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className={cn(
+            "w-full h-full object-cover transition-all duration-700",
+            grayscaleOnHover && "grayscale hover:grayscale-0",
+            colorOnHover && "grayscale hover:grayscale-0",
+            !isLoaded && "invisible",
+            className
+          )}
+          {...props}
+        />
+      )}
 
       {error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-on-surface/5 text-on-surface/20">
-          <span className="font-serif italic text-sm text-center px-4">Image Manifestation Interrupted</span>
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-primary/5 text-primary/20 space-y-4">
+          <div className="w-16 h-16 border border-primary/10 rounded-full flex items-center justify-center">
+            <Utensils className="w-8 h-8 opacity-40" />
+          </div>
+          <div className="text-center px-6">
+            <span className="font-serif italic text-xs block mb-1">Curation Processing</span>
+            <span className="text-[8px] uppercase tracking-widest font-bold opacity-30">Visual manifestation pending</span>
+          </div>
+          <div className="absolute inset-0 wood-texture opacity-5 pointer-events-none" />
         </div>
       )}
     </div>
