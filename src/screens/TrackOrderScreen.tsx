@@ -11,6 +11,7 @@ import { getWhatsAppUrl } from '../lib/order';
 import { cn } from '../lib/utils';
 import { db } from '../lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
+import { useToast } from '../lib/toast-context';
 
 interface TrackOrderScreenProps {
   order: Order | null;
@@ -18,6 +19,7 @@ interface TrackOrderScreenProps {
 }
 
 export default function TrackOrderScreen({ order: initialOrder, onBack }: TrackOrderScreenProps) {
+  const { showToast } = useToast();
   const [activeOrder, setActiveOrder] = useState<Order | null>(initialOrder);
   const [searchId, setSearchId] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -89,7 +91,7 @@ export default function TrackOrderScreen({ order: initialOrder, onBack }: TrackO
       if (found) {
         setActiveOrder(found);
       } else {
-        alert("Order sequence not found in our archives. Please check your unique ID.");
+        showToast("Order sequence not found in our archives. Please check your unique ID.", "error");
       }
       setIsSearching(false);
     }, 800);
