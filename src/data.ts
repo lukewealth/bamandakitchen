@@ -319,7 +319,7 @@ export const MENU_ITEMS: MenuItem[] = [
   },
   {
     id: 'rice_and_beans_full',
-    name: 'Rice and Beans',
+    name: 'White rice & beans',
     description: 'A balanced classic combining fluffy rice and slow-cooked beans.',
     price: 2500,
     category: 'Rice Dishes',
@@ -331,7 +331,7 @@ export const MENU_ITEMS: MenuItem[] = [
   },
   {
     id: 'rice_and_beans_half',
-    name: 'Rice and Beans (Half)',
+    name: 'White rice & beans (Half)',
     description: 'A balanced classic combining fluffy rice and slow-cooked beans.',
     price: 1500,
     category: 'Rice Dishes',
@@ -342,7 +342,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'white_rice_full',
+    id: 'white_rice_full_std',
     name: 'White Rice',
     description: 'Fluffy steamed white rice, a perfect canvas for our rich sauces.',
     price: 2000,
@@ -355,7 +355,7 @@ export const MENU_ITEMS: MenuItem[] = [
     whatsappLink: 'https://wa.me/p/24880919871584809/2349024084911'
   },
   {
-    id: 'white_rice_half',
+    id: 'white_rice_half_std',
     name: 'White Rice (Half)',
     description: 'Fluffy steamed white rice, a perfect canvas for our rich sauces.',
     price: 1000,
@@ -367,7 +367,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'basmati_white_rice',
+    id: 'basmati_white_rice_std',
     name: 'Basmati white rice',
     description: 'Long-grain fragrant basmati rice, steamed to perfection.',
     price: 2500,
@@ -382,7 +382,7 @@ export const MENU_ITEMS: MenuItem[] = [
   // 🍖 PROTEINS (Meat & Fish)
   // ========================
   {
-    id: 'panla_fish',
+    id: 'panla_fish_std',
     name: 'panla Fish',
     description: 'Crispy fried panla fish, perfectly seasoned.',
     price: 4000,
@@ -393,7 +393,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'full_panla_fish',
+    id: 'full_panla_fish_std',
     name: 'Full panla Fish',
     description: 'A complete fried panla fish curation.',
     price: 10000,
@@ -404,7 +404,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'turkey_standard',
+    id: 'turkey_std',
     name: 'Turkey',
     description: 'Succulent grilled turkey meat with crispy, glazed skin.',
     price: 6000,
@@ -416,7 +416,7 @@ export const MENU_ITEMS: MenuItem[] = [
     whatsappLink: 'https://wa.me/p/26387980920798908/2349024084911'
   },
   {
-    id: 'big_turkey',
+    id: 'big_turkey_std',
     name: 'Big Turkey',
     description: 'A larger portion of our signature succulent grilled turkey.',
     price: 7000,
@@ -427,7 +427,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'chicken_laps_standard',
+    id: 'chicken_laps_std',
     name: 'Chicken laps',
     description: 'Tender and juicy chicken laps, seasoned and grilled.',
     price: 4000,
@@ -438,7 +438,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'chicken_laps_large',
+    id: 'chicken_laps_large_std',
     name: 'Chicken Laps',
     description: 'Premium large chicken laps, seasoned and grilled.',
     price: 6000,
@@ -449,7 +449,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'croaker_fish',
+    id: 'croaker_fish_std',
     name: 'Croaker Fish',
     description: 'Freshly grilled or fried croaker fish with heritage herbs.',
     price: 5000,
@@ -460,7 +460,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'tilapia_fish',
+    id: 'tilapia_fish_std',
     name: 'Tilapia Fish',
     description: 'Artisanal Tilapia fish curation, seasoned to perfection.',
     price: 5000,
@@ -471,7 +471,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'asun_protein',
+    id: 'asun_protein_std',
     name: 'Asun',
     description: 'Spicy peppered goat meat chunks, authentic and bold.',
     price: 5000,
@@ -482,7 +482,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'goat_meat_standard',
+    id: 'goat_meat_std',
     name: 'Goat Meat',
     description: 'Peppered goat meat chunks in a rich dark sauce.',
     price: 4000,
@@ -493,7 +493,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'kote_fish',
+    id: 'kote_fish_std',
     name: 'Kote Fish',
     description: 'Traditional fried Kote fish, well seasoned.',
     price: 4000,
@@ -504,7 +504,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'titus_protein',
+    id: 'titus_protein_std',
     name: 'Titus',
     description: 'Fried Titus fish, seasoned with heritage spices.',
     price: 4000,
@@ -516,7 +516,7 @@ export const MENU_ITEMS: MenuItem[] = [
     whatsappLink: 'https://wa.me/p/26597784393157127/2349024084911'
   },
   {
-    id: 'catfish_peppered',
+    id: 'catfish_peppered_std',
     name: 'Catfish Peppered',
     description: 'Spicy peppered catfish, a true heritage delicacy.',
     price: 4000,
@@ -527,7 +527,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'snail_standard',
+    id: 'snail_std',
     name: 'Snail',
     description: 'Large African peppered snails, glossy sauce coating.',
     price: 4000,
@@ -538,7 +538,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'crispy_chicken',
+    id: 'crispy_chicken_std',
     name: 'Crispy Chicken',
     description: 'Golden fried chicken with a crunch that speaks of heritage.',
     price: 5000,
@@ -549,7 +549,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'gizzard_standard',
+    id: 'gizzard_std_protein',
     name: 'Gizzard',
     description: 'Spicy peppered gizzard, perfect for snacking or as a side.',
     price: 2500,
@@ -561,7 +561,7 @@ export const MENU_ITEMS: MenuItem[] = [
     whatsappLink: 'https://wa.me/p/25685241957750962/2349024084911'
   },
   {
-    id: 'chicken_wings_standard',
+    id: 'chicken_wings_std_protein',
     name: 'Chicken Wings',
     description: 'Crispy fried chicken wings tossed in a spicy, glossy pepper sauce.',
     price: 2000,
@@ -573,7 +573,7 @@ export const MENU_ITEMS: MenuItem[] = [
     whatsappLink: 'https://wa.me/p/25975139568840526/2349024084911'
   },
   {
-    id: 'assorted_meat',
+    id: 'assorted_meat_std',
     name: 'Assorted Meat',
     description: 'A variety of peppered meats curated for the true enthusiast.',
     price: 4000,
@@ -584,7 +584,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'beef_portion',
+    id: 'beef_portion_std',
     name: 'Beef',
     description: 'Tender peppered beef chunks.',
     price: 1500,
@@ -595,7 +595,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'boiled_egg_protein',
+    id: 'boiled_egg_std_protein',
     name: 'Boiled Egg',
     description: 'Perfectly boiled egg for that extra protein boost.',
     price: 500,
@@ -611,7 +611,7 @@ export const MENU_ITEMS: MenuItem[] = [
   // 🍝 PASTA & NOODLES
   // ========================
   {
-    id: 'seafood_pasta_verified',
+    id: 'seafood_pasta_std',
     name: 'Seafood Pasta',
     description: 'Luxury seafood pasta with shrimp and mussels in a creamy heritage sauce.',
     price: 14000,
@@ -622,7 +622,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'stir_fried_pasta',
+    id: 'stir_fried_pasta_std',
     name: 'Stir Fried Pasta',
     description: 'Savory stir-fried pasta with vegetables and heritage seasonings.',
     price: 3000,
@@ -633,7 +633,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'chicken_noodles_verified',
+    id: 'chicken_noodles_std',
     name: 'Chicken Noodles',
     description: 'Stir-fried noodles with sliced chicken and glossy heritage sauce.',
     price: 6500,
@@ -644,7 +644,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'noodles_and_egg',
+    id: 'noodles_and_egg_std',
     name: 'Noodles & Egg (2 noodles & 2 eggs)',
     description: 'Double portion of noodles paired with two perfectly cooked eggs.',
     price: 5000,
@@ -655,7 +655,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'shredded_beef_pasta',
+    id: 'shredded_beef_pasta_std',
     name: 'Shredded Beef Pasta',
     description: 'Pasta tossed with tender shredded beef and rich sauce.',
     price: 3500,
@@ -666,7 +666,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'spaghetti_jollof_full',
+    id: 'spaghetti_jollof_full_std',
     name: 'Spaghetti Jollof',
     description: 'Spaghetti cooked in a rich and spicy tomato-based Jollof sauce.',
     price: 2500,
@@ -679,7 +679,7 @@ export const MENU_ITEMS: MenuItem[] = [
     whatsappLink: 'https://wa.me/p/25883557641293785/2349024084911'
   },
   {
-    id: 'spaghetti_jollof_half',
+    id: 'spaghetti_jollof_half_std',
     name: 'Spaghetti Jollof (Half)',
     description: 'Spaghetti cooked in a rich and spicy tomato-based Jollof sauce.',
     price: 1300,
@@ -695,7 +695,7 @@ export const MENU_ITEMS: MenuItem[] = [
   // 🌯 SNACKS
   // ========================
   {
-    id: 'burger_luxury',
+    id: 'burger_std',
     name: 'Burger (French Fresh & Classic Chicken)',
     description: 'Premium chicken burger served with French-style fresh fries.',
     price: 12000,
@@ -706,7 +706,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'big_chicken_chips',
+    id: 'big_chicken_chips_std',
     name: 'Big Chicken & Chips',
     description: 'Large portion of crispy fried chicken and golden potato chips.',
     price: 9000,
@@ -717,7 +717,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'small_chicken_chips',
+    id: 'small_chicken_chips_std',
     name: 'Small Chicken & Chips',
     description: 'A standard portion of crispy fried chicken and golden potato chips.',
     price: 8000,
@@ -728,7 +728,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'chicken_shawarma_verified',
+    id: 'chicken_shawarma_std',
     name: 'Chicken Shawarma',
     description: 'Double-wrapped pita with spiced chicken and creamy garlic spread.',
     price: 6000,
@@ -739,7 +739,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'beef_shawarma',
+    id: 'beef_shawarma_std',
     name: 'Beef Shawarma',
     description: 'Double-wrapped pita with spiced beef and creamy heritage sauce.',
     price: 6000,
@@ -750,7 +750,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'yamarita',
+    id: 'yamarita_std',
     name: 'Yamarita',
     description: 'Egg-coated fried yam fingers, a local favorite.',
     price: 3000,
@@ -761,7 +761,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'yam_chips',
+    id: 'yam_chips_std',
     name: 'Yam Chips',
     description: 'Crispy deep-fried yam slices.',
     price: 3000,
@@ -772,7 +772,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'moi_moi_standard',
+    id: 'moi_moi_std',
     name: 'Moi Moi',
     description: 'Steamed bean pudding with traditional heritage filling.',
     price: 1000,
@@ -787,7 +787,7 @@ export const MENU_ITEMS: MenuItem[] = [
   // 🍲 SIDES, SAUCES & PORRIDGE
   // ========================
   {
-    id: 'peppersoup_catfish_yam',
+    id: 'peppersoup_catfish_yam_std',
     name: 'Peppersoup Catfish Yam',
     description: 'Spicy catfish pepper soup with slow-cooked yam cubes.',
     price: 6500,
@@ -798,7 +798,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'plantain_egg_sauce',
+    id: 'plantain_egg_sauce_std',
     name: 'Plantain and Egg Sauce',
     description: 'Fried plantain served with savory stir-fried egg sauce.',
     price: 5000,
@@ -809,7 +809,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'vegetable_boiled_plantain',
+    id: 'vegetable_boiled_plantain_std',
     name: 'Vegetable and Boiled Plantain',
     description: 'Healthy boiled plantain served with rich vegetable sauce.',
     price: 5000,
@@ -820,7 +820,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'yam_egg_sauce',
+    id: 'yam_egg_sauce_std',
     name: 'Yam and Egg Sauce',
     description: 'Boiled or fried yam served with savory egg sauce.',
     price: 4000,
@@ -832,7 +832,7 @@ export const MENU_ITEMS: MenuItem[] = [
     whatsappLink: 'https://wa.me/p/25838240129165540/2349024084911'
   },
   {
-    id: 'ukwa_standard',
+    id: 'ukwa_std_side',
     name: 'Breadfruit (Ukwa)',
     description: 'Premium breadfruit curation, a traditional Igbo delicacy.',
     price: 3000,
@@ -843,7 +843,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'ukwa_dry_fish',
+    id: 'ukwa_dry_fish_std',
     name: 'Dry Fish (Ukwa)',
     description: 'Premium breadfruit curation paired with intense dry fish.',
     price: 2500,
@@ -854,7 +854,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'yam_porridge',
+    id: 'yam_porridge_std',
     name: 'Yam Porridge',
     description: 'Slow-cooked yam in a rich tomato and palm oil base.',
     price: 2500,
@@ -865,7 +865,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'potato_porridge',
+    id: 'potato_porridge_std',
     name: 'Potato Porridge',
     description: 'Traditional porridge made with tender potatoes.',
     price: 2500,
@@ -876,7 +876,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'plantain_porridge',
+    id: 'plantain_porridge_std',
     name: 'Plantain Porridge',
     description: 'Sweet and savory plantain porridge curation.',
     price: 1000,
@@ -887,7 +887,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'beans_side',
+    id: 'beans_side_std',
     name: 'Beans',
     description: 'Slow-cooked honey beans portion.',
     price: 1000,
@@ -898,7 +898,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'ofada_sauce_side',
+    id: 'ofada_sauce_side_std',
     name: 'Ofada Sauce',
     description: 'Extra portion of our signature spicy Ofada sauce.',
     price: 3000,
@@ -909,7 +909,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'curry_sauce_side',
+    id: 'curry_sauce_side_std',
     name: 'Curry Sauce',
     description: 'Rich and aromatic heritage curry sauce.',
     price: 2500,
@@ -920,7 +920,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'plantain_side_verified',
+    id: 'plantain_side_std',
     name: 'Plantain',
     description: 'Sweet fried golden plantain portions.',
     price: 1000,
@@ -936,7 +936,7 @@ export const MENU_ITEMS: MenuItem[] = [
   // 🍲 SIGNATURE SOUPS
   // ========================
   {
-    id: 'goat_meat_peppersoup',
+    id: 'goat_meat_peppersoup_std',
     name: 'Goat meat pepper soup',
     description: 'Hot spicy goat meat soup with traditional healing herbs.',
     price: 8000,
@@ -948,7 +948,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isTrending: true
   },
   {
-    id: 'chicken_pepper_soup',
+    id: 'chicken_pepper_soup_std',
     name: 'Chicken pepper soup',
     description: 'Spicy chicken broth with heritage herbs.',
     price: 8000,
@@ -959,7 +959,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'turkey_pepper_soup',
+    id: 'turkey_pepper_soup_std',
     name: 'Turkey pepper soup',
     description: 'Turkey pepper soup with rich broth and visible heritage spices.',
     price: 7000,
@@ -974,7 +974,7 @@ export const MENU_ITEMS: MenuItem[] = [
   // 🥤 DRINKS
   // ========================
   {
-    id: 'red_wine',
+    id: 'red_wine_std',
     name: 'Red Wine',
     description: 'Premium curated red wine bottle.',
     price: 10000,
@@ -985,7 +985,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'five_alive',
+    id: 'five_alive_std',
     name: '5Alive',
     description: 'Chilled 5Alive fruit juice.',
     price: 2000,
@@ -996,7 +996,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'hollandia',
+    id: 'hollandia_std',
     name: 'Hollandia',
     description: 'Hollandia yogurt curation.',
     price: 3000,
@@ -1007,7 +1007,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'chivita',
+    id: 'chivita_std',
     name: 'Chivita',
     description: 'Premium Chivita fruit juice.',
     price: 3000,
@@ -1018,7 +1018,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'active_juice',
+    id: 'active_juice_std',
     name: 'Active Juice',
     description: 'Refreshing Active fruit juice.',
     price: 3000,
@@ -1029,7 +1029,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'amstel_malt',
+    id: 'amstel_malt_std',
     name: 'Amstel Malt',
     description: 'Premium Amstel Malt beverage.',
     price: 1300,
@@ -1040,7 +1040,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'canned_fanta',
+    id: 'canned_fanta_std',
     name: 'Canned Fanta',
     description: 'Chilled Fanta in a can.',
     price: 1200,
@@ -1051,7 +1051,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'malta_guinness',
+    id: 'malta_guinness_std',
     name: 'Malta Guinness',
     description: 'The legendary Malta Guinness beverage.',
     price: 1000,
@@ -1062,7 +1062,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'maltina',
+    id: 'maltina_std',
     name: 'Maltina',
     description: 'Smooth Maltina beverage.',
     price: 1000,
@@ -1073,7 +1073,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'nutri_milk',
+    id: 'nutri_milk_std',
     name: 'Nutri Milk',
     description: 'Nutritional milk beverage.',
     price: 1000,
@@ -1084,7 +1084,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'active_zest',
+    id: 'active_zest_std',
     name: 'Active Zest',
     description: 'Zesty refreshing beverage.',
     price: 1000,
@@ -1095,7 +1095,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'fearless',
+    id: 'fearless_std',
     name: 'Fearless',
     description: 'Energy drink curation.',
     price: 1000,
@@ -1106,7 +1106,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'schweppes',
+    id: 'schweppes_std',
     name: 'Schweppes',
     description: 'Premium Schweppes beverage.',
     price: 1000,
@@ -1117,7 +1117,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'pepsi',
+    id: 'pepsi_std',
     name: 'Pepsi',
     description: 'Chilled Pepsi bottle.',
     price: 800,
@@ -1128,7 +1128,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'coke',
+    id: 'coke_std',
     name: 'Coke',
     description: 'Chilled bottle of Coca-Cola.',
     price: 800,
@@ -1139,7 +1139,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'seven_up',
+    id: 'seven_up_std',
     name: '7up',
     description: 'Chilled 7up bottle.',
     price: 800,
@@ -1150,7 +1150,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'teem',
+    id: 'teem_std',
     name: 'Teem',
     description: 'Refreshing Teem beverage.',
     price: 800,
@@ -1161,7 +1161,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'sprite',
+    id: 'sprite_std',
     name: 'Sprite',
     description: 'Chilled Sprite bottle.',
     price: 800,
@@ -1172,7 +1172,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'fanta',
+    id: 'fanta_std',
     name: 'Fanta',
     description: 'Chilled Fanta bottle.',
     price: 800,
@@ -1183,7 +1183,7 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
-    id: 'bottle_water',
+    id: 'bottle_water_std',
     name: 'Bottle Water',
     description: 'Premium bottled water, minimal clean aesthetic.',
     price: 500,
