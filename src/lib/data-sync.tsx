@@ -150,7 +150,6 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   const updateMenuItem = async (item: Partial<MenuItem>) => {
     let updatedItem = { ...item } as MenuItem;
     
-    // Generate a temporary ID if missing
     if (!updatedItem.id) {
       updatedItem.id = `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
@@ -168,6 +167,17 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
       }
     }
     const newMenu = item.id ? menu.map(m => m.id === item.id ? updatedItem : m) : [updatedItem, ...menu];
+    setMenu(newMenu);
+    localStorage.setItem('bamanda_menu_cache', JSON.stringify(newMenu));
+  };
+
+  const deleteMenuItem = async (id: string) => {
+    if (db) {
+      try {
+        await deleteDoc(doc(db, 'menu', id));
+      } catch (err) {}
+    }
+    const newMenu = menu.filter(m => m.id !== id);
     setMenu(newMenu);
     localStorage.setItem('bamanda_menu_cache', JSON.stringify(newMenu));
   };
@@ -195,6 +205,17 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
       }
     }
     const newPosts = post.id ? posts.map(p => p.id === post.id ? updatedPost : p) : [updatedPost, ...posts];
+    setPosts(newPosts);
+    localStorage.setItem('bamanda_blog_cache', JSON.stringify(newPosts));
+  };
+
+  const deletePost = async (id: string) => {
+    if (db) {
+      try {
+        await deleteDoc(doc(db, 'blog', id));
+      } catch (err) {}
+    }
+    const newPosts = posts.filter(p => p.id !== id);
     setPosts(newPosts);
     localStorage.setItem('bamanda_blog_cache', JSON.stringify(newPosts));
   };
@@ -227,7 +248,11 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteStaff = async (id: string) => {
-    if (db) await deleteDoc(doc(db, 'staff', id));
+    if (db) {
+      try {
+        await deleteDoc(doc(db, 'staff', id));
+      } catch (err) {}
+    }
     const newStaff = staff.filter(s => s.id !== id);
     setStaff(newStaff);
     localStorage.setItem('bamanda_staff_cache', JSON.stringify(newStaff));
