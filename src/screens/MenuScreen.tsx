@@ -11,7 +11,7 @@ import { MenuItem } from "../types";
 import MenuCard from "../components/MenuCard";
 import SkeletonLoader from "../components/SkeletonLoader";
 import { patronTracker } from "../lib/security";
-import { cn } from "../lib/utils";
+import { cn, getCookie } from "../lib/utils";
 
 interface MenuScreenProps {
   menuItems: MenuItem[];
@@ -32,8 +32,9 @@ export default function MenuScreen({ menuItems, onAddToCart, initialFilter }: Me
     // Load patron insights
     setPatronFavorites(patronTracker.getFavorites());
     
-    // Simulate loading for UX, but resolve faster if we have data
-    const delay = menuItems.length > 0 ? 300 : 800;
+    // Simulate loading for UX, but resolve faster if we have data or visited before
+    const isReturningUser = !!getCookie('bamanda_visited');
+    const delay = isReturningUser ? 100 : (menuItems.length > 0 ? 300 : 800);
     const timer = setTimeout(() => setIsLoading(false), delay);
     return () => clearTimeout(timer);
   }, [menuItems.length]);

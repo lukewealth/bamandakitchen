@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Package, ChefHat, Truck, CheckCircle2, Clock, MapPin, Phone, ArrowLeft, MessageCircle, Bike, Car } from 'lucide-react';
 import { Order, OrderStatus } from '../types';
 import { getWhatsAppUrl } from '../lib/order';
+import { cn } from '../lib/utils';
 
 interface TrackOrderScreenProps {
   order: Order | null;
@@ -52,6 +53,19 @@ export default function TrackOrderScreen({ order: initialOrder, onBack }: TrackO
     e.preventDefault();
     setIsSearching(true);
 
+    // Capture metadata for lookup interaction
+    const metadata = {
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      language: navigator.language,
+      orderIdAttempted: searchId.toUpperCase()
+    };
+
+    // Persist lookup attempt for curator insights (stored locally for demo)
+    const lookups = JSON.parse(localStorage.getItem('bamanda_track_lookups') || '[]');
+    localStorage.setItem('bamanda_track_lookups', JSON.stringify([metadata, ...lookups].slice(0, 50)));
+
     // Simulate lookup
     setTimeout(() => {
       const allOrders = JSON.parse(localStorage.getItem('bamanda_orders') || '[]');
@@ -65,7 +79,6 @@ export default function TrackOrderScreen({ order: initialOrder, onBack }: TrackO
       setIsSearching(false);
     }, 1000);
   };
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -264,14 +277,14 @@ export default function TrackOrderScreen({ order: initialOrder, onBack }: TrackO
                  </button>
                </div>
 
-               {order.notes && (
+               {activeOrder.notes && (
                  <div className="flex items-start gap-6">
                    <div className="p-4 bg-primary/5 rounded-full border border-accent/10">
                      <Clock className="w-6 h-6 text-accent" />
                    </div>
                    <div>
                      <h3 className="editorial-label text-xs mb-2 opacity-40 uppercase tracking-widest">Instructions</h3>
-                     <p className="font-sans text-sm text-on-surface-variant leading-relaxed">{order.notes}</p>
+                     <p className="font-sans text-sm text-on-surface-variant leading-relaxed">{activeOrder.notes}</p>
                    </div>
                  </div>
                )}
@@ -284,7 +297,7 @@ export default function TrackOrderScreen({ order: initialOrder, onBack }: TrackO
               <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
               
               <AnimatePresence mode="wait">
-                {order.status === 'on-the-way' ? (
+                {activeOrder.status === 'on-the-way' ? (
                   <motion.div 
                     key="on-way"
                     initial={{ opacity: 0, scale: 0.8 }}

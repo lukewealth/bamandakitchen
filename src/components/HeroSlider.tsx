@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { ShoppingBag, Truck } from "lucide-react";
 import OptimizedImage from "./OptimizedImage";
 import { Screen } from "../types";
+import { patronTracker } from "../lib/security";
 
 const slides = [
   {
@@ -126,11 +127,14 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
                 <span>Order Heritage</span>
               </button>
               <button 
-                onClick={() => onNavigate("track-order")}
+                onClick={() => {
+                  patronTracker.captureTrackingMetadata("check_track_landing");
+                  onNavigate("track-order");
+                }}
                 className="group border border-white/30 text-white px-10 py-5 rounded-2xl font-bold uppercase tracking-[0.2em] text-[11px] hover:bg-white hover:text-primary transition-all w-full sm:w-auto backdrop-blur-md flex items-center justify-center gap-3 hover:border-white shadow-xl"
               >
                 <Truck className="w-4 h-4 group-hover:animate-bounce" />
-                <span>Track Curation</span>
+                <span>Check Track</span>
               </button>
             </div>
           </motion.div>

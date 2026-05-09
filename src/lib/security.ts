@@ -84,5 +84,21 @@ export const patronTracker = {
     const viewed = JSON.parse(localStorage.getItem('bamanda_viewed_items') || '[]');
     const updated = [itemId, ...viewed.filter((id: string) => id !== itemId)].slice(0, 12);
     localStorage.setItem('bamanda_viewed_items', JSON.stringify(updated));
+  },
+
+  captureTrackingMetadata: (action: string) => {
+    const metadata = {
+      action,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      language: navigator.language,
+      platform: navigator.platform,
+      screenResolution: `${window.screen.width}x${window.screen.height}`,
+      referrer: document.referrer || 'direct',
+      href: window.location.href
+    };
+    const logs = JSON.parse(localStorage.getItem('bamanda_tracking_logs') || '[]');
+    localStorage.setItem('bamanda_tracking_logs', JSON.stringify([metadata, ...logs].slice(0, 50)));
+    console.log(`[Tracking] Captured metadata for: ${action}`, metadata);
   }
 };

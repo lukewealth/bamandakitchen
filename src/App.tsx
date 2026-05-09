@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { cn } from './lib/utils';
+import { cn, getCookie, setCookie } from './lib/utils';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
@@ -31,6 +31,15 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeOrder, setActiveOrder] = useState<Order | null>(null);
   const [showTrackingPopup, setShowTrackingPopup] = useState(false);
+  const [hasVisited, setHasVisited] = useState(() => !!getCookie('bamanda_visited'));
+
+  // Set visited cookie on mount
+  useEffect(() => {
+    if (!getCookie('bamanda_visited')) {
+      setCookie('bamanda_visited', 'true', 30);
+      setHasVisited(true);
+    }
+  }, []);
   
   // Dynamic Data
   const [menu, setMenu] = useState<MenuItem[]>(() => {
@@ -100,15 +109,29 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
-  // Screen change effect with loading simulation - Speeded up to 400ms
+  // Screen change effect with loading simulation
   useEffect(() => {
-    setIsLoading(true);
+    // If we're already on this screen or data is cached, speed up or skip
+    const isDataCached = currentScreen === 'menu' ? menu.length > 0 : true;
+    const isReturningUser = hasVisited || !!getCookie('bamanda_visited');
+    
     window.scrollTo(0, 0);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [currentScreen]);
+    
+    if (isDataCached) {
+      // Near-instant transition for cached content
+      setIsLoading(true);
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, isReturningUser ? 100 : 200); // halved delay for returning users
+      return () => clearTimeout(timer);
+    } else {
+      setIsLoading(true);
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, isReturningUser ? 300 : 600); // halved delay for returning users
+      return () => clearTimeout(timer);
+    }
+  }, [currentScreen, hasVisited]);
 
   const handleNavigateToMenu = (filter?: string) => {
     setMenuFilter(filter);
@@ -174,7 +197,12 @@ export default function App() {
 
       <main className={cn(currentScreen !== 'admin' && "pt-20")}>
         {currentScreen === 'home' && (
-          <HomeScreen onNavigateToMenu={handleNavigateToMenu} onAddToCart={handleAddToCart} trendingDishes={menu.filter(item => item.isTrending)} />
+          <HomeScreen 
+            onNavigate={setCurrentScreen}
+            onNavigateToMenu={handleNavigateToMenu} 
+            onAddToCart={handleAddToCart} 
+            trendingDishes={menu.filter(item => item.isTrending)} 
+          />
         )}
         {currentScreen === 'menu' && (
           <MenuScreen menuItems={menu} onAddToCart={handleAddToCart} initialFilter={menuFilter} />
