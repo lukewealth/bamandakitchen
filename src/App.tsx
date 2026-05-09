@@ -33,11 +33,32 @@ export default function App() {
   const [showTrackingPopup, setShowTrackingPopup] = useState(false);
   
   // Dynamic Data
-  const [menu, setMenu] = useState<MenuItem[]>([]);
+  const [menu, setMenu] = useState<MenuItem[]>(() => {
+    const saved = localStorage.getItem('bamanda_menu');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return MENU_ITEMS;
+      }
+    }
+    return MENU_ITEMS;
+  });
 
-  // Initial Data Load & Sync
+  const [posts, setPosts] = useState<BlogPost[]>(() => {
+    const saved = localStorage.getItem('bamanda_posts');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  // Sync Data on Screen Change
   useEffect(() => {
-    // Sync Menu
     const savedMenu = localStorage.getItem('bamanda_menu');
     if (savedMenu) {
       try {
@@ -50,9 +71,14 @@ export default function App() {
       setMenu(MENU_ITEMS);
     }
 
-    // Sync Blog Posts
     const savedPosts = localStorage.getItem('bamanda_posts');
-    if (!savedPosts) {
+    if (savedPosts) {
+      try {
+        setPosts(JSON.parse(savedPosts));
+      } catch (e) {
+        // Fallback handled in initialization or default blog post
+      }
+    } else {
       const initialPosts: BlogPost[] = [{
         id: '1',
         title: 'The Ritual of Communal Dining',
@@ -65,8 +91,9 @@ export default function App() {
         category: 'Rituals'
       }];
       localStorage.setItem('bamanda_posts', JSON.stringify(initialPosts));
+      setPosts(initialPosts);
     }
-  }, [currentScreen]); // Re-sync on screen changes to pick up Admin updates
+  }, [currentScreen]);
 
   // Theme effect
   useEffect(() => {

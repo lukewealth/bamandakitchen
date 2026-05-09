@@ -32,10 +32,11 @@ export default function MenuScreen({ menuItems, onAddToCart, initialFilter }: Me
     // Load patron insights
     setPatronFavorites(patronTracker.getFavorites());
     
-    // Simulate loading for UX
-    const timer = setTimeout(() => setIsLoading(false), 800);
+    // Simulate loading for UX, but resolve faster if we have data
+    const delay = menuItems.length > 0 ? 300 : 800;
+    const timer = setTimeout(() => setIsLoading(false), delay);
     return () => clearTimeout(timer);
-  }, []);
+  }, [menuItems.length]);
 
   // Memoized Categories
   const categories = useMemo(() => ["All", ...Array.from(new Set(menuItems.map(item => item.category)))], [menuItems]);
