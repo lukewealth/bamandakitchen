@@ -134,7 +134,7 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
                 className="group border border-white/30 text-white px-10 py-5 rounded-2xl font-bold uppercase tracking-[0.2em] text-[11px] hover:bg-white hover:text-primary transition-all w-full sm:w-auto backdrop-blur-md flex items-center justify-center gap-3 hover:border-white shadow-xl"
               >
                 <Truck className="w-4 h-4 group-hover:animate-bounce" />
-                <span>Check Track</span>
+                <span>Check Order</span>
               </button>
             </div>
           </motion.div>

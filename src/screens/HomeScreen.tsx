@@ -32,30 +32,6 @@ export default function HomeScreen({ onNavigate, onNavigateToMenu, onAddToCart, 
         else onNavigate(screen);
       }} />
 
-      {/* Quick Track Section */}
-      <section className="py-12 bg-accent/5 border-y border-accent/10">
-        <div className="editorial-container flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-center gap-6">
-            <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent">
-              <Truck className="w-8 h-8" />
-            </div>
-            <div>
-              <h3 className="font-serif text-2xl text-primary">Expecting a delivery?</h3>
-              <p className="text-on-surface-variant text-sm">Track your heritage curation in real-time.</p>
-            </div>
-          </div>
-          <button 
-            onClick={() => {
-              patronTracker.captureTrackingMetadata("check_track_button_home");
-              onNavigate("track-order");
-            }}
-            className="bg-primary text-white px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:bg-primary/90 transition-all shadow-xl"
-          >
-            Check Track <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
-      </section>
-
       {/* Meal Time Segments */}
       <section className="py-24 editorial-container">
         <div className="editorial-label mb-4 text-center">Meal Time Segments</div>
