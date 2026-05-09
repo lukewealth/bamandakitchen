@@ -9,13 +9,12 @@ import { cn } from '../lib/utils';
 import { useDataSync } from '../lib/data-sync';
 import { 
   Lock, LogOut, ShoppingBag, Utensils, BookOpen, X, Star, Edit, Trash2, Plus, 
-  CheckCircle2, Clock, Truck, Image as ImageIcon, Layout, Save, AlertCircle, MessageCircle,
-  Menu as MenuIcon, Users, ChevronLeft, ChevronRight, Loader2, RefreshCw, Download, FileCode
+  Image as ImageIcon, Save, MessageCircle, Users, ChevronLeft, ChevronRight, RefreshCw, Download, FileCode
 } from 'lucide-react';
-import { MenuItem, Order, BlogPost, OrderStatus, BlogLayout, MenuCategory, StaffAccount } from '../types';
+import { MenuItem, Order, BlogPost, BlogLayout, StaffAccount } from '../types';
 import { formatStatusUpdateMessage, getWhatsAppUrl } from '../lib/order';
 import { useToast } from '../lib/toast-context';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 import { 
   collection, 
   query, 
@@ -23,12 +22,9 @@ import {
   doc, 
   updateDoc, 
   deleteDoc, 
-  setDoc, 
-  writeBatch,
   orderBy,
-  serverTimestamp,
-  addDoc
 } from 'firebase/firestore';
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut, User } from 'firebase/auth';
 
 export default function AdminScreen() {
   const { showToast, confirm } = useToast();
@@ -49,7 +45,8 @@ export default function AdminScreen() {
     exportAsDataTs 
   } = useDataSync();
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'blog' | 'staff'>('orders');
@@ -63,9 +60,22 @@ export default function AdminScreen() {
   const [editingMenuItem, setEditingMenuItem] = useState<Partial<MenuItem> | null>(null);
   const [editingStaff, setEditingStaff] = useState<Partial<StaffAccount> | null>(null);
 
+  // Persistence & Auth Check
+  useEffect(() => {
+    if (!auth) {
+      setAuthLoading(false);
+      return;
+    }
+    const unsub = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setAuthLoading(false);
+    });
+    return () => unsub();
+  }, []);
+
   // Firestore Real-time Sync (Orders only, rest via DataSync)
   useEffect(() => {
-    if (!isAuthenticated || !db) return;
+    if (!currentUser || !db) return;
 
     const unsubOrders = onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), (snapshot) => {
       setOrders(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Order)));
@@ -74,7 +84,7 @@ export default function AdminScreen() {
     return () => {
       unsubOrders();
     };
-  }, [isAuthenticated]);
+  }, [currentUser]);
 
   // ==========================================
   // MASTER OPERATIONS
@@ -176,18 +186,36 @@ export default function AdminScreen() {
   // ==========================================
   // AUTH LOGIC
   // ==========================================
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === (import.meta.env.VITE_ADMIN_EMAIL || 'admin@bamanda.com') && 
-        password === (import.meta.env.VITE_ADMIN_PASSWORD || 'heritage2026')) {
-      setIsAuthenticated(true);
+    if (!auth) return;
+    
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       showToast('Welcome back, Curator.', 'success');
-    } else {
-      showToast('Invalid credentials.', 'error');
+    } catch (err: any) {
+      showToast(err.message || 'Authentication failed.', 'error');
     }
   };
 
-  if (!isAuthenticated) {
+  const handleSignOut = async () => {
+    if (!auth) return;
+    await signOut(auth);
+    showToast('Departed the sanctuary.', 'info');
+  };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-primary flex items-center justify-center">
+        <div className="flex flex-col items-center gap-6">
+          <div className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin" />
+          <p className="text-accent font-serif italic text-xl">Consulting the Scribes...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-primary p-6">
         <div className="max-w-md w-full bg-white p-12 rounded-[3rem] shadow-2xl">
@@ -283,7 +311,7 @@ export default function AdminScreen() {
           </nav>
 
           <button 
-            onClick={() => setIsAuthenticated(false)} 
+            onClick={handleSignOut} 
             className={cn(
               "flex items-center gap-5 p-5 bg-white/5 rounded-2xl text-white/40 hover:text-accent hover:bg-white/10 transition-all group relative",
               isSidebarCollapsed && "justify-center"
@@ -372,7 +400,7 @@ export default function AdminScreen() {
                     </button>
                   ))}
                 </nav>
-                <button onClick={() => setIsAuthenticated(false)} className="flex items-center gap-5 p-6 bg-white/5 rounded-2xl text-white/40 mt-auto">
+                <button onClick={handleSignOut} className="flex items-center gap-5 p-6 bg-white/5 rounded-2xl text-white/40 mt-auto">
                   <LogOut className="w-5 h-5" />
                   <span className="text-xs font-black uppercase tracking-widest">Sign Out</span>
                 </button>
