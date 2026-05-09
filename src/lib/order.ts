@@ -13,7 +13,8 @@ export const generateOrderId = () => {
 
 export const formatWhatsAppMessage = (order: Order) => {
   const itemDetails = order.items.map(item => 
-    `• ${item.name} (${item.portion || 'Full'}) x ${item.quantity} - ₦${(item.price * item.quantity).toLocaleString()}`
+    `• ${item.name} (${item.portion || 'Full'}) x ${item.quantity} - ₦${(item.price * item.quantity).toLocaleString()}` +
+    (item.whatsappLink ? `\n  🔗 View: ${item.whatsappLink}` : '')
   ).join('\n');
 
   const subtotal = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);

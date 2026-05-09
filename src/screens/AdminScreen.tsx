@@ -575,6 +575,17 @@ export default function AdminScreen() {
                       className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans text-xs"
                     />
                   </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase font-bold text-accent">WhatsApp Catalog Link</label>
+                    <input 
+                      type="text" 
+                      placeholder="https://wa.me/p/..."
+                      value={editingMenuItem.whatsappLink || ''} 
+                      onChange={e => setEditingMenuItem({ ...editingMenuItem, whatsappLink: e.target.value })}
+                      className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans text-xs"
+                    />
+                  </div>
                 </div>
                 <div className="p-8 bg-cream flex justify-end gap-6">
                   <button onClick={() => setEditingMenuItem(null)} className="text-[10px] font-bold uppercase tracking-widest opacity-40">Cancel</button>

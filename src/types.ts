@@ -27,6 +27,7 @@ export interface MenuItem {
   tags: string[];
   available: boolean;
   isTrending?: boolean; // For "Now Selling: Trending Hot Picks"
+  whatsappLink?: string; // Link to the WhatsApp catalog item
 }
 
 export interface CartItem extends MenuItem {
