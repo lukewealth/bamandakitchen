@@ -9,6 +9,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
 import FloatingCart from './components/FloatingCart';
+import BrandLoader from './components/BrandLoader';
 import HomeScreen from './screens/HomeScreen';
 import MenuScreen from './screens/MenuScreen';
 import CheckoutScreen from './screens/CheckoutScreen';
@@ -30,39 +31,78 @@ export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [theme, setTheme] = useState<'night' | 'day'>('night');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Start with true for initial boot
+  const [loadingMessage, setLoadingMessage] = useState("Consulting Ancestral Recipes");
   const [activeOrder, setActiveOrder] = useState<Order | null>(null);
-  const [showTrackingPopup, setShowTrackingPopup] = useState(false);
   const [hasVisited, setHasVisited] = useState(() => !!getCookie('bamanda_visited'));
 
-  // Set visited cookie on mount
-  useEffect(() => {
-    if (!getCookie('bamanda_visited')) {
-      setCookie('bamanda_visited', 'true', 30);
-      setHasVisited(true);
+  // Hybrid Data State
+  const [menu, setMenu] = useState<MenuItem[]>(() => {
+    // Phase 1: LocalStorage Hydration
+    const cached = localStorage.getItem('bamanda_menu_cache');
+    if (cached) {
+      try {
+        return JSON.parse(cached);
+      } catch (e) {
+        return MENU_ITEMS;
+      }
     }
-  }, []);
+    return MENU_ITEMS;
+  });
   
-  // Dynamic Data
-  const [menu, setMenu] = useState<MenuItem[]>([]);
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [posts, setPosts] = useState<BlogPost[]>(() => {
+    const cached = localStorage.getItem('bamanda_blog_cache');
+    try {
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
 
-  // Firestore Real-time Menu & Blog
+  // Initial Boot Sequence
   useEffect(() => {
-    const unsubMenu = onSnapshot(query(collection(db, 'menu'), orderBy('name')), (snapshot) => {
-      const items = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as MenuItem));
-      setMenu(items.length > 0 ? items : MENU_ITEMS);
-    });
+    const bootSequence = async () => {
+      setLoadingMessage("Synchronizing Sanctuary Cache");
+      
+      // Check cookies
+      if (!getCookie('bamanda_visited')) {
+        setCookie('bamanda_visited', 'true', 30);
+        setHasVisited(true);
+      }
 
-    const unsubBlog = onSnapshot(query(collection(db, 'blog'), orderBy('date', 'desc')), (snapshot) => {
-      const articles = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as BlogPost));
-      setPosts(articles);
-    });
-
-    return () => {
-      unsubMenu();
-      unsubBlog();
+      // Simulate a brief minimum loading for aesthetics
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setIsLoading(false);
     };
+
+    bootSequence();
+  }, []);
+
+  // Firestore Real-time Sync (Background)
+  useEffect(() => {
+    if (!db) return;
+
+    try {
+      const unsubMenu = onSnapshot(query(collection(db, 'menu'), orderBy('name')), (snapshot) => {
+        const items = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as MenuItem));
+        const finalMenu = items.length > 0 ? items : MENU_ITEMS;
+        setMenu(finalMenu);
+        localStorage.setItem('bamanda_menu_cache', JSON.stringify(finalMenu));
+      });
+
+      const unsubBlog = onSnapshot(query(collection(db, 'blog'), orderBy('date', 'desc')), (snapshot) => {
+        const articles = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as BlogPost));
+        setPosts(articles);
+        localStorage.setItem('bamanda_blog_cache', JSON.stringify(articles));
+      });
+
+      return () => {
+        unsubMenu();
+        unsubBlog();
+      };
+    } catch (err) {
+      console.error('Firebase background sync failed:', err);
+    }
   }, []);
 
   // Theme effect
@@ -70,29 +110,26 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
-  // Screen change effect with loading simulation
+  // Screen change logic
   useEffect(() => {
-    // If we're already on this screen or data is cached, speed up or skip
+    if (isLoading) return; // Don't interrupt initial boot
+    
     const isDataCached = currentScreen === 'menu' ? menu.length > 0 : true;
     const isReturningUser = hasVisited || !!getCookie('bamanda_visited');
     
     window.scrollTo(0, 0);
     
-    if (isDataCached) {
-      // Near-instant transition for cached content
-      setIsLoading(true);
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, isReturningUser ? 100 : 200); // halved delay for returning users
-      return () => clearTimeout(timer);
-    } else {
-      setIsLoading(true);
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, isReturningUser ? 300 : 600); // halved delay for returning users
-      return () => clearTimeout(timer);
-    }
-  }, [currentScreen, hasVisited]);
+    // Quick transition loader for navigation
+    setIsLoading(true);
+    setLoadingMessage(currentScreen === 'menu' ? "Curing the Inventory" : "Navigating the Sanctuary");
+    
+    const delay = isDataCached ? (isReturningUser ? 300 : 500) : 800;
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, delay);
+    
+    return () => clearTimeout(timer);
+  }, [currentScreen]);
 
   const handleNavigateToMenu = (filter?: string) => {
     setMenuFilter(filter);
@@ -127,19 +164,22 @@ export default function App() {
 
   const handleOrderComplete = async (order: Order) => {
     setActiveOrder(order);
-    
-    // Sync to Firestore
     try {
-      await setDoc(doc(db, 'orders', order.id), {
-        ...order,
-        createdAt: new Date().toISOString()
-      });
-    } catch (err) {
-      console.error('Firestore order sync failed:', err);
+      const existingOrders = JSON.parse(localStorage.getItem('bamanda_orders') || '[]');
+      localStorage.setItem('bamanda_orders', JSON.stringify([order, ...existingOrders].slice(0, 50)));
+    } catch (e) {}
+
+    if (db) {
+      try {
+        await setDoc(doc(db, 'orders', order.id), {
+          ...order,
+          createdAt: new Date().toISOString()
+        });
+      } catch (err) {}
     }
     
     setCart([]);
-    setShowTrackingPopup(true);
+    setCurrentScreen('track-order');
   };
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -147,6 +187,9 @@ export default function App() {
   return (
     <ToastProvider>
       <div className="min-h-screen bg-surface selection:bg-accent/30 overflow-x-hidden">
+      
+      {isLoading && <BrandLoader subMessage={loadingMessage} />}
+
       {currentScreen !== 'admin' && (
         <Header 
           currentScreen={currentScreen} 
@@ -171,24 +214,12 @@ export default function App() {
         {currentScreen === 'menu' && (
           <MenuScreen menuItems={menu} onAddToCart={handleAddToCart} initialFilter={menuFilter} />
         )}
-        {currentScreen === 'about' && (
-          <AboutScreen />
-        )}
-        {currentScreen === 'blog' && (
-          <BlogScreen />
-        )}
-        {currentScreen === 'contact' && (
-          <ContactScreen />
-        )}
-        {currentScreen === 'checkout' && (
-          <CheckoutScreen items={cart} onOrderComplete={handleOrderComplete} />
-        )}
-        {currentScreen === 'track-order' && (
-          <TrackOrderScreen order={activeOrder} onBack={() => setCurrentScreen('menu')} />
-        )}
-        {currentScreen === 'admin' && (
-          <AdminScreen />
-        )}
+        {currentScreen === 'about' && <AboutScreen />}
+        {currentScreen === 'blog' && <BlogScreen />}
+        {currentScreen === 'contact' && <ContactScreen />}
+        {currentScreen === 'checkout' && <CheckoutScreen items={cart} onOrderComplete={handleOrderComplete} />}
+        {currentScreen === 'track-order' && <TrackOrderScreen order={activeOrder} onBack={() => setCurrentScreen('menu')} />}
+        {currentScreen === 'admin' && <AdminScreen />}
         
         {currentScreen === 'heritage' && (
           <InfoScreen 
@@ -243,19 +274,8 @@ export default function App() {
         onCheckout={handleCheckout}
       />
 
-      {currentScreen !== 'admin' && (
-        <FloatingCart 
-          items={cart}
-          onOpenCart={() => setIsCartOpen(true)}
-        />
-      )}
-      
-      {/* Editorial Loading Bar */}
-      <div className={`fixed top-0 left-0 w-full h-[3px] z-[200] pointer-events-none transition-opacity duration-300 ${isLoading ? 'opacity-100' : 'opacity-0'}`}>
-        <div className="h-full bg-accent animate-editorial-loading" />
+      {currentScreen !== 'admin' && <FloatingCart items={cart} onOpenCart={() => setIsCartOpen(true)} />}
       </div>
-      </div>
-      </ToastProvider>
-      );
-      }
-
+    </ToastProvider>
+  );
+}

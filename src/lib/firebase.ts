@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApp, getApps } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -19,15 +19,24 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Robust Initialization
+let app;
+try {
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+  } else {
+    app = getApp();
+  }
+} catch (error) {
+  console.error("Firebase initialization failed:", error);
+}
 
-// Initialize Services
-export const db = getFirestore(app);
-export const auth = getAuth(app);
-export const storage = getStorage(app);
+// Initialize Services with null fallbacks if app failed
+export const db = app ? getFirestore(app) : null as any;
+export const auth = app ? getAuth(app) : null as any;
+export const storage = app ? getStorage(app) : null as any;
 
 // Analytics (Safe check for SSR/Support)
-export const analytics = isSupported().then(yes => yes ? getAnalytics(app) : null);
+export const analytics = isSupported().then(yes => (yes && app) ? getAnalytics(app) : null);
 
 export default app;

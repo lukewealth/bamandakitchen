@@ -9,7 +9,7 @@ import { cn } from '../lib/utils';
 import { 
   Lock, LogOut, ShoppingBag, Utensils, BookOpen, X, Star, Edit, Trash2, Plus, 
   CheckCircle2, Clock, Truck, Image as ImageIcon, Layout, Save, AlertCircle, MessageCircle,
-  Menu as MenuIcon, Users, ChevronLeft, ChevronRight, Loader2, RefreshCw
+  Menu as MenuIcon, Users, ChevronLeft, ChevronRight, Loader2, RefreshCw, Download
 } from 'lucide-react';
 import { MenuItem, Order, BlogPost, OrderStatus, BlogLayout, MenuCategory, StaffAccount } from '../types';
 import { MENU_ITEMS } from '../data';
@@ -42,7 +42,10 @@ export default function AdminScreen() {
   const [isMigrating, setIsMigrating] = useState(false);
   
   const [orders, setOrders] = useState<Order[]>([]);
-  const [menu, setMenu] = useState<MenuItem[]>([]);
+  const [menu, setMenu] = useState<MenuItem[]>(() => {
+    const cached = localStorage.getItem('bamanda_menu_cache');
+    try { return cached ? JSON.parse(cached) : MENU_ITEMS; } catch { return MENU_ITEMS; }
+  });
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [staff, setStaff] = useState<StaffAccount[]>([]);
 
@@ -53,37 +56,61 @@ export default function AdminScreen() {
 
   // Firestore Real-time Subscriptions
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !db) {
+      if (isAuthenticated && !db) {
+        showToast('Cloud database unavailable. Using local view.', 'warning');
+      }
+      return;
+    }
 
-    const unsubMenu = onSnapshot(query(collection(db, 'menu'), orderBy('name')), (snapshot) => {
-      setMenu(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as MenuItem)));
-    });
+    try {
+      const unsubMenu = onSnapshot(query(collection(db, 'menu'), orderBy('name')), (snapshot) => {
+        const items = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as MenuItem));
+        if (items.length > 0) {
+          setMenu(items);
+          localStorage.setItem('bamanda_menu_cache', JSON.stringify(items));
+        }
+      }, (err) => {
+        console.error('Admin menu subscription failed:', err);
+      });
 
-    const unsubOrders = onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), (snapshot) => {
-      setOrders(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Order)));
-    });
+      const unsubOrders = onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), (snapshot) => {
+        const items = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Order));
+        setOrders(items);
+      }, (err) => {
+        console.error('Admin orders subscription failed:', err);
+      });
 
-    const unsubBlog = onSnapshot(query(collection(db, 'blog'), orderBy('date', 'desc')), (snapshot) => {
-      setPosts(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as BlogPost)));
-    });
+      const unsubBlog = onSnapshot(query(collection(db, 'blog'), orderBy('date', 'desc')), (snapshot) => {
+        const items = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as BlogPost));
+        setPosts(items);
+        localStorage.setItem('bamanda_blog_cache', JSON.stringify(items));
+      }, (err) => {
+        console.error('Admin blog subscription failed:', err);
+      });
 
-    const unsubStaff = onSnapshot(query(collection(db, 'staff'), orderBy('name')), (snapshot) => {
-      setStaff(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as StaffAccount)));
-    });
+      const unsubStaff = onSnapshot(query(collection(db, 'staff'), orderBy('name')), (snapshot) => {
+        setStaff(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as StaffAccount)));
+      }, (err) => {
+        console.error('Admin staff subscription failed:', err);
+      });
 
-    return () => {
-      unsubMenu();
-      unsubOrders();
-      unsubBlog();
-      unsubStaff();
-    };
+      return () => {
+        unsubMenu();
+        unsubOrders();
+        unsubBlog();
+        unsubStaff();
+      };
+    } catch (err) {
+      console.error('Admin Firebase subscriptions failed:', err);
+    }
   }, [isAuthenticated]);
 
   // Sidebar Auto-collapse Logic
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     if (!isSidebarCollapsed && !isMobileMenuOpen && isAuthenticated) {
-      timeout = setTimeout(() => setIsSidebarCollapsed(true), 15000); // Collapse after 15s of no interaction
+      timeout = setTimeout(() => setIsSidebarCollapsed(true), 15000);
     }
     return () => clearTimeout(timeout);
   }, [isSidebarCollapsed, activeTab, isMobileMenuOpen, isAuthenticated]);
@@ -92,15 +119,20 @@ export default function AdminScreen() {
     setIsTabLoading(true);
     setActiveTab(tab);
     setIsMobileMenuOpen(false);
-    setTimeout(() => setIsTabLoading(false), 400); // Smooth async feel
+    setTimeout(() => setIsTabLoading(false), 400);
   };
 
   const handleMigration = async () => {
-    if (!window.confirm('This will seed the cloud database with local heritage items. Continue?')) return;
+    if (!db) {
+      showToast('Sanctuary cloud connection is offline. Seed aborted.', 'error');
+      return;
+    }
+
+    if (!window.confirm('This will seed the cloud database with current local menu items. Continue?')) return;
     setIsMigrating(true);
     try {
       const batch = writeBatch(db);
-      MENU_ITEMS.forEach(item => {
+      menu.forEach(item => {
         const docRef = doc(db, 'menu', item.id);
         batch.set(docRef, { ...item, updatedAt: serverTimestamp() });
       });
@@ -111,6 +143,14 @@ export default function AdminScreen() {
       showToast('Migration encountered a spiritual blockage.', 'error');
     } finally {
       setIsMigrating(false);
+    }
+  };
+
+  const restoreFromStatic = () => {
+    if (window.confirm('Restore menu items from static heritage data? Current changes will be overwritten.')) {
+      setMenu(MENU_ITEMS);
+      localStorage.setItem('bamanda_menu_cache', JSON.stringify(MENU_ITEMS));
+      showToast('Restored from ancestral records.', 'info');
     }
   };
 
@@ -125,9 +165,20 @@ export default function AdminScreen() {
     }
   };
 
-  const updateOrderStatus = (orderId: string, newStatus: OrderStatus) => {
-    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
-    showToast(`Order status updated to ${newStatus}.`, 'success');
+  const updateOrderStatus = async (orderId: string, newStatus: OrderStatus) => {
+    if (db) {
+      try {
+        await updateDoc(doc(db, 'orders', orderId), { status: newStatus });
+        showToast(`Order status updated to ${newStatus}.`, 'success');
+      } catch (err) {
+        console.error('Failed to update cloud order:', err);
+        setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+        showToast('Local status updated (Cloud sync failed).', 'warning');
+      }
+    } else {
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+      showToast(`Local record updated to ${newStatus}.`, 'success');
+    }
   };
 
   const handleNotifyCustomer = (order: Order) => {
@@ -136,90 +187,212 @@ export default function AdminScreen() {
     window.open(url, '_blank');
   };
 
-  const deleteOrder = (orderId: string) => {
+  const deleteOrder = async (orderId: string) => {
     if (window.confirm('Are you sure you want to remove this curation from history?')) {
-      setOrders(prev => prev.filter(o => o.id !== orderId));
-      showToast('Curation archived from records.', 'info');
+      if (db) {
+        try {
+          await deleteDoc(doc(db, 'orders', orderId));
+          showToast('Curation archived from cloud records.', 'info');
+        } catch (err) {
+          console.error('Cloud delete failed:', err);
+          setOrders(prev => prev.filter(o => o.id !== orderId));
+          showToast('Curation archived from local view.', 'info');
+        }
+      } else {
+        setOrders(prev => prev.filter(o => o.id !== orderId));
+        showToast('Curation archived from records.', 'info');
+      }
     }
   };
 
   // Blog Actions
-  const handleSavePost = () => {
+  const handleSavePost = async () => {
     if (!editingPost?.title || !editingPost?.content) return;
 
-    if (editingPost.id) {
-      setPosts(prev => prev.map(p => p.id === editingPost.id ? (editingPost as BlogPost) : p));
-      showToast('Article manifestation updated.', 'success');
+    if (db) {
+      try {
+        const postData = {
+          ...editingPost,
+          updatedAt: serverTimestamp(),
+          date: editingPost.date || new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+          author: editingPost.author || 'Heritage Curator'
+        };
+
+        if (editingPost.id) {
+          await updateDoc(doc(db, 'blog', editingPost.id), postData);
+          showToast('Article manifestation updated in cloud.', 'success');
+        } else {
+          await addDoc(collection(db, 'blog'), postData);
+          showToast('New article manifested in the Gazette cloud.', 'success');
+        }
+      } catch (err) {
+        console.error('Cloud blog save failed:', err);
+        showToast('Cloud sync failed. Manifestation remains local.', 'warning');
+      }
     } else {
-      const newPost: BlogPost = {
-        ...editingPost,
-        id: Date.now().toString(),
-        date: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-        author: 'Heritage Curator',
-      } as BlogPost;
-      setPosts(prev => [newPost, ...prev]);
-      showToast('New article manifested in the Gazette.', 'success');
+      if (editingPost.id) {
+        setPosts(prev => prev.map(p => p.id === editingPost.id ? (editingPost as BlogPost) : p));
+        showToast('Article manifestation updated locally.', 'success');
+      } else {
+        const newPost: BlogPost = {
+          ...editingPost,
+          id: Date.now().toString(),
+          date: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+          author: 'Heritage Curator',
+        } as BlogPost;
+        setPosts(prev => [newPost, ...prev]);
+        showToast('New article manifested in the Gazette.', 'success');
+      }
     }
     setEditingPost(null);
   };
 
-  const handleDeletePost = (id: string) => {
+  const handleDeletePost = async (id: string) => {
     if (window.confirm('Delete this article?')) {
-      setPosts(prev => prev.filter(p => p.id !== id));
-      showToast('Article archived from the Gazette.', 'info');
+      if (db) {
+        try {
+          await deleteDoc(doc(db, 'blog', id));
+          showToast('Article archived from cloud.', 'info');
+        } catch (err) {
+          console.error('Cloud blog delete failed:', err);
+          setPosts(prev => prev.filter(p => p.id !== id));
+          showToast('Article archived from local view.', 'info');
+        }
+      } else {
+        setPosts(prev => prev.filter(p => p.id !== id));
+        showToast('Article archived from the Gazette.', 'info');
+      }
     }
   };
 
   // Menu Actions
-  const handleSaveMenuItem = () => {
+  const handleSaveMenuItem = async () => {
     if (!editingMenuItem?.name || !editingMenuItem?.price) return;
 
-    if (editingMenuItem.id) {
-      setMenu(prev => prev.map(item => item.id === editingMenuItem.id ? (editingMenuItem as MenuItem) : item));
-      showToast('Inventory curation updated.', 'success');
+    if (db) {
+      try {
+        const itemData = {
+          ...editingMenuItem,
+          updatedAt: serverTimestamp()
+        };
+
+        if (editingMenuItem.id) {
+          await updateDoc(doc(db, 'menu', editingMenuItem.id), itemData);
+          showToast('Inventory curation updated in cloud.', 'success');
+        } else {
+          await addDoc(collection(db, 'menu'), itemData);
+          showToast('New dish added to cloud inventory.', 'success');
+        }
+      } catch (err) {
+        console.error('Cloud menu save failed:', err);
+        showToast('Cloud sync failed. Record remains local.', 'warning');
+      }
     } else {
-      const newItem: MenuItem = {
-        ...editingMenuItem,
-        id: 'item-' + Date.now(),
-        mealTime: ['Lunch', 'Dinner'],
-        available: true,
-        tags: [],
-      } as MenuItem;
-      setMenu(prev => [newItem, ...prev]);
-      showToast('New dish added to the sanctuary inventory.', 'success');
+      if (editingMenuItem.id) {
+        setMenu(prev => {
+          const updated = prev.map(item => item.id === editingMenuItem.id ? (editingMenuItem as MenuItem) : item);
+          localStorage.setItem('bamanda_menu_cache', JSON.stringify(updated));
+          return updated;
+        });
+        showToast('Inventory curation updated locally.', 'success');
+      } else {
+        const newItem: MenuItem = {
+          ...editingMenuItem,
+          id: 'item-' + Date.now(),
+          mealTime: ['Lunch', 'Dinner'],
+          available: true,
+          tags: [],
+        } as MenuItem;
+        setMenu(prev => {
+          const updated = [newItem, ...prev];
+          localStorage.setItem('bamanda_menu_cache', JSON.stringify(updated));
+          return updated;
+        });
+        showToast('New dish added to the sanctuary inventory.', 'success');
+      }
     }
     setEditingMenuItem(null);
   };
 
-  const handleSaveStaff = () => {
+  const handleSaveStaff = async () => {
     if (!editingStaff?.name || !editingStaff?.email) return;
 
-    if (editingStaff.id) {
-      setStaff(prev => prev.map(s => s.id === editingStaff.id ? (editingStaff as StaffAccount) : s));
-      showToast('Staff credentials updated.', 'success');
+    if (db) {
+      try {
+        const staffData = {
+          ...editingStaff,
+          updatedAt: serverTimestamp()
+        };
+
+        if (editingStaff.id) {
+          await updateDoc(doc(db, 'staff', editingStaff.id), staffData);
+          showToast('Staff credentials updated in cloud.', 'success');
+        } else {
+          await addDoc(collection(db, 'staff'), {
+            ...staffData,
+            createdAt: new Date().toISOString()
+          });
+          showToast('New staff member added to cloud team.', 'success');
+        }
+      } catch (err) {
+        console.error('Cloud staff save failed:', err);
+        showToast('Cloud sync failed. Record remains local.', 'warning');
+      }
     } else {
-      const newStaff: StaffAccount = {
-        ...editingStaff,
-        id: 'staff-' + Date.now(),
-        createdAt: new Date().toISOString(),
-      } as StaffAccount;
-      setStaff(prev => [newStaff, ...prev]);
-      showToast('New staff member added to the curation team.', 'success');
+      if (editingStaff.id) {
+        setStaff(prev => prev.map(s => s.id === editingStaff.id ? (editingStaff as StaffAccount) : s));
+        showToast('Staff credentials updated locally.', 'success');
+      } else {
+        const newStaff: StaffAccount = {
+          ...editingStaff,
+          id: 'staff-' + Date.now(),
+          createdAt: new Date().toISOString(),
+        } as StaffAccount;
+        setStaff(prev => [newStaff, ...prev]);
+        showToast('New staff member added to the curation team.', 'success');
+      }
     }
     setEditingStaff(null);
   };
 
-  const deleteStaff = (id: string) => {
+  const deleteStaff = async (id: string) => {
     if (window.confirm('Remove this staff member from the sanctuary records?')) {
-      setStaff(prev => prev.filter(s => s.id !== id));
-      showToast('Staff records archived.', 'info');
+      if (db) {
+        try {
+          await deleteDoc(doc(db, 'staff', id));
+          showToast('Staff records archived from cloud.', 'info');
+        } catch (err) {
+          console.error('Cloud staff delete failed:', err);
+          setStaff(prev => prev.filter(s => s.id !== id));
+          showToast('Staff archived from local view.', 'info');
+        }
+      } else {
+        setStaff(prev => prev.filter(s => s.id !== id));
+        showToast('Staff records archived.', 'info');
+      }
     }
   };
 
-  const toggleTrending = (id: string) => {
-    setMenu(prev => prev.map(item => 
-      item.id === id ? { ...item, isTrending: !item.isTrending } : item
-    ));
+  const toggleTrending = async (id: string) => {
+    const item = menu.find(m => m.id === id);
+    if (!item) return;
+    
+    const nextState = !item.isTrending;
+    
+    if (db) {
+      try {
+        await updateDoc(doc(db, 'menu', id), { isTrending: nextState });
+      } catch (err) {
+        console.error('Cloud trending toggle failed:', err);
+        setMenu(prev => prev.map(m => m.id === id ? { ...m, isTrending: nextState } : m));
+      }
+    } else {
+      setMenu(prev => {
+        const updated = prev.map(m => m.id === id ? { ...m, isTrending: nextState } : m);
+        localStorage.setItem('bamanda_menu_cache', JSON.stringify(updated));
+        return updated;
+      });
+    }
   };
 
   if (!isAuthenticated) {
@@ -243,9 +416,8 @@ export default function AdminScreen() {
       <aside className={cn(
         "bg-primary text-white transition-all duration-500 z-[60] shadow-xl relative group flex flex-col",
         isMobileMenuOpen ? "fixed inset-0 w-full h-screen" : (isSidebarCollapsed ? "w-0 lg:w-24 overflow-hidden" : "w-full lg:w-72"),
-        isSidebarCollapsed && "lg:hover:w-72" // Temporary hover expand
+        isSidebarCollapsed && "lg:hover:w-72"
       )}>
-        {/* Toggle Button for Desktop */}
         <button 
           onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           className="hidden lg:flex absolute -right-4 top-10 w-8 h-8 bg-accent text-white rounded-full items-center justify-center shadow-lg hover:scale-110 active:scale-90 transition-all z-10"
@@ -327,13 +499,16 @@ export default function AdminScreen() {
                 "flex items-center gap-2 px-4 py-2 rounded-full border border-accent/20 text-[10px] font-black uppercase tracking-widest transition-all",
                 isMigrating ? "opacity-50 cursor-not-allowed" : "hover:bg-accent hover:text-white"
               )}
+              title="Push current local menu to cloud"
             >
-              {isMigrating ? <RefreshCw className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
-              {isMigrating ? 'Seeding...' : 'Seed Cloud'}
+              <RefreshCw className={cn("w-3 h-3", isMigrating && "animate-spin")} />
+              {isMigrating ? 'Syncing...' : 'Push to Cloud'}
             </button>
             <div className="bg-white px-4 py-2 rounded-full border border-primary/10 flex items-center gap-2 shadow-sm">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-[10px] uppercase tracking-widest font-bold text-primary opacity-60">System Online</span>
+              <div className={cn("w-2 h-2 rounded-full animate-pulse", db ? "bg-green-500" : "bg-red-500")} />
+              <span className="text-[10px] uppercase tracking-widest font-bold text-primary opacity-60">
+                {db ? "System Online" : "System Degraded"}
+              </span>
             </div>
           </div>
         </header>
@@ -352,7 +527,6 @@ export default function AdminScreen() {
             </motion.div>
           ) : (
             <>
-              {/* ORDERS TAB */}
               {activeTab === 'orders' && (
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
@@ -428,7 +602,6 @@ export default function AdminScreen() {
             </motion.div>
           )}
 
-          {/* MENU DB TAB */}
           {activeTab === 'menu' && (
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
@@ -437,7 +610,12 @@ export default function AdminScreen() {
               className="space-y-8"
             >
               <div className="flex justify-between items-center">
-                <h2 className="editorial-label text-accent">Active Inventory</h2>
+                <div className="flex items-center gap-4">
+                  <h2 className="editorial-label text-accent">Active Inventory</h2>
+                  <button onClick={restoreFromStatic} className="p-2 text-primary/20 hover:text-accent transition-colors" title="Restore from Static Heritage Records">
+                    <Download className="w-4 h-4" />
+                  </button>
+                </div>
                 <button 
                   onClick={() => setEditingMenuItem({ name: '', price: 0, category: 'Rice Dishes', description: '', isTrending: false, image: '' })}
                   className="bg-accent text-white px-8 py-4 rounded-xl font-bold text-xs flex items-center gap-2 shadow-lg shadow-accent/20"
@@ -467,7 +645,11 @@ export default function AdminScreen() {
                         </button>
                         <div className="flex gap-4">
                           <button onClick={() => setEditingMenuItem(item)} className="text-primary/40 hover:text-accent"><Edit className="w-4 h-4" /></button>
-                          <button onClick={() => setMenu(prev => prev.filter(m => m.id !== item.id))} className="text-primary/40 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                          <button onClick={() => setMenu(prev => {
+                            const updated = prev.filter(m => m.id !== item.id);
+                            localStorage.setItem('bamanda_menu_cache', JSON.stringify(updated));
+                            return updated;
+                          })} className="text-primary/40 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
                         </div>
                       </div>
                     </div>
@@ -477,7 +659,6 @@ export default function AdminScreen() {
             </motion.div>
           )}
 
-          {/* BLOG CMS TAB */}
           {activeTab === 'blog' && (
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
@@ -518,7 +699,6 @@ export default function AdminScreen() {
             </motion.div>
           )}
 
-          {/* STAFF MANAGEMENT TAB */}
           {activeTab === 'staff' && (
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
@@ -573,15 +753,10 @@ export default function AdminScreen() {
         )}
         </AnimatePresence>
 
-        {/* MODAL EDITORS */}
         <AnimatePresence>
           {editingPost && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-primary/90 backdrop-blur-md">
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="bg-white w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
-              >
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
                 <div className="p-8 border-b border-primary/5 flex justify-between items-center">
                   <h2 className="font-serif text-2xl italic">Compose Editorial</h2>
                   <button onClick={() => setEditingPost(null)}><X className="w-6 h-6 text-primary/40" /></button>
@@ -590,41 +765,24 @@ export default function AdminScreen() {
                   <div className="grid grid-cols-2 gap-8">
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase font-bold text-accent">Article Title</label>
-                      <input 
-                        type="text" 
-                        value={editingPost.title} 
-                        onChange={e => setEditingPost({ ...editingPost, title: e.target.value })}
-                        className="w-full bg-primary/5 border-none rounded-xl p-4 font-serif text-lg"
-                        placeholder="The Alchemy of Smoke..."
-                      />
+                      <input type="text" value={editingPost.title} onChange={e => setEditingPost({ ...editingPost, title: e.target.value })} className="w-full bg-primary/5 border-none rounded-xl p-4 font-serif text-lg" placeholder="The Alchemy of Smoke..." />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase font-bold text-accent">Design Layout Template</label>
-                      <select 
-                        value={editingPost.layout} 
-                        onChange={e => setEditingPost({ ...editingPost, layout: e.target.value as BlogLayout })}
-                        className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans text-sm font-bold appearance-none"
-                      >
-                        <option value="editorial">Modern Editorial (Large Title)</option>
-                        <option value="minimal">Minimalist Archive (Clean, White)</option>
-                        <option value="narrative">Personal Narrative (Story Focus)</option>
-                        <option value="journal">Journal Entry (Date Focused)</option>
-                        <option value="luxury">Luxury Curation (Gold & Black)</option>
+                      <select value={editingPost.layout} onChange={e => setEditingPost({ ...editingPost, layout: e.target.value as BlogLayout })} className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans text-sm font-bold appearance-none">
+                        <option value="editorial">Modern Editorial</option>
+                        <option value="minimal">Minimalist Archive</option>
+                        <option value="narrative">Personal Narrative</option>
+                        <option value="journal">Journal Entry</option>
+                        <option value="luxury">Luxury Curation</option>
                       </select>
                     </div>
                   </div>
-
                   <div className="grid grid-cols-2 gap-8">
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase font-bold text-accent">Feature Image URL</label>
                       <div className="flex gap-4">
-                        <input 
-                          type="text" 
-                          value={editingPost.image} 
-                          onChange={e => setEditingPost({ ...editingPost, image: e.target.value })}
-                          className="flex-1 bg-primary/5 border-none rounded-xl p-4 font-sans text-xs"
-                          placeholder="https://images.unsplash.com/..."
-                        />
+                        <input type="text" value={editingPost.image} onChange={e => setEditingPost({ ...editingPost, image: e.target.value })} className="flex-1 bg-primary/5 border-none rounded-xl p-4 font-sans text-xs" placeholder="https://images.unsplash.com/..." />
                         <div className="w-14 h-14 bg-primary/5 rounded-xl flex items-center justify-center overflow-hidden">
                           {editingPost.image ? <img src={editingPost.image} className="w-full h-full object-cover" /> : <ImageIcon className="w-6 h-6 opacity-10" />}
                         </div>
@@ -633,18 +791,8 @@ export default function AdminScreen() {
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase font-bold text-accent">Topic & Category</label>
                       <div className="grid grid-cols-2 gap-4">
-                        <input 
-                          type="text" 
-                          placeholder="Rituals"
-                          value={editingPost.topic} 
-                          onChange={e => setEditingPost({ ...editingPost, topic: e.target.value })}
-                          className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans text-xs font-bold"
-                        />
-                        <select 
-                          value={editingPost.category} 
-                          onChange={e => setEditingPost({ ...editingPost, category: e.target.value })}
-                          className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans text-xs font-bold"
-                        >
+                        <input type="text" placeholder="Rituals" value={editingPost.topic} onChange={e => setEditingPost({ ...editingPost, topic: e.target.value })} className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans text-xs font-bold" />
+                        <select value={editingPost.category} onChange={e => setEditingPost({ ...editingPost, category: e.target.value })} className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans text-xs font-bold">
                           <option value="Heritage">Heritage</option>
                           <option value="Innovation">Innovation</option>
                           <option value="Rituals">Rituals</option>
@@ -653,16 +801,9 @@ export default function AdminScreen() {
                       </div>
                     </div>
                   </div>
-
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase font-bold text-accent">Article Content (Markdown Supported)</label>
-                    <textarea 
-                      rows={12}
-                      value={editingPost.content} 
-                      onChange={e => setEditingPost({ ...editingPost, content: e.target.value })}
-                      className="w-full bg-primary/5 border-none rounded-xl p-6 font-serif text-base leading-relaxed"
-                      placeholder="Manifest your story here..."
-                    />
+                    <textarea rows={12} value={editingPost.content} onChange={e => setEditingPost({ ...editingPost, content: e.target.value })} className="w-full bg-primary/5 border-none rounded-xl p-6 font-serif text-base leading-relaxed" placeholder="Manifest your story here..." />
                   </div>
                 </div>
                 <div className="p-8 bg-cream flex justify-end gap-6">
@@ -677,11 +818,7 @@ export default function AdminScreen() {
 
           {editingMenuItem && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-primary/90 backdrop-blur-md">
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="bg-white w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col"
-              >
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col">
                 <div className="p-8 border-b border-primary/5 flex justify-between items-center">
                   <h2 className="font-serif text-2xl italic">Modify Inventory</h2>
                   <button onClick={() => setEditingMenuItem(null)}><X className="w-6 h-6 text-primary/40" /></button>
@@ -690,31 +827,16 @@ export default function AdminScreen() {
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase font-bold text-accent">Dish Name</label>
-                      <input 
-                        type="text" 
-                        value={editingMenuItem.name} 
-                        onChange={e => setEditingMenuItem({ ...editingMenuItem, name: e.target.value })}
-                        className="w-full bg-primary/5 border-none rounded-xl p-4 font-serif text-lg"
-                      />
+                      <input type="text" value={editingMenuItem.name} onChange={e => setEditingMenuItem({ ...editingMenuItem, name: e.target.value })} className="w-full bg-primary/5 border-none rounded-xl p-4 font-serif text-lg" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase font-bold text-accent">Price (₦)</label>
-                      <input 
-                        type="number" 
-                        value={editingMenuItem.price} 
-                        onChange={e => setEditingMenuItem({ ...editingMenuItem, price: parseInt(e.target.value) })}
-                        className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans font-bold"
-                      />
+                      <input type="number" value={editingMenuItem.price} onChange={e => setEditingMenuItem({ ...editingMenuItem, price: parseInt(e.target.value) })} className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans font-bold" />
                     </div>
                   </div>
-
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase font-bold text-accent">Category</label>
-                    <select 
-                      value={editingMenuItem.category} 
-                      onChange={e => setEditingMenuItem({ ...editingMenuItem, category: e.target.value as MenuCategory })}
-                      className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans font-bold appearance-none"
-                    >
+                    <select value={editingMenuItem.category} onChange={e => setEditingMenuItem({ ...editingMenuItem, category: e.target.value as MenuCategory })} className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans font-bold appearance-none">
                       <option value="Rice Dishes">Rice Dishes</option>
                       <option value="Proteins">Proteins</option>
                       <option value="Pasta & Noodles">Pasta & Noodles</option>
@@ -723,36 +845,17 @@ export default function AdminScreen() {
                       <option value="Drinks">Drinks</option>
                     </select>
                   </div>
-
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase font-bold text-accent">Inventory Description</label>
-                    <textarea 
-                      rows={4}
-                      value={editingMenuItem.description} 
-                      onChange={e => setEditingMenuItem({ ...editingMenuItem, description: e.target.value })}
-                      className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans text-sm"
-                    />
+                    <textarea rows={4} value={editingMenuItem.description} onChange={e => setEditingMenuItem({ ...editingMenuItem, description: e.target.value })} className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans text-sm" />
                   </div>
-
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase font-bold text-accent">Image Asset URL</label>
-                    <input 
-                      type="text" 
-                      value={editingMenuItem.image} 
-                      onChange={e => setEditingMenuItem({ ...editingMenuItem, image: e.target.value })}
-                      className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans text-xs"
-                    />
+                    <input type="text" value={editingMenuItem.image} onChange={e => setEditingMenuItem({ ...editingMenuItem, image: e.target.value })} className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans text-xs" />
                   </div>
-
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase font-bold text-accent">WhatsApp Catalog Link</label>
-                    <input 
-                      type="text" 
-                      placeholder="https://wa.me/p/..."
-                      value={editingMenuItem.whatsappLink || ''} 
-                      onChange={e => setEditingMenuItem({ ...editingMenuItem, whatsappLink: e.target.value })}
-                      className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans text-xs"
-                    />
+                    <input type="text" placeholder="https://wa.me/p/..." value={editingMenuItem.whatsappLink || ''} onChange={e => setEditingMenuItem({ ...editingMenuItem, whatsappLink: e.target.value })} className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans text-xs" />
                   </div>
                 </div>
                 <div className="p-8 bg-cream flex justify-end gap-6">
@@ -761,66 +864,45 @@ export default function AdminScreen() {
                   <Save className="w-4 h-4" /> Commit Changes
                 </button>
                 </div>
-                </motion.div>
-                </div>
-                )}
+              </motion.div>
+            </div>
+          )}
 
-                {editingStaff && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-primary/90 backdrop-blur-md">
-                <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="bg-white w-full max-w-xl rounded-3xl overflow-hidden shadow-2xl flex flex-col"
-                >
+          {editingStaff && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-primary/90 backdrop-blur-md">
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white w-full max-w-xl rounded-3xl overflow-hidden shadow-2xl flex flex-col">
                 <div className="p-8 border-b border-primary/5 flex justify-between items-center">
-                <h2 className="font-serif text-2xl italic">Staff Credentials</h2>
-                <button onClick={() => setEditingStaff(null)}><X className="w-6 h-6 text-primary/40" /></button>
+                  <h2 className="font-serif text-2xl italic">Staff Credentials</h2>
+                  <button onClick={() => setEditingStaff(null)}><X className="w-6 h-6 text-primary/40" /></button>
                 </div>
                 <div className="p-10 space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase font-bold text-accent">Full Name</label>
-                  <input 
-                    type="text" 
-                    value={editingStaff.name} 
-                    onChange={e => setEditingStaff({ ...editingStaff, name: e.target.value })}
-                    className="w-full bg-primary/5 border-none rounded-xl p-4 font-serif text-lg"
-                    placeholder="e.g. Ebuka Okoro"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase font-bold text-accent">Email Address</label>
-                  <input 
-                    type="email" 
-                    value={editingStaff.email} 
-                    onChange={e => setEditingStaff({ ...editingStaff, email: e.target.value })}
-                    className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans font-bold"
-                    placeholder="staff@bamanda.com"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase font-bold text-accent">Organizational Role</label>
-                  <select 
-                    value={editingStaff.role} 
-                    onChange={e => setEditingStaff({ ...editingStaff, role: e.target.value as any })}
-                    className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans font-bold appearance-none"
-                  >
-                    <option value="admin">Administrator</option>
-                    <option value="staff">Floor Staff</option>
-                    <option value="rider">Dispatch Rider</option>
-                  </select>
-                </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase font-bold text-accent">Full Name</label>
+                    <input type="text" value={editingStaff.name} onChange={e => setEditingStaff({ ...editingStaff, name: e.target.value })} className="w-full bg-primary/5 border-none rounded-xl p-4 font-serif text-lg" placeholder="e.g. Ebuka Okoro" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase font-bold text-accent">Email Address</label>
+                    <input type="email" value={editingStaff.email} onChange={e => setEditingStaff({ ...editingStaff, email: e.target.value })} className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans font-bold" placeholder="staff@bamanda.com" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase font-bold text-accent">Organizational Role</label>
+                    <select value={editingStaff.role} onChange={e => setEditingStaff({ ...editingStaff, role: e.target.value as any })} className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans font-bold appearance-none">
+                      <option value="admin">Administrator</option>
+                      <option value="staff">Floor Staff</option>
+                      <option value="rider">Dispatch Rider</option>
+                    </select>
+                  </div>
                 </div>
                 <div className="p-8 bg-cream flex justify-end gap-6">
-                <button onClick={() => setEditingStaff(null)} className="text-[10px] font-bold uppercase tracking-widest opacity-40">Cancel</button>
-                <button onClick={handleSaveStaff} className="bg-primary text-white px-12 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] flex items-center gap-2">
-                  <Save className="w-4 h-4" /> Enlist Member
-                </button>
+                  <button onClick={() => setEditingStaff(null)} className="text-[10px] font-bold uppercase tracking-widest opacity-40">Cancel</button>
+                  <button onClick={handleSaveStaff} className="bg-primary text-white px-12 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] flex items-center gap-2">
+                    <Save className="w-4 h-4" /> Enlist Member
+                  </button>
                 </div>
-                </motion.div>
-                </div>
-                )}
-                </AnimatePresence>
-
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );
