@@ -4,7 +4,7 @@
  */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { MenuItem, BlogPost } from '../types';
+import { MenuItem, BlogPost, StaffAccount } from '../types';
 import { MENU_ITEMS } from '../data';
 import { db } from './firebase';
 import { 
@@ -24,11 +24,24 @@ import { useToast } from './toast-context';
 interface DataSyncContextType {
   menu: MenuItem[];
   posts: BlogPost[];
+  staff: StaffAccount[];
   isLoading: boolean;
   isCloudSyncing: boolean;
   isConnected: boolean;
+  
+  // Menu Operations
   updateMenuItem: (item: Partial<MenuItem>) => Promise<void>;
   deleteMenuItem: (id: string) => Promise<void>;
+  
+  // Blog Operations
+  updatePost: (post: Partial<BlogPost>) => Promise<void>;
+  deletePost: (id: string) => Promise<void>;
+  
+  // Staff Operations
+  updateStaff: (member: Partial<StaffAccount>) => Promise<void>;
+  deleteStaff: (id: string) => Promise<void>;
+  
+  // Master Sync
   syncToCloud: () => Promise<void>;
   restoreFromStatic: () => void;
   exportAsDataTs: () => string;
@@ -40,17 +53,23 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   const { showToast } = useToast();
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [staff, setStaff] = useState<StaffAccount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCloudSyncing, setIsCloudSyncing] = useState(false);
   const [isConnected, setIsConnected] = useState(!!db);
 
+  // ==========================================
+  // INITIAL LOAD (LocalStorage)
+  // ==========================================
   useEffect(() => {
     const loadRootData = async () => {
       const cachedMenu = localStorage.getItem('bamanda_menu_cache');
       const cachedPosts = localStorage.getItem('bamanda_blog_cache');
+      const cachedStaff = localStorage.getItem('bamanda_staff_cache');
 
       let initialMenu: MenuItem[] = [];
       let initialPosts: BlogPost[] = [];
+      let initialStaff: StaffAccount[] = [];
 
       try {
         if (cachedMenu) {
@@ -61,40 +80,28 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
           const parsed = JSON.parse(cachedPosts);
           if (Array.isArray(parsed)) initialPosts = parsed;
         }
+        if (cachedStaff) {
+          const parsed = JSON.parse(cachedStaff);
+          if (Array.isArray(parsed)) initialStaff = parsed;
+        }
       } catch (e) {
         console.error('Failed to parse cached data', e);
       }
 
-      if (initialMenu.length === 0) {
-        try {
-          const response = await fetch('/menu.json');
-          if (response.ok) {
-            const data = await response.json();
-            if (data.menu && Array.isArray(data.menu)) {
-              initialMenu = data.menu;
-            } else if (data.categories && Array.isArray(data.categories)) {
-              initialMenu = data.categories.flatMap((cat: any) => 
-                cat.items.map((item: any) => ({ ...item, category: cat.name }))
-              );
-            }
-          }
-        } catch (e) {
-          console.warn('Failed to fetch public/menu.json', e);
-        }
-      }
-
-      if (initialMenu.length === 0) {
-        initialMenu = MENU_ITEMS;
-      }
+      if (initialMenu.length === 0) initialMenu = MENU_ITEMS;
 
       setMenu(initialMenu);
       setPosts(initialPosts);
+      setStaff(initialStaff);
       setIsLoading(false);
     };
 
     loadRootData();
   }, []);
 
+  // ==========================================
+  // CLOUD SYNCHRONIZATION (Firestore)
+  // ==========================================
   useEffect(() => {
     if (!db) {
       setIsConnected(false);
@@ -110,8 +117,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('bamanda_menu_cache', JSON.stringify(items));
       }
     }, (err) => {
-      console.error('Cloud Menu Sync Failed:', err);
-      setIsConnected(false);
+      console.error('Menu Sync Failed:', err);
     });
 
     const unsubBlog = onSnapshot(query(collection(db, 'blog'), orderBy('date', 'desc')), (snapshot) => {
@@ -119,67 +125,121 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
       setPosts(items);
       localStorage.setItem('bamanda_blog_cache', JSON.stringify(items));
     }, (err) => {
-      console.error('Cloud Blog Sync Failed:', err);
+      console.error('Blog Sync Failed:', err);
+    });
+
+    const unsubStaff = onSnapshot(query(collection(db, 'staff'), orderBy('name')), (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as StaffAccount));
+      setStaff(items);
+      localStorage.setItem('bamanda_staff_cache', JSON.stringify(items));
+    }, (err) => {
+      console.error('Staff Sync Failed:', err);
     });
 
     return () => {
       unsubMenu();
       unsubBlog();
+      unsubStaff();
     };
   }, []);
 
+  // ==========================================
+  // OPERATIONS
+  // ==========================================
+
   const updateMenuItem = async (item: Partial<MenuItem>) => {
-    let updatedItem = { ...item, updatedAt: new Date().toISOString() } as MenuItem;
+    let updatedItem = { ...item } as MenuItem;
     
+    // Generate a temporary ID if missing
+    if (!updatedItem.id) {
+      updatedItem.id = `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
     if (db) {
       try {
-        if (updatedItem.id) {
-          await updateDoc(doc(db, 'menu', updatedItem.id), { ...updatedItem, updatedAt: serverTimestamp() });
+        if (item.id) {
+          await updateDoc(doc(db, 'menu', item.id), { ...item, updatedAt: serverTimestamp() });
         } else {
-          const newDoc = await addDoc(collection(db, 'menu'), { ...updatedItem, updatedAt: serverTimestamp() });
+          const newDoc = await addDoc(collection(db, 'menu'), { ...item, updatedAt: serverTimestamp() });
           updatedItem.id = newDoc.id;
         }
       } catch (err) {
         showToast('Cloud sync failed. Preserving local copy.', 'warning');
       }
     }
-
-    const newMenu = updatedItem.id 
-      ? menu.map(m => m.id === updatedItem.id ? updatedItem : m)
-      : [updatedItem, ...menu];
-    
+    const newMenu = item.id ? menu.map(m => m.id === item.id ? updatedItem : m) : [updatedItem, ...menu];
     setMenu(newMenu);
     localStorage.setItem('bamanda_menu_cache', JSON.stringify(newMenu));
   };
 
-  const deleteMenuItem = async (id: string) => {
-    if (db) {
-      try {
-        await deleteDoc(doc(db, 'menu', id));
-      } catch (err) {
-        showToast('Failed to delete from cloud.', 'error');
-        return;
-      }
+  const updatePost = async (post: Partial<BlogPost>) => {
+    let updatedPost = { 
+      ...post, 
+      date: post.date || new Date().toISOString().split('T')[0] 
+    } as BlogPost;
+
+    if (!updatedPost.id) {
+      updatedPost.id = `post_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
 
-    const newMenu = menu.filter(m => m.id !== id);
-    setMenu(newMenu);
-    localStorage.setItem('bamanda_menu_cache', JSON.stringify(newMenu));
-    showToast('Dish removed from records.', 'info');
+    if (db) {
+      try {
+        if (post.id) {
+          await updateDoc(doc(db, 'blog', post.id), { ...post, updatedAt: serverTimestamp() });
+        } else {
+          const newDoc = await addDoc(collection(db, 'blog'), { ...post, updatedAt: serverTimestamp() });
+          updatedPost.id = newDoc.id;
+        }
+      } catch (err) {
+        showToast('Cloud blog sync failed.', 'warning');
+      }
+    }
+    const newPosts = post.id ? posts.map(p => p.id === post.id ? updatedPost : p) : [updatedPost, ...posts];
+    setPosts(newPosts);
+    localStorage.setItem('bamanda_blog_cache', JSON.stringify(newPosts));
+  };
+
+  const updateStaff = async (member: Partial<StaffAccount>) => {
+    let updatedMember = { 
+      ...member, 
+      createdAt: member.createdAt || new Date().toISOString() 
+    } as StaffAccount;
+
+    if (!updatedMember.id) {
+      updatedMember.id = `staff_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    if (db) {
+      try {
+        if (member.id) {
+          await updateDoc(doc(db, 'staff', member.id), { ...member, lastUpdated: serverTimestamp() });
+        } else {
+          const newDoc = await addDoc(collection(db, 'staff'), { ...member, createdAt: serverTimestamp() });
+          updatedMember.id = newDoc.id;
+        }
+      } catch (err) {
+        showToast('Cloud staff sync failed.', 'warning');
+      }
+    }
+    const newStaff = member.id ? staff.map(s => s.id === member.id ? updatedMember : s) : [updatedMember, ...staff];
+    setStaff(newStaff);
+    localStorage.setItem('bamanda_staff_cache', JSON.stringify(newStaff));
+  };
+
+  const deleteStaff = async (id: string) => {
+    if (db) await deleteDoc(doc(db, 'staff', id));
+    const newStaff = staff.filter(s => s.id !== id);
+    setStaff(newStaff);
+    localStorage.setItem('bamanda_staff_cache', JSON.stringify(newStaff));
   };
 
   const syncToCloud = async () => {
-    if (!db) {
-      showToast('Cloud sanctuary offline.', 'error');
-      return;
-    }
-
+    if (!db) return;
     setIsCloudSyncing(true);
     try {
       const batch = writeBatch(db);
       menu.forEach(item => {
-        const docRef = doc(db, 'menu', item.id);
-        batch.set(docRef, { ...item, updatedAt: serverTimestamp() });
+        if (item.id) batch.set(doc(db, 'menu', item.id), { ...item, updatedAt: serverTimestamp() });
       });
       await batch.commit();
       showToast('Heritage manifested in cloud.', 'success');
@@ -204,11 +264,16 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
     <DataSyncContext.Provider value={{
       menu,
       posts,
+      staff,
       isLoading,
       isCloudSyncing,
       isConnected,
       updateMenuItem,
       deleteMenuItem,
+      updatePost,
+      deletePost,
+      updateStaff,
+      deleteStaff,
       syncToCloud,
       restoreFromStatic,
       exportAsDataTs

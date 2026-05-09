@@ -3,21 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { BookOpen, Calendar, Clock, Share2, Bookmark, ArrowRight } from "lucide-react";
+import { Share2, Bookmark, ArrowRight } from "lucide-react";
 import { BlogPost } from "../types";
+import { useDataSync } from "../lib/data-sync";
 import OptimizedImage from "../components/OptimizedImage";
 
-export default function BlogScreen() {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+interface BlogScreenProps {
+  posts?: BlogPost[]; // Optional as we now have useDataSync
+}
 
-  useEffect(() => {
-    const savedPosts = localStorage.getItem("bamanda_posts");
-    if (savedPosts) {
-      setPosts(JSON.parse(savedPosts));
-    }
-  }, []);
+export default function BlogScreen({ posts: propPosts }: BlogScreenProps) {
+  const { posts: contextPosts } = useDataSync();
+  const posts = propPosts || contextPosts;
 
   const renderPost = (post: BlogPost, index: number) => {
     const isEven = index % 2 === 0;
@@ -34,7 +32,7 @@ export default function BlogScreen() {
                   <h2 className="font-serif text-5xl sm:text-6xl md:text-8xl italic leading-tight text-accent">
                     {post.title}
                   </h2>
-                  <p className="font-sans text-lg md:text-xl leading-relaxed opacity-80 first-letter:text-7xl first-letter:font-serif first-letter:mr-4 first-letter:float-left first-letter:text-accent">
+                  <p className="font-sans text-lg md:text-xl leading-relaxed opacity-80 first-letter:text-7xl first-letter:font-serif first-letter:mr-4 first-letter:float-left first-letter:text-accent whitespace-pre-line">
                     {post.content}
                   </p>
                   <div className="flex items-center gap-4 text-[10px] uppercase tracking-widest font-bold text-accent">
@@ -135,7 +133,7 @@ export default function BlogScreen() {
                     aspectRatio="h-full w-full"
                   />
                 </div>
-                <p className="font-serif text-xl md:text-2xl text-on-surface-variant leading-relaxed italic">
+                <p className="font-serif text-xl md:text-2xl text-on-surface-variant leading-relaxed italic whitespace-pre-line">
                   {post.content}
                 </p>
               </div>
