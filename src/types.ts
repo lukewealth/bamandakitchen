@@ -70,6 +70,15 @@ export interface BlogPost {
   category: string;
 }
 
+export interface StaffAccount {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'staff' | 'rider';
+  createdAt: string;
+  lastActive?: string;
+}
+
 export type Screen = 
   | 'home' 
   | 'menu' 

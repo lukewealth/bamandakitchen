@@ -9,9 +9,9 @@ import { cn } from '../lib/utils';
 import { 
   Lock, LogOut, ShoppingBag, Utensils, BookOpen, X, Star, Edit, Trash2, Plus, 
   CheckCircle2, Clock, Truck, Image as ImageIcon, Layout, Save, AlertCircle, MessageCircle,
-  Menu as MenuIcon
+  Menu as MenuIcon, Users, ChevronLeft, ChevronRight, Loader2
 } from 'lucide-react';
-import { MenuItem, Order, BlogPost, OrderStatus, BlogLayout, MenuCategory } from '../types';
+import { MenuItem, Order, BlogPost, OrderStatus, BlogLayout, MenuCategory, StaffAccount } from '../types';
 import { MENU_ITEMS } from '../data';
 import { formatStatusUpdateMessage, getWhatsAppUrl } from '../lib/order';
 import { useToast } from '../lib/toast-context';
@@ -21,16 +21,20 @@ export default function AdminScreen() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'blog'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'blog' | 'staff'>('orders');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isTabLoading, setIsTabLoading] = useState(false);
   
   const [orders, setOrders] = useState<Order[]>([]);
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [staff, setStaff] = useState<StaffAccount[]>([]);
 
   // Editing states
   const [editingPost, setEditingPost] = useState<Partial<BlogPost> | null>(null);
   const [editingMenuItem, setEditingMenuItem] = useState<Partial<MenuItem> | null>(null);
+  const [editingStaff, setEditingStaff] = useState<Partial<StaffAccount> | null>(null);
 
   useEffect(() => {
     const savedOrders = localStorage.getItem('bamanda_orders');
@@ -63,6 +67,17 @@ export default function AdminScreen() {
       setPosts(initialPosts);
       localStorage.setItem('bamanda_posts', JSON.stringify(initialPosts));
     }
+
+    const savedStaff = localStorage.getItem('bamanda_staff');
+    if (savedStaff) {
+      setStaff(JSON.parse(savedStaff));
+    } else {
+      const initialStaff: StaffAccount[] = [
+        { id: '1', name: 'Admin Curator', email: 'admin@bamanda.com', role: 'admin', createdAt: new Date().toISOString() }
+      ];
+      setStaff(initialStaff);
+      localStorage.setItem('bamanda_staff', JSON.stringify(initialStaff));
+    }
   }, []);
 
   useEffect(() => {
@@ -70,8 +85,25 @@ export default function AdminScreen() {
       localStorage.setItem('bamanda_orders', JSON.stringify(orders));
       localStorage.setItem('bamanda_menu', JSON.stringify(menu));
       localStorage.setItem('bamanda_posts', JSON.stringify(posts));
+      localStorage.setItem('bamanda_staff', JSON.stringify(staff));
     }
-  }, [orders, menu, posts, isAuthenticated]);
+  }, [orders, menu, posts, staff, isAuthenticated]);
+
+  // Sidebar Auto-collapse Logic
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (!isSidebarCollapsed && !isMobileMenuOpen && isAuthenticated) {
+      timeout = setTimeout(() => setIsSidebarCollapsed(true), 15000); // Collapse after 15s of no interaction
+    }
+    return () => clearTimeout(timeout);
+  }, [isSidebarCollapsed, activeTab, isMobileMenuOpen, isAuthenticated]);
+
+  const handleTabChange = (tab: any) => {
+    setIsTabLoading(true);
+    setActiveTab(tab);
+    setIsMobileMenuOpen(false);
+    setTimeout(() => setIsTabLoading(false), 400); // Smooth async feel
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,6 +182,31 @@ export default function AdminScreen() {
     setEditingMenuItem(null);
   };
 
+  const handleSaveStaff = () => {
+    if (!editingStaff?.name || !editingStaff?.email) return;
+
+    if (editingStaff.id) {
+      setStaff(prev => prev.map(s => s.id === editingStaff.id ? (editingStaff as StaffAccount) : s));
+      showToast('Staff credentials updated.', 'success');
+    } else {
+      const newStaff: StaffAccount = {
+        ...editingStaff,
+        id: 'staff-' + Date.now(),
+        createdAt: new Date().toISOString(),
+      } as StaffAccount;
+      setStaff(prev => [newStaff, ...prev]);
+      showToast('New staff member added to the curation team.', 'success');
+    }
+    setEditingStaff(null);
+  };
+
+  const deleteStaff = (id: string) => {
+    if (window.confirm('Remove this staff member from the sanctuary records?')) {
+      setStaff(prev => prev.filter(s => s.id !== id));
+      showToast('Staff records archived.', 'info');
+    }
+  };
+
   const toggleTrending = (id: string) => {
     setMenu(prev => prev.map(item => 
       item.id === id ? { ...item, isTrending: !item.isTrending } : item
@@ -175,55 +232,79 @@ export default function AdminScreen() {
   return (
     <div className="min-h-screen bg-cream flex flex-col lg:flex-row">
       <aside className={cn(
-        "w-full lg:w-64 bg-primary text-white p-6 lg:p-8 lg:h-screen sticky top-0 lg:sticky overflow-y-auto z-[60] shadow-xl transition-all duration-500",
-        isMobileMenuOpen ? "h-screen bg-primary" : "h-auto"
+        "bg-primary text-white transition-all duration-500 z-[60] shadow-xl relative group flex flex-col",
+        isMobileMenuOpen ? "fixed inset-0 w-full h-screen" : (isSidebarCollapsed ? "w-0 lg:w-24 overflow-hidden" : "w-full lg:w-72"),
+        isSidebarCollapsed && "lg:hover:w-72" // Temporary hover expand
       )}>
-        <div className="flex items-center justify-between lg:block space-y-0 lg:space-y-8">
-          <h2 className="font-serif italic text-2xl text-accent">Bamanda</h2>
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-3 bg-white/5 rounded-xl border border-white/10 text-white active:scale-95 transition-all"
-            >
-              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
-            </button>
-            <button onClick={() => setIsAuthenticated(false)} className="flex items-center gap-2 p-3 px-4 opacity-60 hover:opacity-100 text-[10px] uppercase tracking-widest font-bold border border-white/20 rounded-xl bg-white/5 active:scale-95 transition-all">
-              <LogOut className="w-4 h-4" /> 
-              <span className="hidden sm:inline">Exit</span>
-            </button>
-          </div>
-        </div>
+        {/* Toggle Button for Desktop */}
+        <button 
+          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          className="hidden lg:flex absolute -right-4 top-10 w-8 h-8 bg-accent text-white rounded-full items-center justify-center shadow-lg hover:scale-110 active:scale-90 transition-all z-10"
+        >
+          {isSidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+        </button>
 
-        <div className={cn(
-          "lg:flex lg:flex-col gap-2 lg:gap-4 lg:mt-8",
-          isMobileMenuOpen ? "flex flex-col mt-8" : "hidden"
-        )}>
-          {[
-            { id: 'orders', label: 'Orders', icon: ShoppingBag },
-            { id: 'menu', label: 'Menu DB', icon: Utensils },
-            { id: 'blog', label: 'Gazette', icon: BookOpen },
-          ].map((tab) => (
-            <button 
-              key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id as any);
-                setIsMobileMenuOpen(false);
-              }} 
-              className={`w-full flex items-center justify-start gap-4 p-5 rounded-2xl transition-all ${activeTab === tab.id ? 'bg-white text-primary shadow-xl scale-[1.02]' : 'bg-white/5 opacity-60 hover:opacity-100 border border-white/5'}`}
-            >
-              <tab.icon className={cn("w-5 h-5", activeTab === tab.id ? "text-accent" : "text-white")} /> 
-              <span className="text-xs font-bold uppercase tracking-[0.2em]">{tab.label}</span>
-            </button>
-          ))}
+        <div className="flex flex-col h-full p-6 lg:p-8 space-y-8">
+          <div className="flex items-center justify-between lg:justify-start gap-4">
+            <h2 className={cn("font-serif italic text-2xl text-accent transition-all duration-500", isSidebarCollapsed && "lg:opacity-0")}>
+              Bamanda
+            </h2>
+            <div className="lg:hidden">
+               <button 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-3 bg-white/5 rounded-xl border border-white/10 text-white active:scale-95 transition-all"
+              >
+                {isMobileMenuOpen ? <X className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+
+          <div className={cn(
+            "flex-1 flex flex-col gap-3",
+            !isMobileMenuOpen && isSidebarCollapsed && "lg:items-center"
+          )}>
+            {[
+              { id: 'orders', label: 'Orders', icon: ShoppingBag },
+              { id: 'menu', label: 'Menu DB', icon: Utensils },
+              { id: 'blog', label: 'Gazette', icon: BookOpen },
+              { id: 'staff', label: 'Staff', icon: Users },
+            ].map((tab) => (
+              <button 
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id as any)} 
+                className={cn(
+                  "flex items-center gap-4 p-4 rounded-2xl transition-all relative overflow-hidden group",
+                  activeTab === tab.id ? 'bg-white text-primary shadow-xl' : 'bg-white/5 opacity-60 hover:opacity-100 border border-white/5',
+                  isSidebarCollapsed && !isMobileMenuOpen && "lg:p-4 lg:justify-center"
+                )}
+                title={tab.label}
+              >
+                <tab.icon className={cn("w-5 h-5 shrink-0", activeTab === tab.id ? "text-accent" : "text-white")} /> 
+                <span className={cn(
+                  "text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300",
+                  isSidebarCollapsed && !isMobileMenuOpen && "lg:hidden"
+                )}>
+                  {tab.label}
+                </span>
+                {activeTab === tab.id && <div className="absolute right-0 top-0 bottom-0 w-1 bg-accent" />}
+              </button>
+            ))}
+          </div>
           
-          <button onClick={() => setIsAuthenticated(false)} className="lg:hidden flex items-center gap-4 p-5 opacity-40 hover:opacity-100 hover:text-accent transition-colors">
-            <LogOut className="w-5 h-5" /> Exit
+          <button 
+            onClick={() => setIsAuthenticated(false)} 
+            className={cn(
+              "flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl text-white/40 hover:text-accent hover:border-accent transition-all",
+              isSidebarCollapsed && !isMobileMenuOpen && "lg:justify-center"
+            )}
+          >
+            <LogOut className="w-5 h-5 shrink-0" />
+            <span className={cn(
+              "text-[10px] font-bold uppercase tracking-widest",
+              isSidebarCollapsed && !isMobileMenuOpen && "lg:hidden"
+            )}>Sign Out</span>
           </button>
         </div>
-        
-        <button onClick={() => setIsAuthenticated(false)} className="hidden lg:flex items-center gap-4 p-4 mt-8 opacity-40 hover:opacity-100 hover:text-accent transition-colors">
-          <LogOut className="w-5 h-5" /> Exit
-        </button>
       </aside>
       
       <main className="flex-1 p-6 lg:p-12 overflow-x-hidden">
@@ -238,8 +319,21 @@ export default function AdminScreen() {
         </header>
 
         <AnimatePresence mode="wait">
-          {/* ORDERS TAB */}
-          {activeTab === 'orders' && (
+          {isTabLoading ? (
+            <motion.div 
+              key="loader"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="h-[60vh] flex flex-col items-center justify-center space-y-4"
+            >
+              <Loader2 className="w-12 h-12 text-accent animate-spin" />
+              <p className="font-serif italic text-primary/40 uppercase tracking-widest text-xs">Accessing Records...</p>
+            </motion.div>
+          ) : (
+            <>
+              {/* ORDERS TAB */}
+              {activeTab === 'orders' && (
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -403,6 +497,60 @@ export default function AdminScreen() {
               </div>
             </motion.div>
           )}
+
+          {/* STAFF MANAGEMENT TAB */}
+          {activeTab === 'staff' && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-8"
+            >
+              <div className="flex justify-between items-center">
+                <h2 className="editorial-label text-accent">Internal Curation Team</h2>
+                <button 
+                  onClick={() => setEditingStaff({ name: '', email: '', role: 'staff' })}
+                  className="bg-accent text-white px-8 py-4 rounded-xl font-bold text-xs flex items-center gap-2 shadow-lg shadow-accent/20"
+                >
+                  <Plus className="w-4 h-4" /> Add Team Member
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {staff.map(member => (
+                  <div key={member.id} className="bg-white rounded-3xl p-8 shadow-sm border border-primary/5 hover:border-accent/20 transition-all group">
+                    <div className="flex items-center gap-6 mb-6">
+                      <div className="w-16 h-16 bg-primary/5 rounded-2xl flex items-center justify-center text-primary group-hover:bg-accent group-hover:text-white transition-all">
+                        <Users className="w-8 h-8" />
+                      </div>
+                      <div>
+                        <h3 className="font-serif text-xl italic">{member.name}</h3>
+                        <div className="px-3 py-1 bg-primary/5 text-primary rounded-full text-[8px] font-black uppercase tracking-widest mt-1 inline-block">
+                          {member.role}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-4 pt-6 border-t border-primary/5">
+                      <div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-primary/40 mb-1">Email Access</div>
+                        <div className="text-xs font-medium text-primary/80">{member.email}</div>
+                      </div>
+                      <div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-primary/40 mb-1">Enlisted On</div>
+                        <div className="text-xs font-medium text-primary/80">{new Date(member.createdAt).toLocaleDateString()}</div>
+                      </div>
+                      <div className="flex gap-4 pt-4">
+                        <button onClick={() => setEditingStaff(member)} className="flex-1 bg-primary/5 hover:bg-accent hover:text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">Update</button>
+                        <button onClick={() => deleteStaff(member.id)} className="p-3 text-primary/20 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+          </>
+        )}
         </AnimatePresence>
 
         {/* MODAL EDITORS */}
@@ -588,15 +736,71 @@ export default function AdminScreen() {
                   </div>
                 </div>
                 <div className="p-8 bg-cream flex justify-end gap-6">
-                  <button onClick={() => setEditingMenuItem(null)} className="text-[10px] font-bold uppercase tracking-widest opacity-40">Cancel</button>
-                  <button onClick={handleSaveMenuItem} className="bg-primary text-white px-12 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] flex items-center gap-2">
-                    <Save className="w-4 h-4" /> Commit Changes
-                  </button>
+                <button onClick={() => setEditingMenuItem(null)} className="text-[10px] font-bold uppercase tracking-widest opacity-40">Cancel</button>
+                <button onClick={handleSaveMenuItem} className="bg-primary text-white px-12 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] flex items-center gap-2">
+                  <Save className="w-4 h-4" /> Commit Changes
+                </button>
                 </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
+                </motion.div>
+                </div>
+                )}
+
+                {editingStaff && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-primary/90 backdrop-blur-md">
+                <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-white w-full max-w-xl rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+                >
+                <div className="p-8 border-b border-primary/5 flex justify-between items-center">
+                <h2 className="font-serif text-2xl italic">Staff Credentials</h2>
+                <button onClick={() => setEditingStaff(null)}><X className="w-6 h-6 text-primary/40" /></button>
+                </div>
+                <div className="p-10 space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase font-bold text-accent">Full Name</label>
+                  <input 
+                    type="text" 
+                    value={editingStaff.name} 
+                    onChange={e => setEditingStaff({ ...editingStaff, name: e.target.value })}
+                    className="w-full bg-primary/5 border-none rounded-xl p-4 font-serif text-lg"
+                    placeholder="e.g. Ebuka Okoro"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase font-bold text-accent">Email Address</label>
+                  <input 
+                    type="email" 
+                    value={editingStaff.email} 
+                    onChange={e => setEditingStaff({ ...editingStaff, email: e.target.value })}
+                    className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans font-bold"
+                    placeholder="staff@bamanda.com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase font-bold text-accent">Organizational Role</label>
+                  <select 
+                    value={editingStaff.role} 
+                    onChange={e => setEditingStaff({ ...editingStaff, role: e.target.value as any })}
+                    className="w-full bg-primary/5 border-none rounded-xl p-4 font-sans font-bold appearance-none"
+                  >
+                    <option value="admin">Administrator</option>
+                    <option value="staff">Floor Staff</option>
+                    <option value="rider">Dispatch Rider</option>
+                  </select>
+                </div>
+                </div>
+                <div className="p-8 bg-cream flex justify-end gap-6">
+                <button onClick={() => setEditingStaff(null)} className="text-[10px] font-bold uppercase tracking-widest opacity-40">Cancel</button>
+                <button onClick={handleSaveStaff} className="bg-primary text-white px-12 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] flex items-center gap-2">
+                  <Save className="w-4 h-4" /> Enlist Member
+                </button>
+                </div>
+                </motion.div>
+                </div>
+                )}
+                </AnimatePresence>
+
       </main>
     </div>
   );
