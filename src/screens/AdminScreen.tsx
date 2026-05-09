@@ -253,59 +253,59 @@ export default function AdminScreen() {
                 </div>
               ) : (
                 orders.map(order => (
-                  <div key={order.id} className="bg-white p-6 lg:p-8 rounded-3xl shadow-sm border border-primary/5 overflow-hidden">
+                  <div key={order.id} className="bg-white p-6 lg:p-8 rounded-3xl shadow-sm hover:shadow-xl border border-primary/5 hover:border-accent/20 transition-all duration-500 overflow-hidden group">
                     <div className="flex flex-col xl:flex-row justify-between gap-8">
                       <div className="flex-1 space-y-6">
                         <div className="flex items-center justify-between">
-                          <div className="editorial-label text-accent text-[9px]">Order #{order.id}</div>
-                          <div className={`px-4 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${
-                            order.status === 'delivered' ? 'bg-green-100 text-green-700' :
-                            order.status === 'on-the-way' ? 'bg-blue-100 text-blue-700' :
-                            order.status === 'preparing' ? 'bg-orange-100 text-orange-700' :
-                            'bg-gray-100 text-gray-700'
+                          <div className="editorial-label text-accent text-[10px] font-black group-hover:scale-110 transition-transform origin-left">Order #{order.id}</div>
+                          <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-sm ${
+                            order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                            order.status === 'on-the-way' ? 'bg-blue-100 text-blue-800' :
+                            order.status === 'preparing' ? 'bg-orange-100 text-orange-800' :
+                            'bg-gray-200 text-gray-800'
                           }`}>
                             {order.status}
                           </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                           <div>
-                            <h4 className="text-[9px] uppercase font-bold text-primary/40 mb-2 tracking-widest">Patron</h4>
-                            <p className="font-serif italic text-lg leading-tight">{order.customer.name}</p>
-                            <p className="text-xs text-primary/60 mt-1">{order.customer.phone}</p>
-                            <p className="text-xs text-primary/60">{order.customer.address}</p>
+                            <h4 className="text-[10px] uppercase font-black text-primary/60 mb-2 tracking-[0.2em]">Patron</h4>
+                            <p className="font-serif italic text-2xl leading-tight text-primary">{order.customer.name}</p>
+                            <p className="text-sm font-medium text-primary/80 mt-1">{order.customer.phone}</p>
+                            <p className="text-sm text-primary/70">{order.customer.address}</p>
                           </div>
                           <div>
-                            <h4 className="text-[9px] uppercase font-bold text-primary/40 mb-2 tracking-widest">Financials</h4>
-                            <p className="font-sans font-bold text-xl">₦{order.total.toLocaleString()}</p>
-                            <p className="text-[10px] text-primary/60 mt-1 uppercase tracking-widest">{new Date(order.createdAt).toLocaleString()}</p>
+                            <h4 className="text-[10px] uppercase font-black text-primary/60 mb-2 tracking-[0.2em]">Financials</h4>
+                            <p className="font-sans font-black text-2xl text-primary">₦{order.total.toLocaleString()}</p>
+                            <p className="text-[11px] text-primary/70 mt-1 font-bold uppercase tracking-widest">{new Date(order.createdAt).toLocaleString()}</p>
                           </div>
                         </div>
                         {order.notes && (
-                          <div className="bg-cream p-4 rounded-xl text-xs italic opacity-80 border border-primary/5">
+                          <div className="bg-primary/5 p-5 rounded-2xl text-sm italic text-primary/80 border-l-4 border-accent">
                             " {order.notes} "
                           </div>
                         )}
-                        <div className="flex flex-wrap gap-2 pt-4 border-t border-primary/5">
+                        <div className="flex flex-wrap gap-3 pt-6 border-t border-primary/10">
                           {order.items.map(item => (
-                            <span key={item.id} className="bg-primary/5 px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider">
+                            <span key={item.id} className="bg-primary text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm">
                               {item.quantity}x {item.name}
                             </span>
                           ))}
                         </div>
                       </div>
-                      <div className="xl:w-64 space-y-3 xl:border-l border-primary/5 xl:pl-8 flex flex-col justify-center">
+                      <div className="xl:w-72 space-y-4 xl:border-l border-primary/10 xl:pl-8 flex flex-col justify-center">
                         <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
-                          <button onClick={() => updateOrderStatus(order.id, 'preparing')} className="w-full bg-primary/5 hover:bg-orange-50 text-[10px] font-bold py-4 rounded-xl transition-colors tracking-widest uppercase">PREPARE</button>
-                          <button onClick={() => updateOrderStatus(order.id, 'on-the-way')} className="w-full bg-primary/5 hover:bg-blue-50 text-[10px] font-bold py-4 rounded-xl transition-all tracking-widest uppercase">SHIP</button>
+                          <button onClick={() => updateOrderStatus(order.id, 'preparing')} className="w-full bg-primary/5 hover:bg-orange-600 hover:text-white text-[10px] font-black py-4 rounded-xl transition-all tracking-widest uppercase border border-primary/5 hover:border-orange-600 shadow-sm active:scale-95">PREPARE</button>
+                          <button onClick={() => updateOrderStatus(order.id, 'on-the-way')} className="w-full bg-primary/5 hover:bg-blue-600 hover:text-white text-[10px] font-black py-4 rounded-xl transition-all tracking-widest uppercase border border-primary/5 hover:border-blue-600 shadow-sm active:scale-95">SHIP</button>
                         </div>
-                        <button onClick={() => updateOrderStatus(order.id, 'delivered')} className="w-full bg-primary/5 hover:bg-green-50 text-[10px] font-bold py-4 rounded-xl transition-all tracking-widest uppercase">DELIVER</button>
+                        <button onClick={() => updateOrderStatus(order.id, 'delivered')} className="w-full bg-primary/5 hover:bg-green-600 hover:text-white text-[10px] font-black py-4 rounded-xl transition-all tracking-widest uppercase border border-primary/5 hover:border-green-600 shadow-sm active:scale-95">DELIVER</button>
                         <button 
                           onClick={() => handleNotifyCustomer(order)}
-                          className="w-full bg-accent/10 hover:bg-accent hover:text-white text-accent text-[10px] font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 tracking-widest uppercase"
+                          className="w-full bg-accent text-white hover:bg-primary text-[10px] font-black py-4 rounded-xl transition-all flex items-center justify-center gap-3 tracking-widest uppercase shadow-lg shadow-accent/20 hover:shadow-primary/20 active:scale-95"
                         >
-                          <MessageCircle className="w-4 h-4" /> NOTIFY PATRON
+                          <MessageCircle className="w-5 h-5" /> NOTIFY PATRON
                         </button>
-                        <button onClick={() => deleteOrder(order.id)} className="w-full text-red-500 text-[10px] font-bold py-3 hover:bg-red-50 rounded-xl mt-2 tracking-widest uppercase">ARCHIVE RECORD</button>
+                        <button onClick={() => deleteOrder(order.id)} className="w-full text-red-600 hover:text-white hover:bg-red-600 text-[10px] font-black py-4 rounded-xl transition-all tracking-widest uppercase border border-transparent hover:border-red-600 active:scale-95">ARCHIVE RECORD</button>
                       </div>
                     </div>
                   </div>
