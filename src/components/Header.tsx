@@ -172,15 +172,21 @@ export default function Header({
             {theme === "night" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
-          {/* Mobile Menu Toggle - Elevated z-index */}
+          {/* Mobile Menu Toggle - Elevated z-index and improved design */}
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className={cn(
-              "md:hidden transition-all duration-500 p-2 z-[200] relative rounded-full",
-              isMobileMenuOpen ? "bg-accent text-white rotate-90 shadow-lg" : "text-on-surface hover:text-accent"
+              "md:hidden transition-all duration-500 px-4 py-2 z-[200] relative rounded-full flex items-center gap-2",
+              isMobileMenuOpen ? "bg-accent text-white shadow-lg" : "bg-primary/5 text-on-surface hover:bg-primary/10 border border-on-surface/5"
             )}
           >
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-6 h-6" />}
+            <span className="text-[9px] font-bold uppercase tracking-widest hidden sm:inline">Menu</span>
+            {isMobileMenuOpen ? <X className="w-5 h-5 rotate-90" /> : (
+              <div className="flex items-center gap-1">
+                <Menu className="w-5 h-5" />
+                <ChevronDown className="w-3 h-3 opacity-40" />
+              </div>
+            )}
           </button>
         </div>
       </div>
@@ -189,34 +195,34 @@ export default function Header({
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
-            {/* Backdrop - Increased depth */}
+            {/* Backdrop - Solid coverage */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-primary/60 backdrop-blur-md z-[160] md:hidden"
+              className="fixed inset-0 bg-primary z-[160] md:hidden"
             />
             
-            {/* Side Drawer - Full screen and refined padding */}
+            {/* Full Screen Menu - Immersive and ergonomic */}
             <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="fixed top-0 right-0 h-full w-full bg-surface z-[170] md:hidden shadow-2xl flex flex-col"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300, mass: 0.8 }}
+              className="fixed inset-0 bg-surface z-[170] md:hidden flex flex-col pt-32"
             >
-              <div className="p-8 pt-24 space-y-12 flex-1 overflow-y-auto no-scrollbar">
+              <div className="px-8 pb-12 space-y-12 flex-1 overflow-y-auto no-scrollbar">
                 <div className="grid grid-cols-2 gap-4">
                   {navItems.map((item, i) => (
                     <motion.button
                       key={item.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 + i * 0.1 }}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.1 + i * 0.05 }}
                       onClick={() => handleNavigate(item.id as Screen)}
                       className={cn(
-                        "text-left aspect-square flex flex-col justify-end p-6 rounded-3xl transition-all group border border-on-surface/5",
+                        "text-left aspect-square flex flex-col justify-end p-6 rounded-[2rem] transition-all group border border-on-surface/5 shadow-sm",
                         currentScreen === item.id ? "bg-accent text-white border-accent shadow-xl" : "bg-primary/5 text-on-surface hover:bg-primary/10"
                       )}
                     >
@@ -224,7 +230,7 @@ export default function Header({
                       <span className={cn(
                         "text-[8px] uppercase tracking-[0.2em] font-bold",
                         currentScreen === item.id ? "text-white/60" : "text-accent"
-                      )}>Explore</span>
+                      )}>Manifest</span>
                     </motion.button>
                   ))}
                 </div>
@@ -233,62 +239,61 @@ export default function Header({
                   <motion.button 
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 }}
-                    onClick={() => {
-                      handleNavigate("track-order");
-                    }}
-                    className="flex flex-col items-center justify-center p-8 bg-primary/5 rounded-3xl border border-primary/5 hover:border-accent/30 transition-all group"
+                    transition={{ delay: 0.4 }}
+                    onClick={() => handleNavigate("track-order")}
+                    className="flex flex-col items-center justify-center p-8 bg-on-surface text-surface rounded-[2rem] shadow-xl active:scale-95 transition-transform group"
                   >
-                    <Truck className="w-6 h-6 text-accent mb-2 group-hover:scale-110 transition-transform" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface/60 group-hover:text-accent">Track</span>
+                    <Truck className="w-7 h-7 text-accent mb-3 group-hover:animate-bounce" />
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em]">Track Order</span>
                   </motion.button>
                   <motion.button 
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 }}
-                    onClick={() => {
-                      handleNavigate("admin");
-                    }}
-                    className="flex flex-col items-center justify-center p-8 bg-primary/5 rounded-3xl border border-primary/5 hover:border-accent/30 transition-all group"
+                    transition={{ delay: 0.4 }}
+                    onClick={() => handleNavigate("admin")}
+                    className="flex flex-col items-center justify-center p-8 bg-primary/5 text-on-surface rounded-[2rem] border border-on-surface/5 active:scale-95 transition-transform"
                   >
-                    <Settings className="w-6 h-6 text-on-surface/40 mb-2 group-hover:scale-110 transition-transform" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface/60 group-hover:text-accent">Curator</span>
+                    <Settings className="w-7 h-7 text-accent mb-3" />
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em]">Curator</span>
                   </motion.button>
                 </div>
 
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7 }}
-                  className="pt-10 border-t border-on-surface/5 space-y-6"
+                  transition={{ delay: 0.5 }}
+                  className="p-10 bg-primary text-white rounded-[2.5rem] relative overflow-hidden"
                 >
-                  <div className="space-y-4">
-                    <h4 className="font-serif italic text-2xl text-on-surface">Our Storyline</h4>
-                    <p className="font-sans text-xs text-on-surface-variant leading-relaxed opacity-70">
-                      Manifesting centuries of culinary alchemy from the smoke-filled kitchens of ancient empires.
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full blur-3xl -mr-10 -mt-10" />
+                  <div className="relative z-10 space-y-4">
+                    <h4 className="font-serif italic text-2xl">The Heritage Gazette</h4>
+                    <p className="font-sans text-xs text-on-surface-variant leading-relaxed opacity-60">
+                      Explore the alchemy of smoke and spice in our seasonal journal.
                     </p>
                     <button 
                       onClick={() => handleNavigate("blog")}
-                      className="flex items-center space-x-3 text-accent font-bold uppercase tracking-[0.2em] text-[10px] hover:translate-x-2 transition-transform"
+                      className="flex items-center space-x-3 text-accent font-bold uppercase tracking-[0.2em] text-[10px]"
                     >
                       <BookOpen className="w-4 h-4" />
-                      <span>Explore Gazette</span>
+                      <span>Read Journal</span>
                     </button>
                   </div>
+                  <div className="absolute inset-0 wood-texture opacity-5 pointer-events-none" />
                 </motion.div>
               </div>
 
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
+                transition={{ delay: 0.6 }}
                 className="p-8 border-t border-on-surface/5 bg-on-surface/5 flex items-center justify-between"
               >
-                 <div className="text-[9px] font-bold uppercase tracking-[0.3em] opacity-30">© 2026 Bamanda</div>
+                 <div className="text-[9px] font-bold uppercase tracking-[0.3em] opacity-30">© 2026 Bamanda Heritage</div>
                  <button 
                    onClick={onToggleTheme}
-                   className="p-4 bg-surface rounded-2xl shadow-xl text-accent border border-on-surface/5 active:scale-95 transition-transform"
+                   className="p-4 bg-surface rounded-2xl shadow-xl text-accent border border-on-surface/5 active:scale-95 transition-transform flex items-center gap-3"
                  >
+                   <span className="text-[9px] font-black uppercase tracking-widest">{theme === "night" ? "Night" : "Day"}</span>
                    {theme === "night" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                  </button>
               </motion.div>
