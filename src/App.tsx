@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { cn, getCookie, setCookie } from './lib/utils';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -27,7 +28,9 @@ import { setDoc, doc } from 'firebase/firestore';
 
 function AppContent() {
   const { menu, posts, isLoading: isDataLoading } = useDataSync();
-  const [currentScreen, setCurrentScreen] = useState<Screen>('home');
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const [menuFilter, setMenuFilter] = useState<string | undefined>(undefined);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -37,7 +40,39 @@ function AppContent() {
   const [activeOrder, setActiveOrder] = useState<Order | null>(null);
   const [hasVisited, setHasVisited] = useState(() => !!getCookie('bamanda_visited'));
 
-  // Initial Boot Sequence
+  const currentScreen = useMemo((): Screen => {
+    const path = location.pathname;
+    if (path === '/') return 'home';
+    if (path === '/menu') return 'menu';
+    if (path === '/checkout') return 'checkout';
+    if (path === '/about') return 'about';
+    if (path === '/blog') return 'blog';
+    if (path === '/contact') return 'contact';
+    if (path === '/track-order') return 'track-order';
+    if (path === '/admin') return 'admin';
+    if (path === '/heritage') return 'heritage';
+    if (path === '/sustainability') return 'sustainability';
+    if (path === '/legal') return 'legal';
+    return 'home';
+  }, [location.pathname]);
+
+  const handleNavigate = (screen: Screen) => {
+    const paths: Record<string, string> = {
+      'home': '/',
+      'menu': '/menu',
+      'checkout': '/checkout',
+      'about': '/about',
+      'blog': '/blog',
+      'contact': '/contact',
+      'track-order': '/track-order',
+      'admin': '/admin',
+      'heritage': '/heritage',
+      'sustainability': '/sustainability',
+      'legal': '/legal'
+    };
+    navigate(paths[screen] || '/');
+  };
+
   useEffect(() => {
     const bootSequence = async () => {
       setLoadingMessage("Synchronizing Sanctuary Cache");
@@ -45,14 +80,12 @@ function AppContent() {
         setCookie('bamanda_visited', 'true', 30);
         setHasVisited(true);
       }
-      // Aesthetically pleasing minimum load time
       await new Promise(resolve => setTimeout(resolve, 1500));
       setIsLoading(false);
     };
     bootSequence();
   }, []);
 
-  // UI & NAVIGATION LOGIC
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
@@ -67,11 +100,11 @@ function AppContent() {
     const delay = hasVisited ? 400 : 800;
     const timer = setTimeout(() => setIsLoading(false), delay);
     return () => clearTimeout(timer);
-  }, [currentScreen, isDataLoading]);
+  }, [currentScreen, isDataLoading, hasVisited]);
 
   const handleNavigateToMenu = (filter?: string) => {
     setMenuFilter(filter);
-    setCurrentScreen('menu');
+    navigate('/menu');
   };
 
   const handleAddToCart = (item: MenuItem) => {
@@ -97,12 +130,11 @@ function AppContent() {
 
   const handleCheckout = () => {
     setIsCartOpen(false);
-    setCurrentScreen('checkout');
+    navigate('/checkout');
   };
 
   const handleOrderComplete = async (order: Order) => {
     setActiveOrder(order);
-    
     try {
       const existing = JSON.parse(localStorage.getItem('bamanda_orders') || '[]');
       localStorage.setItem('bamanda_orders', JSON.stringify([order, ...existing].slice(0, 50)));
@@ -120,7 +152,7 @@ function AppContent() {
     }
     
     setCart([]);
-    setCurrentScreen('track-order');
+    navigate('/track-order');
   };
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -133,7 +165,7 @@ function AppContent() {
       {currentScreen !== 'admin' && (
         <Header 
           currentScreen={currentScreen} 
-          onNavigate={setCurrentScreen} 
+          onNavigate={handleNavigate} 
           onOpenCart={() => setIsCartOpen(true)}
           cartCount={cartCount}
           theme={theme}
@@ -143,41 +175,45 @@ function AppContent() {
       )}
 
       <main className={cn(currentScreen !== 'admin' && "pt-20")}>
-        {currentScreen === 'home' && (
-          <HomeScreen 
-            onNavigate={setCurrentScreen}
-            onNavigateToMenu={handleNavigateToMenu} 
-            onAddToCart={handleAddToCart} 
-            trendingDishes={menu.filter(item => item.isTrending)} 
-          />
-        )}
-        {currentScreen === 'menu' && (
-          <MenuScreen menuItems={menu} onAddToCart={handleAddToCart} initialFilter={menuFilter} />
-        )}
-        {currentScreen === 'about' && <AboutScreen />}
-        {currentScreen === 'blog' && <BlogScreen posts={posts} />}
-        {currentScreen === 'contact' && <ContactScreen />}
-        {currentScreen === 'checkout' && <CheckoutScreen items={cart} onOrderComplete={handleOrderComplete} />}
-        {currentScreen === 'track-order' && <TrackOrderScreen order={activeOrder} onBack={() => setCurrentScreen('menu')} />}
-        {currentScreen === 'admin' && <AdminScreen />}
-        
-        {currentScreen === 'heritage' && (
-          <InfoScreen 
-            title="Our Heritage" 
-            subtitle="The Legacy"
-            onBack={() => setCurrentScreen('home')}
-            content="Bamanda Kitchen is more than a restaurant; it is a sanctuary of ancestral recipes."
-          />
-        )}
-        {currentScreen === 'sustainability' && (
-          <InfoScreen title="Sustainability" subtitle="Earth First" onBack={() => setCurrentScreen('home')} content="Guided by our responsibility to the future land." />
-        )}
-        {currentScreen === 'legal' && (
-          <InfoScreen title="Legal" subtitle="Transparency" onBack={() => setCurrentScreen('home')} content="Legal framework ensuring data protection." />
-        )}
+        <Routes>
+          <Route path="/" element={
+            <HomeScreen 
+              onNavigate={handleNavigate}
+              onNavigateToMenu={handleNavigateToMenu} 
+              onAddToCart={handleAddToCart} 
+              trendingDishes={menu.filter(item => item.isTrending)} 
+            />
+          } />
+          <Route path="/menu" element={
+            <MenuScreen menuItems={menu} onAddToCart={handleAddToCart} initialFilter={menuFilter} />
+          } />
+          <Route path="/about" element={<AboutScreen />} />
+          <Route path="/blog" element={<BlogScreen posts={posts} />} />
+          <Route path="/contact" element={<ContactScreen />} />
+          <Route path="/checkout" element={<CheckoutScreen items={cart} onOrderComplete={handleOrderComplete} />} />
+          <Route path="/track-order" element={<TrackOrderScreen order={activeOrder} onBack={() => navigate('/menu')} />} />
+          <Route path="/admin" element={<AdminScreen />} />
+          
+          <Route path="/heritage" element={
+            <InfoScreen 
+              title="Our Heritage" 
+              subtitle="The Legacy"
+              onBack={() => navigate('/')}
+              content="Bamanda Kitchen is more than a restaurant; it is a sanctuary of ancestral recipes."
+            />
+          } />
+          <Route path="/sustainability" element={
+            <InfoScreen title="Sustainability" subtitle="Earth First" onBack={() => navigate('/')} content="Guided by our responsibility to the future land." />
+          } />
+          <Route path="/legal" element={
+            <InfoScreen title="Legal" subtitle="Transparency" onBack={() => navigate('/')} content="Legal framework ensuring data protection." />
+          } />
+          
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
 
-      {currentScreen !== 'admin' && <Footer onNavigate={setCurrentScreen} />}
+      {currentScreen !== 'admin' && <Footer onNavigate={handleNavigate} />}
 
       <CartDrawer 
         isOpen={isCartOpen}
@@ -197,7 +233,9 @@ export default function App() {
   return (
     <ToastProvider>
       <DataSyncProvider>
-        <AppContent />
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
       </DataSyncProvider>
     </ToastProvider>
   );

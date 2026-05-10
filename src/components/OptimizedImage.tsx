@@ -7,7 +7,6 @@ import React, { useState, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import BrandLoader from "./BrandLoader";
 import { cn } from "../lib/utils";
-import { Utensils } from "lucide-react";
 
 interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src?: string;
@@ -33,10 +32,10 @@ const OptimizedImage = memo(({
   ...props 
 }: OptimizedImageProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [error, setError] = useState(!src);
+  const [error, setError] = useState(!src || (src && !src.includes('.')));
 
   useEffect(() => {
-    if (!src) {
+    if (!src || !src.includes('.')) {
       setError(true);
       return;
     }
@@ -76,7 +75,7 @@ const OptimizedImage = memo(({
             exit={{ opacity: 0 }}
             className="absolute inset-0 z-10"
           >
-            <BrandLoader />
+            <BrandLoader isInline message="Preparing Visual" subMessage="Ancestral Rendering" />
           </motion.div>
         )}
       </AnimatePresence>
@@ -103,14 +102,12 @@ const OptimizedImage = memo(({
       )}
 
       {error && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-primary/5 text-primary/20 space-y-4">
-          <div className="w-16 h-16 border border-primary/10 rounded-full flex items-center justify-center">
-            <Utensils className="w-8 h-8 opacity-40" />
-          </div>
-          <div className="text-center px-6">
-            <span className="font-serif italic text-xs block mb-1">Curation Processing</span>
-            <span className="text-[8px] uppercase tracking-widest font-bold opacity-30">Visual manifestation pending</span>
-          </div>
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-primary/5">
+          <BrandLoader 
+            isInline 
+            message="Item Unavailable" 
+            subMessage="Chef's Selection Pending" 
+          />
           <div className="absolute inset-0 wood-texture opacity-5 pointer-events-none" />
         </div>
       )}

@@ -5,19 +5,28 @@
 
 import { motion } from 'motion/react';
 import { ChefHat, Sparkles } from 'lucide-react';
+import { cn } from '../lib/utils';
 
 interface BrandLoaderProps {
   message?: string;
   subMessage?: string;
+  isInline?: boolean;
 }
 
 export default function BrandLoader({ 
   message = "Curation in Progress", 
-  subMessage = "Consulting Ancestral Recipes" 
+  subMessage = "Consulting Ancestral Recipes",
+  isInline = false
 }: BrandLoaderProps) {
   return (
-    <div className="fixed inset-0 z-[300] flex items-center justify-center bg-primary/95 backdrop-blur-xl">
-      <div className="relative flex flex-col items-center">
+    <div className={cn(
+      "z-[300] flex items-center justify-center backdrop-blur-xl transition-all duration-500",
+      isInline ? "absolute inset-0 bg-primary/40 rounded-lg" : "fixed inset-0 bg-primary/95"
+    )}>
+      <div className={cn(
+        "relative flex flex-col items-center",
+        isInline && "scale-[0.6] sm:scale-75"
+      )}>
         {/* Animated Background Aura */}
         <motion.div
           className="absolute -inset-20 bg-accent/10 rounded-full blur-[100px]"
@@ -35,7 +44,10 @@ export default function BrandLoader({
         <div className="relative">
           {/* Outer Rotating Ritual Ring */}
           <motion.div
-            className="w-40 h-40 border-t-2 border-b-2 border-accent/30 rounded-full"
+            className={cn(
+              "border-t-2 border-b-2 border-accent/30 rounded-full",
+              isInline ? "w-24 h-24" : "w-40 h-40"
+            )}
             animate={{ rotate: 360 }}
             transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
           />
@@ -55,7 +67,7 @@ export default function BrandLoader({
               transition={{ duration: 0.5 }}
               className="relative"
             >
-              <ChefHat className="w-16 h-16 text-accent" />
+              <ChefHat className={cn("text-accent", isInline ? "w-10 h-10" : "w-16 h-16")} />
               <motion.div
                 className="absolute -top-4 -right-4"
                 animate={{ 
@@ -64,7 +76,7 @@ export default function BrandLoader({
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <Sparkles className="w-6 h-6 text-white" />
+                <Sparkles className={cn("text-white", isInline ? "w-4 h-4" : "w-6 h-6")} />
               </motion.div>
             </motion.div>
           </div>
@@ -72,12 +84,15 @@ export default function BrandLoader({
 
         {/* Textual Feedback */}
         <motion.div 
-          className="mt-12 text-center space-y-3"
+          className={cn("text-center space-y-3", isInline ? "mt-6" : "mt-12")}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          <h2 className="font-serif italic text-2xl text-white tracking-wide uppercase">
+          <h2 className={cn(
+            "font-serif italic text-white tracking-wide uppercase",
+            isInline ? "text-sm" : "text-2xl"
+          )}>
             {message}
           </h2>
           <div className="flex items-center justify-center gap-3">
@@ -90,23 +105,25 @@ export default function BrandLoader({
         </motion.div>
 
         {/* Loading Progress Simulation Dots */}
-        <div className="mt-8 flex gap-2">
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="w-1.5 h-1.5 bg-accent rounded-full"
-              animate={{
-                scale: [1, 1.5, 1],
-                opacity: [0.2, 1, 0.2]
-              }}
-              transition={{
-                duration: 1,
-                repeat: Infinity,
-                delay: i * 0.2
-              }}
-            />
-          ))}
-        </div>
+        {!isInline && (
+          <div className="mt-8 flex gap-2">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="w-1.5 h-1.5 bg-accent rounded-full"
+                animate={{
+                  scale: [1, 1.5, 1],
+                  opacity: [0.2, 1, 0.2]
+                }}
+                transition={{
+                  duration: 1,
+                  repeat: Infinity,
+                  delay: i * 0.2
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
