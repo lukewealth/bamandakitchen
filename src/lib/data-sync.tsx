@@ -81,9 +81,9 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
         if (docSnap.exists()) {
           setUserProfile({ ...docSnap.data(), id: docSnap.id } as StaffAccount);
         } else {
-          // If this is the first admin (e.g. from .env.example), auto-create profile
-          // This is a safety for initial setup
-          if (user.email === 'admin@bamanda.com') {
+          // If this is the first admin (defined in .env), auto-create profile
+          const primaryAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'admin@bamanda.com';
+          if (user.email === primaryAdminEmail) {
             const initialAdmin = {
               name: 'Master Curator',
               email: user.email,
@@ -92,6 +92,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
             };
             await setDoc(docRef, { ...initialAdmin, createdAt: serverTimestamp() });
             setUserProfile({ ...initialAdmin, id: user.uid });
+            showToast('Sacred Profile Manifested.', 'success');
           } else {
             setUserProfile(null);
             showToast('Access denied. No staff profile found.', 'error');
