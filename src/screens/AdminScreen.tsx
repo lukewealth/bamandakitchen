@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 import { useDataSync } from '../lib/data-sync';
 import { 
   Lock, LogOut, ShoppingBag, Utensils, BookOpen, X, Star, Edit, Trash2, Plus, 
-  Image as ImageIcon, Save, MessageCircle, Users, ChevronLeft, ChevronRight, RefreshCw, Download, FileCode
+  Image as ImageIcon, Save, MessageCircle, Users, ChevronLeft, ChevronRight, RefreshCw, Download, FileCode, Menu as MenuIcon, ShieldAlert
 } from 'lucide-react';
 import { MenuItem, Order, BlogPost, BlogLayout, StaffAccount } from '../types';
 import { formatStatusUpdateMessage, getWhatsAppUrl } from '../lib/order';
@@ -32,6 +32,7 @@ export default function AdminScreen() {
     menu, 
     posts,
     staff,
+    userProfile,
     syncToCloud, 
     updateMenuItem, 
     deleteMenuItem, 
@@ -39,6 +40,7 @@ export default function AdminScreen() {
     deletePost,
     updateStaff,
     deleteStaff,
+    logAction,
     restoreFromStatic, 
     isCloudSyncing, 
     isConnected,
@@ -86,10 +88,28 @@ export default function AdminScreen() {
     };
   }, [currentUser]);
 
+  // Role Protection
+  const isAdmin = userProfile?.role === 'admin';
+  const isStaff = !!userProfile;
+
+  // Filter tabs based on role
+  const availableTabs = useMemo(() => {
+    const tabs = [{ id: 'orders', label: 'Orders', icon: ShoppingBag }];
+    if (isAdmin) {
+      tabs.push(
+        { id: 'menu', label: 'Menu DB', icon: Utensils },
+        { id: 'blog', label: 'Gazette', icon: BookOpen },
+        { id: 'staff', label: 'Staff', icon: Users }
+      );
+    }
+    return tabs;
+  }, [isAdmin]);
+
   // ==========================================
   // MASTER OPERATIONS
   // ==========================================
   const handlePushToCloud = async () => {
+    if (!isAdmin) return;
     confirm({
       title: "Master Manifestation",
       message: "Synchronize current local inventory with the cloud sanctuary? This ensures all devices see your latest curations.",
@@ -100,13 +120,25 @@ export default function AdminScreen() {
     });
   };
 
+  const handleUpdateOrderStatus = async (orderId: string, status: string) => {
+    if (!db) return;
+    try {
+      await updateDoc(doc(db, 'orders', orderId), { status });
+      await logAction('UPDATE_ORDER_STATUS', { orderId, status });
+      showToast(`Order marked as ${status}.`, 'success');
+    } catch (e) {
+      showToast('Status update failed.', 'error');
+    }
+  };
+
   const handleSaveMenuItem = async () => {
-    if (!editingMenuItem?.name || !editingMenuItem?.price) return;
+    if (!isAdmin || !editingMenuItem?.name || !editingMenuItem?.price) return;
     await updateMenuItem(editingMenuItem);
     setEditingMenuItem(null);
   };
 
   const handleRestoreHeritage = () => {
+    if (!isAdmin) return;
     confirm({
       title: "Restore Ancestry",
       message: "Reset your local menu to the ancestral static records? This will overwrite recent local changes.",
@@ -118,6 +150,7 @@ export default function AdminScreen() {
   };
 
   const handleExportCode = () => {
+    if (!isAdmin) return;
     const code = exportAsDataTs();
     navigator.clipboard.writeText(code);
     showToast('Manifest copied to clipboard.', 'success');
@@ -141,32 +174,35 @@ export default function AdminScreen() {
   };
 
   const deleteOrder = async (orderId: string) => {
+    if (!isAdmin) return;
     confirm({
       title: "Archive Curation",
       message: "Remove this record from the active logs?",
       type: "danger",
       onConfirm: async () => {
         if (db) await deleteDoc(doc(db, 'orders', orderId));
+        await logAction('DELETE_ORDER', { orderId });
         showToast('Record archived.', 'info');
       }
     });
   };
 
   const toggleTrending = async (id: string) => {
+    if (!isAdmin) return;
     const item = menu.find(m => m.id === id);
     if (!item) return;
     await updateMenuItem({ ...item, isTrending: !item.isTrending });
   };
 
   const handleSavePost = async () => {
-    if (!editingPost?.title || !editingPost?.content) return;
+    if (!isAdmin || !editingPost?.title || !editingPost?.content) return;
     await updatePost(editingPost);
     setEditingPost(null);
     showToast('Gazette entry manifested.', 'success');
   };
 
   const handleSaveStaff = async () => {
-    if (!editingStaff?.name || !editingStaff?.email) return;
+    if (!isAdmin || !editingStaff?.name || !editingStaff?.email) return;
     await updateStaff(editingStaff);
     setEditingStaff(null);
     showToast('Staff record updated.', 'success');
@@ -233,6 +269,24 @@ export default function AdminScreen() {
     );
   }
 
+  if (currentUser && !isStaff) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-primary p-6">
+        <div className="max-w-md w-full bg-white p-12 rounded-[3rem] shadow-2xl text-center">
+          <ShieldAlert className="w-16 h-16 mx-auto mb-8 text-red-500" />
+          <h1 className="font-serif text-3xl italic mb-6 text-primary">Access Restricted</h1>
+          <p className="font-sans text-sm text-primary/60 mb-10 leading-relaxed">
+            Your account ({currentUser.email}) is not yet registered as a sanctuary guardian. 
+            Please contact a Master Curator to manifest your credentials.
+          </p>
+          <button onClick={handleSignOut} className="w-full bg-primary text-white py-5 rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] shadow-xl shadow-primary/20 active:scale-95 transition-all">
+            Return to Sanctuary
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-cream flex flex-col lg:flex-row">
       <motion.aside 
@@ -274,13 +328,22 @@ export default function AdminScreen() {
             </button>
           </div>
 
+          <div className="px-2">
+            {!isSidebarCollapsed && (
+              <div className="flex items-center gap-4 p-4 bg-white/5 rounded-[2rem] border border-white/5 mb-8">
+                <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent font-serif italic text-xl">
+                  {userProfile?.name.charAt(0)}
+                </div>
+                <div className="overflow-hidden">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-accent truncate">{userProfile?.name}</p>
+                  <p className="text-[8px] font-bold text-white/30 uppercase tracking-widest truncate">{userProfile?.role}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
           <nav className="flex-1 flex flex-col gap-4">
-            {[
-              { id: 'orders', label: 'Orders', icon: ShoppingBag },
-              { id: 'menu', label: 'Menu DB', icon: Utensils },
-              { id: 'blog', label: 'Gazette', icon: BookOpen },
-              { id: 'staff', label: 'Staff', icon: Users },
-            ].map((tab) => (
+            {availableTabs.map((tab) => (
               <button 
                 key={tab.id} 
                 onClick={() => setActiveTab(tab.id as any)} 
@@ -345,10 +408,12 @@ export default function AdminScreen() {
             </div>
           </div>
           <div className="flex items-center gap-5 w-full sm:w-auto">
-            <button onClick={handlePushToCloud} disabled={isCloudSyncing} className="flex-1 sm:flex-none flex items-center justify-center gap-4 px-8 py-4 rounded-full border-2 border-accent/20 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-accent hover:text-white transition-all disabled:opacity-50 active:scale-95">
-              <RefreshCw className={cn("w-4 h-4", isCloudSyncing && "animate-spin")} />
-              {isCloudSyncing ? 'Manifesting...' : 'Push to Cloud'}
-            </button>
+            {isAdmin && (
+              <button onClick={handlePushToCloud} disabled={isCloudSyncing} className="flex-1 sm:flex-none flex items-center justify-center gap-4 px-8 py-4 rounded-full border-2 border-accent/20 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-accent hover:text-white transition-all disabled:opacity-50 active:scale-95">
+                <RefreshCw className={cn("w-4 h-4", isCloudSyncing && "animate-spin")} />
+                {isCloudSyncing ? 'Manifesting...' : 'Push to Cloud'}
+              </button>
+            )}
             <div className="bg-white px-8 py-4 rounded-full border border-primary/10 flex items-center gap-4 shadow-sm">
               <div className={cn("w-2.5 h-2.5 rounded-full animate-pulse shadow-glow", isConnected ? "bg-green-500 shadow-green-500/50" : "bg-red-500 shadow-red-500/50")} />
               <span className="text-[10px] uppercase tracking-widest font-black text-primary/60">{isConnected ? "Sanctuary Online" : "Operating Locally"}</span>
@@ -381,12 +446,7 @@ export default function AdminScreen() {
                   </button>
                 </div>
                 <nav className="flex-1 flex flex-col gap-4">
-                  {[
-                    { id: 'orders', label: 'Orders', icon: ShoppingBag },
-                    { id: 'menu', label: 'Menu DB', icon: Utensils },
-                    { id: 'blog', label: 'Gazette', icon: BookOpen },
-                    { id: 'staff', label: 'Staff', icon: Users },
-                  ].map((tab) => (
+                  {availableTabs.map((tab) => (
                     <button 
                       key={tab.id} 
                       onClick={() => { setActiveTab(tab.id as any); setIsMobileMenuOpen(false); }} 
@@ -410,7 +470,7 @@ export default function AdminScreen() {
         </AnimatePresence>
 
         <AnimatePresence mode="wait">
-          {activeTab === 'menu' && (
+          {activeTab === 'menu' && isAdmin && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-16">
               <div className="flex justify-between items-center bg-primary/5 p-8 rounded-[2.5rem] border border-primary/5">
                 <div className="flex items-center gap-8">
@@ -509,12 +569,12 @@ export default function AdminScreen() {
                         </div>
                       </div>
                       <div className="xl:w-96 flex flex-col gap-4 justify-center xl:border-l border-primary/5 xl:pl-16">
-                        <button onClick={() => updateDoc(doc(db, 'orders', order.id), { status: 'preparing' })} className="w-full bg-primary/5 py-6 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] hover:bg-accent hover:text-white transition-all shadow-sm active:scale-95">Initiate Prep</button>
-                        <button onClick={() => updateDoc(doc(db, 'orders', order.id), { status: 'on-the-way' })} className="w-full bg-primary/5 py-6 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95">Dispatch Rider</button>
-                        <button onClick={() => updateDoc(doc(db, 'orders', order.id), { status: 'delivered' })} className="w-full bg-primary/5 py-6 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] hover:bg-green-600 hover:text-white transition-all shadow-sm active:scale-95">Confirm Arrival</button>
+                        <button onClick={() => handleUpdateOrderStatus(order.id, 'preparing')} className="w-full bg-primary/5 py-6 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] hover:bg-accent hover:text-white transition-all shadow-sm active:scale-95">Initiate Prep</button>
+                        <button onClick={() => handleUpdateOrderStatus(order.id, 'on-the-way')} className="w-full bg-primary/5 py-6 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95">Dispatch Rider</button>
+                        <button onClick={() => handleUpdateOrderStatus(order.id, 'delivered')} className="w-full bg-primary/5 py-6 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] hover:bg-green-600 hover:text-white transition-all shadow-sm active:scale-95">Confirm Arrival</button>
                         <div className="h-px bg-primary/5 my-4" />
                         <button onClick={() => handleNotifyCustomer(order)} className="w-full bg-accent text-white py-6 rounded-2xl text-[11px] font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 shadow-2xl shadow-accent/30 hover:scale-[1.02] active:scale-95 transition-all"><MessageCircle className="w-5 h-5" /> Notify Patron</button>
-                        <button onClick={() => deleteOrder(order.id)} className="w-full text-red-600/40 hover:text-red-600 py-3 text-[9px] font-black uppercase tracking-[0.2em] transition-all">Archive Folio</button>
+                        {isAdmin && <button onClick={() => deleteOrder(order.id)} className="w-full text-red-600/40 hover:text-red-600 py-3 text-[9px] font-black uppercase tracking-[0.2em] transition-all">Archive Folio</button>}
                       </div>
                     </div>
                   </div>
@@ -523,7 +583,7 @@ export default function AdminScreen() {
             </motion.div>
           )}
 
-          {activeTab === 'blog' && (
+          {activeTab === 'blog' && isAdmin && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-16">
               <div className="flex justify-between items-center bg-primary/5 p-8 rounded-[2.5rem] border border-primary/5">
                 <h2 className="editorial-label text-accent font-black tracking-[0.4em]">Gazette Records</h2>
@@ -576,7 +636,7 @@ export default function AdminScreen() {
             </motion.div>
           )}
 
-          {activeTab === 'staff' && (
+          {activeTab === 'staff' && isAdmin && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-16">
               <div className="flex justify-between items-center bg-primary/5 p-8 rounded-[2.5rem] border border-primary/5">
                 <h2 className="editorial-label text-accent font-black tracking-[0.4em]">Sanctuary Guardians</h2>
@@ -628,7 +688,7 @@ export default function AdminScreen() {
 
         {/* MODAL EDITOR: MENU ITEM */}
         <AnimatePresence>
-          {editingMenuItem && (
+          {editingMenuItem && isAdmin && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-primary/95 backdrop-blur-2xl">
               <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} className="bg-white w-full max-w-3xl rounded-[4rem] overflow-hidden shadow-2xl border border-primary/5">
                 <div className="p-16 border-b border-primary/5 flex justify-between items-center bg-cream/30">
@@ -693,7 +753,7 @@ export default function AdminScreen() {
 
         {/* MODAL EDITOR: BLOG POST */}
         <AnimatePresence>
-          {editingPost && (
+          {editingPost && isAdmin && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-primary/95 backdrop-blur-2xl">
               <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} className="bg-white w-full max-w-4xl h-[85vh] rounded-[4rem] overflow-hidden shadow-2xl border border-primary/5 flex flex-col">
                 <div className="p-12 border-b border-primary/5 flex justify-between items-center bg-cream/30 shrink-0">
@@ -771,7 +831,7 @@ export default function AdminScreen() {
 
         {/* MODAL EDITOR: STAFF MEMBER */}
         <AnimatePresence>
-          {editingStaff && (
+          {editingStaff && isAdmin && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-primary/95 backdrop-blur-2xl">
               <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} className="bg-white w-full max-w-xl rounded-[4rem] overflow-hidden shadow-2xl border border-primary/5">
                 <div className="p-12 border-b border-primary/5 flex justify-between items-center bg-cream/30">

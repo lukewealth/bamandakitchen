@@ -1,31 +1,53 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow public read access to menu and blog
+    
+    // Helper function to check if user is a staff member with a specific role
+    function isStaff() {
+      return request.auth != null && exists(/databases/$(database)/documents/staff/$(request.auth.uid));
+    }
+    
+    function getRole() {
+      return get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role;
+    }
+    
+    function isAdmin() {
+      return request.auth != null && getRole() == 'admin';
+    }
+
+    // Public: Read-only access to Menu and Blog
     match /menu/{item} {
       allow read: if true;
-      allow write: if true; // In production, restrict to authenticated admins
+      allow write: if isAdmin();
     }
     
     match /blog/{post} {
       allow read: if true;
-      allow write: if true;
-    }
-    
-    // Allow creation of orders, but only admins can read all
-    match /orders/{order} {
-      allow create: if true;
-      allow read, update, delete: if true; // Restrict in production
+      allow write: if isAdmin();
     }
 
-    // Staff records
+    // Orders: Public can create, but only staff can read/update
+    match /orders/{order} {
+      allow create: if true;
+      allow read: if true; // Tracking page needs read access. Ideally restricted by orderId + phone check.
+      allow update: if isStaff();
+      allow delete: if isAdmin();
+    }
+
+    // Staff: Protected access
     match /staff/{member} {
-      allow read, write: if true;
+      // Allow users to read their own profile, admins read all
+      allow read: if request.auth != null && (request.auth.uid == member || isAdmin());
+      // Only admins can create/update staff
+      allow write: if isAdmin();
     }
     
-    // Fallback for everything else
-    match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2026, 12, 31);
+    // Logs: Write-only for public, read for staff
+    match /tracking_logs/{log} {
+      allow create: if true;
+      allow read: if isStaff();
+      allow update, delete: if isAdmin();
     }
   }
 }

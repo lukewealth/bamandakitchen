@@ -6,7 +6,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { MenuItem, BlogPost, StaffAccount } from '../types';
 import { MENU_ITEMS } from '../data';
-import { db } from './firebase';
+import { db, auth } from './firebase';
 import { 
   collection, 
   query, 
@@ -17,14 +17,18 @@ import {
   serverTimestamp,
   updateDoc,
   addDoc,
-  deleteDoc
+  deleteDoc,
+  getDoc,
+  setDoc
 } from 'firebase/firestore';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { useToast } from './toast-context';
 
 interface DataSyncContextType {
   menu: MenuItem[];
   posts: BlogPost[];
   staff: StaffAccount[];
+  userProfile: StaffAccount | null;
   isLoading: boolean;
   isCloudSyncing: boolean;
   isConnected: boolean;
@@ -41,6 +45,9 @@ interface DataSyncContextType {
   updateStaff: (member: Partial<StaffAccount>) => Promise<void>;
   deleteStaff: (id: string) => Promise<void>;
   
+  // Logging
+  logAction: (action: string, context?: any) => Promise<void>;
+
   // Master Sync
   syncToCloud: () => Promise<void>;
   restoreFromStatic: () => void;
@@ -54,9 +61,49 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [staff, setStaff] = useState<StaffAccount[]>([]);
+  const [userProfile, setUserProfile] = useState<StaffAccount | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCloudSyncing, setIsCloudSyncing] = useState(false);
   const [isConnected, setIsConnected] = useState(!!db);
+
+  // ==========================================
+  // AUTH & PROFILE SYNC
+  // ==========================================
+  useEffect(() => {
+    if (!auth || !db) return;
+
+    const unsubAuth = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Fetch user profile from Firestore
+        const docRef = doc(db, 'staff', user.uid);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          setUserProfile({ ...docSnap.data(), id: docSnap.id } as StaffAccount);
+        } else {
+          // If this is the first admin (e.g. from .env.example), auto-create profile
+          // This is a safety for initial setup
+          if (user.email === 'admin@bamanda.com') {
+            const initialAdmin = {
+              name: 'Master Curator',
+              email: user.email,
+              role: 'admin' as const,
+              createdAt: new Date().toISOString()
+            };
+            await setDoc(docRef, { ...initialAdmin, createdAt: serverTimestamp() });
+            setUserProfile({ ...initialAdmin, id: user.uid });
+          } else {
+            setUserProfile(null);
+            showToast('Access denied. No staff profile found.', 'error');
+          }
+        }
+      } else {
+        setUserProfile(null);
+      }
+    });
+
+    return () => unsubAuth();
+  }, [showToast]);
 
   // ==========================================
   // INITIAL LOAD (LocalStorage)
@@ -147,20 +194,39 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   // OPERATIONS
   // ==========================================
 
+  const logAction = async (action: string, context?: any) => {
+    if (!db) return;
+    try {
+      await addDoc(collection(db, 'tracking_logs'), {
+        action,
+        context: context || {},
+        userId: auth?.currentUser?.uid || 'anonymous',
+        userName: userProfile?.name || 'Anonymous',
+        userRole: userProfile?.role || 'none',
+        timestamp: serverTimestamp()
+      });
+    } catch (e) {
+      console.error('Failed to log action:', e);
+    }
+  };
+
   const updateMenuItem = async (item: Partial<MenuItem>) => {
-    let updatedItem = { ...item } as MenuItem;
-    
-    if (!updatedItem.id) {
-      updatedItem.id = `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    if (userProfile?.role !== 'admin') {
+      showToast('Only admins can manifest items.', 'error');
+      return;
     }
 
+    let updatedItem = { ...item } as MenuItem;
+    
     if (db) {
       try {
         if (item.id) {
           await updateDoc(doc(db, 'menu', item.id), { ...item, updatedAt: serverTimestamp() });
+          await logAction('UPDATE_MENU_ITEM', { itemId: item.id, name: item.name });
         } else {
           const newDoc = await addDoc(collection(db, 'menu'), { ...item, updatedAt: serverTimestamp() });
           updatedItem.id = newDoc.id;
+          await logAction('CREATE_MENU_ITEM', { itemId: newDoc.id, name: item.name });
         }
       } catch (err) {
         showToast('Cloud sync failed. Preserving local copy.', 'warning');
@@ -172,9 +238,15 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteMenuItem = async (id: string) => {
+    if (userProfile?.role !== 'admin') {
+      showToast('Only admins can purge items.', 'error');
+      return;
+    }
+
     if (db) {
       try {
         await deleteDoc(doc(db, 'menu', id));
+        await logAction('DELETE_MENU_ITEM', { itemId: id });
       } catch (err) {}
     }
     const newMenu = menu.filter(m => m.id !== id);
@@ -183,22 +255,25 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updatePost = async (post: Partial<BlogPost>) => {
+    if (userProfile?.role !== 'admin') {
+      showToast('Only admins can edit the Gazette.', 'error');
+      return;
+    }
+
     let updatedPost = { 
       ...post, 
       date: post.date || new Date().toISOString().split('T')[0] 
     } as BlogPost;
 
-    if (!updatedPost.id) {
-      updatedPost.id = `post_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    }
-
     if (db) {
       try {
         if (post.id) {
           await updateDoc(doc(db, 'blog', post.id), { ...post, updatedAt: serverTimestamp() });
+          await logAction('UPDATE_BLOG_POST', { postId: post.id, title: post.title });
         } else {
           const newDoc = await addDoc(collection(db, 'blog'), { ...post, updatedAt: serverTimestamp() });
           updatedPost.id = newDoc.id;
+          await logAction('CREATE_BLOG_POST', { postId: newDoc.id, title: post.title });
         }
       } catch (err) {
         showToast('Cloud blog sync failed.', 'warning');
@@ -210,9 +285,15 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deletePost = async (id: string) => {
+    if (userProfile?.role !== 'admin') {
+      showToast('Only admins can expunge articles.', 'error');
+      return;
+    }
+
     if (db) {
       try {
         await deleteDoc(doc(db, 'blog', id));
+        await logAction('DELETE_BLOG_POST', { postId: id });
       } catch (err) {}
     }
     const newPosts = posts.filter(p => p.id !== id);
@@ -221,22 +302,28 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateStaff = async (member: Partial<StaffAccount>) => {
+    if (userProfile?.role !== 'admin') {
+      showToast('Only admins can manage guardians.', 'error');
+      return;
+    }
+
     let updatedMember = { 
       ...member, 
       createdAt: member.createdAt || new Date().toISOString() 
     } as StaffAccount;
 
-    if (!updatedMember.id) {
-      updatedMember.id = `staff_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    }
-
     if (db) {
       try {
         if (member.id) {
           await updateDoc(doc(db, 'staff', member.id), { ...member, lastUpdated: serverTimestamp() });
+          await logAction('UPDATE_STAFF', { staffId: member.id, name: member.name });
         } else {
+          // Note: In a production app, we would use a Firebase Function to create the Auth user
+          // For this prototype, we create the Firestore record. The user will need to be 
+          // manually created in Firebase Console or a separate 'Register' flow.
           const newDoc = await addDoc(collection(db, 'staff'), { ...member, createdAt: serverTimestamp() });
           updatedMember.id = newDoc.id;
+          await logAction('CREATE_STAFF', { staffId: newDoc.id, name: member.name });
         }
       } catch (err) {
         showToast('Cloud staff sync failed.', 'warning');
@@ -248,9 +335,15 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteStaff = async (id: string) => {
+    if (userProfile?.role !== 'admin') {
+      showToast('Only admins can revoke access.', 'error');
+      return;
+    }
+
     if (db) {
       try {
         await deleteDoc(doc(db, 'staff', id));
+        await logAction('DELETE_STAFF', { staffId: id });
       } catch (err) {}
     }
     const newStaff = staff.filter(s => s.id !== id);
@@ -259,7 +352,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   };
 
   const syncToCloud = async () => {
-    if (!db) return;
+    if (!db || userProfile?.role !== 'admin') return;
     setIsCloudSyncing(true);
     try {
       const batch = writeBatch(db);
@@ -267,6 +360,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
         if (item.id) batch.set(doc(db, 'menu', item.id), { ...item, updatedAt: serverTimestamp() });
       });
       await batch.commit();
+      await logAction('SYNC_TO_CLOUD');
       showToast('Heritage manifested in cloud.', 'success');
     } catch (error) {
       showToast('Manifestation failed.', 'error');
@@ -290,6 +384,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
       menu,
       posts,
       staff,
+      userProfile,
       isLoading,
       isCloudSyncing,
       isConnected,
@@ -299,6 +394,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
       deletePost,
       updateStaff,
       deleteStaff,
+      logAction,
       syncToCloud,
       restoreFromStatic,
       exportAsDataTs
