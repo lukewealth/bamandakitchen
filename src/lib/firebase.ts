@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { initializeApp, getApp, getApps } from "firebase/app";
+import { initializeApp, getApp, getApps, FirebaseApp } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -19,19 +19,27 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
+// Validate Config before initializing
+const isConfigValid = !!firebaseConfig.apiKey && !!firebaseConfig.projectId;
+
 // Robust Initialization
-let app;
-try {
-  if (!getApps().length) {
-    app = initializeApp(firebaseConfig);
-  } else {
-    app = getApp();
+let app: FirebaseApp | null = null;
+
+if (isConfigValid) {
+  try {
+    if (!getApps().length) {
+      app = initializeApp(firebaseConfig);
+    } else {
+      app = getApp();
+    }
+  } catch (error) {
+    console.error("Firebase initialization failed:", error);
   }
-} catch (error) {
-  console.error("Firebase initialization failed:", error);
+} else {
+  console.warn("Firebase configuration is missing or incomplete. Some features may not work locally. Check your .env file.");
 }
 
-// Initialize Services with null fallbacks if app failed
+// Initialize Services with null fallbacks if app failed or config invalid
 export const db = app ? getFirestore(app) : null as any;
 export const auth = app ? getAuth(app) : null as any;
 export const storage = app ? getStorage(app) : null as any;

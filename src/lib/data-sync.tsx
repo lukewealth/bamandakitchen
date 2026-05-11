@@ -19,9 +19,10 @@ import {
   addDoc,
   deleteDoc,
   getDoc,
-  setDoc
+  setDoc,
+  Unsubscribe
 } from 'firebase/firestore';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import { useToast } from './toast-context';
 
 interface DataSyncContextType {
@@ -74,14 +75,12 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
 
     const unsubAuth = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Fetch user profile from Firestore
         const docRef = doc(db, 'staff', user.uid);
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
           setUserProfile({ ...docSnap.data(), id: docSnap.id } as StaffAccount);
         } else {
-          // If this is the first admin (defined in .env), auto-create profile
           const primaryAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'admin@bamanda.com';
           if (user.email === primaryAdminEmail) {
             const initialAdmin = {
@@ -100,6 +99,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
         }
       } else {
         setUserProfile(null);
+        setStaff([]); // Clear staff list when logged out
       }
     });
 
@@ -176,20 +176,24 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
       console.error('Blog Sync Failed:', err);
     });
 
-    const unsubStaff = onSnapshot(query(collection(db, 'staff'), orderBy('name')), (snapshot) => {
-      const items = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as StaffAccount));
-      setStaff(items);
-      localStorage.setItem('bamanda_staff_cache', JSON.stringify(items));
-    }, (err) => {
-      console.error('Staff Sync Failed:', err);
-    });
+    // Only sync staff if the user is an admin
+    let unsubStaff: Unsubscribe | null = null;
+    if (userProfile?.role === 'admin') {
+      unsubStaff = onSnapshot(query(collection(db, 'staff'), orderBy('name')), (snapshot) => {
+        const items = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as StaffAccount));
+        setStaff(items);
+        localStorage.setItem('bamanda_staff_cache', JSON.stringify(items));
+      }, (err) => {
+        console.error('Staff Sync Failed:', err);
+      });
+    }
 
     return () => {
       unsubMenu();
       unsubBlog();
-      unsubStaff();
+      if (unsubStaff) unsubStaff();
     };
-  }, []);
+  }, [userProfile?.role]);
 
   // ==========================================
   // OPERATIONS
@@ -319,9 +323,6 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
           await updateDoc(doc(db, 'staff', member.id), { ...member, lastUpdated: serverTimestamp() });
           await logAction('UPDATE_STAFF', { staffId: member.id, name: member.name });
         } else {
-          // Note: In a production app, we would use a Firebase Function to create the Auth user
-          // For this prototype, we create the Firestore record. The user will need to be 
-          // manually created in Firebase Console or a separate 'Register' flow.
           const newDoc = await addDoc(collection(db, 'staff'), { ...member, createdAt: serverTimestamp() });
           updatedMember.id = newDoc.id;
           await logAction('CREATE_STAFF', { staffId: newDoc.id, name: member.name });

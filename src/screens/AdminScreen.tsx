@@ -24,7 +24,7 @@ import {
   deleteDoc, 
   orderBy,
 } from 'firebase/firestore';
-import { signInWithEmailAndPassword, onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut, User, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 export default function AdminScreen() {
   const { showToast, confirm } = useToast();
@@ -51,6 +51,7 @@ export default function AdminScreen() {
   const [authLoading, setAuthLoading] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'blog' | 'staff'>('orders');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -225,12 +226,28 @@ export default function AdminScreen() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth) return;
-    
+    setIsLoggingIn(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
       showToast('Welcome back, Curator.', 'success');
     } catch (err: any) {
       showToast(err.message || 'Authentication failed.', 'error');
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    if (!auth) return;
+    setIsLoggingIn(true);
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      showToast('Welcome back, Curator.', 'success');
+    } catch (err: any) {
+      showToast(err.message || 'Google Auth failed.', 'error');
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -258,12 +275,35 @@ export default function AdminScreen() {
           <Lock className="w-12 h-12 mx-auto mb-8 text-accent" />
           <h1 className="font-serif text-3xl italic mb-12 text-center text-primary">Curator Access</h1>
           <form onSubmit={handleLogin} className="space-y-6">
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans" placeholder="Curator Email" />
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans" placeholder="Sacred Key" />
-            <button type="submit" className="w-full bg-primary text-white py-5 rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] shadow-xl shadow-primary/20 active:scale-95 transition-all">
-              Enter Sanctuary
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans focus:ring-2 focus:ring-accent/50 outline-none transition-all" placeholder="Curator Email" />
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans focus:ring-2 focus:ring-accent/50 outline-none transition-all" placeholder="Sacred Key" />
+            <button 
+              type="submit" 
+              disabled={isLoggingIn}
+              className="w-full bg-primary text-white py-5 rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] shadow-xl shadow-primary/20 active:scale-95 transition-all disabled:opacity-50"
+            >
+              {isLoggingIn ? "Validating..." : "Enter Sanctuary"}
             </button>
           </form>
+
+          <div className="relative my-10">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-primary/5"></div></div>
+            <div className="relative flex justify-center text-[8px] uppercase font-black tracking-widest text-primary/20 bg-white px-4">Or Use Google</div>
+          </div>
+
+          <button 
+            onClick={handleGoogleLogin}
+            disabled={isLoggingIn}
+            className="w-full bg-white border border-primary/10 text-primary py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[9px] flex items-center justify-center gap-4 hover:bg-primary/5 transition-all active:scale-95 disabled:opacity-50"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+              <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+              <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
+              <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+            </svg>
+            Sign in with Google
+          </button>
         </div>
       </div>
     );
