@@ -218,7 +218,7 @@ export default function AdminScreen() {
           await createUserWithEmailAndPassword(auth, email, password);
           showToast('Master Curator Manifested.', 'success');
         } catch (createErr: any) {
-          showToast(err.message || 'Authentication failed.', 'error');
+          showToast(createErr.message || 'Manifestation failed.', 'error');
         }
       } else {
         showToast(err.message || 'Authentication failed.', 'error');
@@ -605,7 +605,7 @@ export default function AdminScreen() {
                         <button onClick={() => handleUpdateOrderStatus(order.id, 'delivered')} className="w-full bg-primary/5 py-6 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] hover:bg-green-600 hover:text-white transition-all shadow-sm active:scale-95">Confirm Arrival</button>
                         <div className="h-px bg-primary/5 my-4" />
                         <button onClick={() => handleNotifyCustomer(order)} className="w-full bg-accent text-white py-6 rounded-2xl text-[11px] font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 shadow-2xl shadow-accent/30 hover:scale-[1.02] active:scale-95 transition-all"><MessageCircle className="w-5 h-5" /> Notify Patron</button>
-                        {isAdmin && <button onClick={() => deleteOrder(order.id)} className="w-full text-red-600/40 hover:text-red-600 py-3 text-[9px] font-black uppercase tracking-[0.2em] transition-all">Archive Folio</button>}
+                        {isAdmin && <button onClick={() => handleDeleteOrder(order.id)} className="w-full text-red-600/40 hover:text-red-600 py-3 text-[9px] font-black uppercase tracking-[0.2em] transition-all">Archive Folio</button>}
                       </div>
                     </div>
                   </div>
