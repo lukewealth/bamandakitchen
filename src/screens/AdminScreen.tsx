@@ -58,6 +58,9 @@ export default function AdminScreen() {
   const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'blog' | 'staff'>('orders');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [menuSearch, setMenuSearch] = useState('');
+  const [staffSearch, setStaffSearch] = useState('');
+  const [blogSearch, setBlogSearch] = useState('');
 
   // Editing states
   const [editingPost, setEditingPost] = useState<Partial<BlogPost> | null>(null);
@@ -93,6 +96,30 @@ export default function AdminScreen() {
     }
     return tabs;
   }, [isAdmin]);
+
+  const filteredMenu = useMemo(() => {
+    return menu.filter(item => 
+      item.name.toLowerCase().includes(menuSearch.toLowerCase()) ||
+      item.category.toLowerCase().includes(menuSearch.toLowerCase()) ||
+      (item.description && item.description.toLowerCase().includes(menuSearch.toLowerCase()))
+    );
+  }, [menu, menuSearch]);
+
+  const filteredBlog = useMemo(() => {
+    return posts.filter(post => 
+      post.title.toLowerCase().includes(blogSearch.toLowerCase()) ||
+      post.category.toLowerCase().includes(blogSearch.toLowerCase()) ||
+      post.content.toLowerCase().includes(blogSearch.toLowerCase())
+    );
+  }, [posts, blogSearch]);
+
+  const filteredStaff = useMemo(() => {
+    return staff.filter(member => 
+      member.name.toLowerCase().includes(staffSearch.toLowerCase()) ||
+      member.email.toLowerCase().includes(staffSearch.toLowerCase()) ||
+      member.role.toLowerCase().includes(staffSearch.toLowerCase())
+    );
+  }, [staff, staffSearch]);
 
   // ==========================================
   // MASTER OPERATIONS
@@ -361,13 +388,27 @@ export default function AdminScreen() {
 
           <div className="px-2">
             {!isSidebarCollapsed && (
-              <div className="flex items-center gap-4 p-4 bg-white/5 rounded-[2rem] border border-white/5 mb-8">
-                <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent font-serif italic text-xl">
-                  {userProfile?.name.charAt(0)}
+              <div className="flex flex-col gap-4 p-6 bg-white/5 rounded-[2rem] border border-white/5 mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center text-accent font-serif italic text-2xl shadow-inner border border-white/5">
+                    {userProfile?.name.charAt(0)}
+                  </div>
+                  <div className="overflow-hidden">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-accent truncate">{userProfile?.name}</p>
+                    <p className="text-[8px] font-bold text-white/30 uppercase tracking-widest truncate">{userProfile?.role}</p>
+                  </div>
                 </div>
-                <div className="overflow-hidden">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-accent truncate">{userProfile?.name}</p>
-                  <p className="text-[8px] font-bold text-white/30 uppercase tracking-widest truncate">{userProfile?.role}</p>
+                <div className="pt-4 mt-4 border-t border-white/5 space-y-2">
+                  <div className="flex justify-between items-center text-[7px] font-black uppercase tracking-[0.2em] text-white/20">
+                    <span>Folio Vector</span>
+                    <span className="text-accent/40">{currentUser?.uid.slice(0, 8)}...</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[7px] font-black uppercase tracking-[0.2em] text-white/20">
+                    <span>Sync Link</span>
+                    <span className={cn("px-2 py-0.5 rounded-full", isConnected ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500")}>
+                      {isConnected ? "ACTIVE" : "OFFLINE"}
+                    </span>
+                  </div>
                 </div>
               </div>
             )}
@@ -503,10 +544,22 @@ export default function AdminScreen() {
         <AnimatePresence mode="wait">
           {activeTab === 'menu' && isAdmin && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-16">
-              <div className="flex justify-between items-center bg-primary/5 p-8 rounded-[2.5rem] border border-primary/5">
-                <div className="flex items-center gap-8">
-                  <h2 className="editorial-label text-accent font-black tracking-[0.4em]">Active Inventory</h2>
-                  <div className="h-8 w-px bg-primary/10" />
+              <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8 bg-primary/5 p-8 rounded-[2.5rem] border border-primary/5">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-8 w-full xl:w-auto">
+                  <h2 className="editorial-label text-accent font-black tracking-[0.4em] shrink-0">Inventory</h2>
+                  <div className="relative w-full md:w-80 group">
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-primary/20 group-focus-within:text-accent transition-colors">
+                      <Plus className="w-4 h-4 rotate-45" />
+                    </div>
+                    <input 
+                      type="text" 
+                      placeholder="Search Manifest..." 
+                      value={menuSearch}
+                      onChange={e => setMenuSearch(e.target.value)}
+                      className="w-full bg-white border border-primary/5 rounded-2xl pl-14 pr-6 py-4 text-[10px] font-black uppercase tracking-widest focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                    />
+                  </div>
+                  <div className="hidden md:block h-8 w-px bg-primary/10" />
                   <div className="flex items-center gap-6">
                     <button onClick={handleRestoreHeritage} className="flex items-center gap-3 text-primary/30 hover:text-accent transition-all">
                       <Download className="w-5 h-5" />
@@ -518,47 +571,65 @@ export default function AdminScreen() {
                     </button>
                   </div>
                 </div>
-                <button onClick={() => setEditingMenuItem({ name: '', price: 0, category: 'Rice Dishes', description: '', isTrending: false, image: '' })} className="bg-primary text-white px-10 py-5 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest flex items-center gap-4 shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+                <button onClick={() => setEditingMenuItem({ name: '', price: 0, category: 'Rice Dishes', description: '', isTrending: false, image: '' })} className="w-full xl:w-auto bg-primary text-white px-10 py-5 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-4 shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
                   <Plus className="w-5 h-5" /> Add New Item
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
-                {menu.map(item => (
-                  <div key={item.id} className="bg-white rounded-[3rem] p-8 shadow-sm border border-primary/5 group relative hover:shadow-2xl transition-all duration-700">
-                    <div className="aspect-square rounded-[2rem] overflow-hidden mb-8 shadow-inner bg-cream relative">
-                      {item.image ? (
-                        <img src={item.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" alt={item.name} />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-primary/10"><ImageIcon className="w-16 h-16" /></div>
-                      )}
-                    </div>
-                    <div className="space-y-6">
-                      <div className="flex justify-between items-start gap-4">
-                        <h3 className="font-serif text-3xl italic text-primary leading-tight">{item.name}</h3>
-                        <p className="font-sans font-black text-accent text-xl whitespace-nowrap">₦{item.price.toLocaleString()}</p>
+              {filteredMenu.length === 0 ? (
+                <div className="py-32 bg-white rounded-[4rem] text-center border border-primary/5">
+                  <Utensils className="w-16 h-16 text-primary/5 mx-auto mb-6" />
+                  <p className="font-serif italic text-2xl text-primary/20">No matching flavors found in the records.</p>
+                  <button onClick={() => setMenuSearch('')} className="mt-6 text-[10px] font-black uppercase tracking-widest text-accent hover:underline">Clear Search</button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+                  {filteredMenu.map(item => (
+                    <div key={item.id} className="bg-white rounded-[3rem] p-8 shadow-sm border border-primary/5 group relative hover:shadow-2xl transition-all duration-700 overflow-hidden">
+                      {/* Internal Metadata Hover */}
+                      <div className="absolute top-4 left-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        <div className="bg-primary/90 backdrop-blur-md text-white/60 p-4 rounded-2xl border border-white/10 text-[6px] font-mono leading-relaxed shadow-2xl">
+                          <p className="uppercase text-[8px] text-accent font-black mb-2 tracking-widest">System Folio</p>
+                          <p>UID: {item.id}</p>
+                          <p>CAT: {item.category.toUpperCase()}</p>
+                          <p>TRD: {item.isTrending ? 'TRUE' : 'FALSE'}</p>
+                        </div>
                       </div>
-                      <p className="text-[10px] text-primary/40 uppercase tracking-widest font-black leading-relaxed line-clamp-3 h-[45px]">{item.description}</p>
-                      <div className="flex items-center justify-between pt-8 border-t border-primary/5">
-                        <button onClick={() => toggleTrending(item.id)} className={cn("flex items-center gap-2 text-[10px] font-black uppercase transition-all", item.isTrending ? "text-orange-500" : "text-primary/20 hover:text-accent")}>
-                           <Star className={cn("w-4 h-4", item.isTrending && "fill-current")} /> {item.isTrending ? "Trending" : "Boost"}
-                        </button>
-                        <div className="flex gap-3">
-                          <button onClick={() => setEditingMenuItem(item)} className="p-3 bg-primary/5 rounded-xl hover:bg-accent hover:text-white transition-all active:scale-90"><Edit className="w-4 h-4" /></button>
-                          <button onClick={() => {
-                            confirm({
-                              title: "Purge Selection",
-                              message: "Erase this dish from the sanctuary records permanently?",
-                              type: "danger",
-                              onConfirm: () => deleteMenuItem(item.id)
-                            });
-                          }} className="p-3 bg-primary/5 rounded-xl hover:bg-red-600 hover:text-white transition-all active:scale-90"><Trash2 className="w-4 h-4" /></button>
+
+                      <div className="aspect-square rounded-[2rem] overflow-hidden mb-8 shadow-inner bg-cream relative">
+                        {item.image ? (
+                          <img src={item.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" alt={item.name} />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-primary/10"><ImageIcon className="w-16 h-16" /></div>
+                        )}
+                      </div>
+                      <div className="space-y-6">
+                        <div className="flex justify-between items-start gap-4">
+                          <h3 className="font-serif text-3xl italic text-primary leading-tight">{item.name}</h3>
+                          <p className="font-sans font-black text-accent text-xl whitespace-nowrap">₦{item.price.toLocaleString()}</p>
+                        </div>
+                        <p className="text-[10px] text-primary/40 uppercase tracking-widest font-black leading-relaxed line-clamp-3 h-[45px]">{item.description}</p>
+                        <div className="flex items-center justify-between pt-8 border-t border-primary/5">
+                          <button onClick={() => toggleTrending(item.id)} className={cn("flex items-center gap-2 text-[10px] font-black uppercase transition-all", item.isTrending ? "text-orange-500" : "text-primary/20 hover:text-accent")}>
+                            <Star className={cn("w-4 h-4", item.isTrending && "fill-current")} /> {item.isTrending ? "Trending" : "Boost"}
+                          </button>
+                          <div className="flex gap-3">
+                            <button onClick={() => setEditingMenuItem(item)} className="p-3 bg-primary/5 rounded-xl hover:bg-accent hover:text-white transition-all active:scale-90"><Edit className="w-4 h-4" /></button>
+                            <button onClick={() => {
+                              confirm({
+                                title: "Purge Selection",
+                                message: "Erase this dish from the sanctuary records permanently?",
+                                type: "danger",
+                                onConfirm: () => deleteMenuItem(item.id)
+                              });
+                            }} className="p-3 bg-primary/5 rounded-xl hover:bg-red-600 hover:text-white transition-all active:scale-90"><Trash2 className="w-4 h-4" /></button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -571,7 +642,14 @@ export default function AdminScreen() {
                 </div>
               ) : (
                 orders.map(order => (
-                  <div key={order.id} className="bg-white p-12 rounded-[3rem] border border-primary/5 shadow-sm hover:shadow-2xl transition-all duration-700 relative overflow-hidden">
+                  <div key={order.id} className="bg-white p-12 rounded-[3rem] border border-primary/5 shadow-sm hover:shadow-2xl transition-all duration-700 relative overflow-hidden group">
+                    {/* Order Metadata Hover */}
+                    <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all">
+                      <div className="bg-primary text-[6px] font-mono text-white/40 px-3 py-1.5 rounded-full border border-white/5">
+                        PLATFORM: {order.metadata?.platform} | VER: {order.metadata?.version}
+                      </div>
+                    </div>
+
                     <div className="flex flex-col xl:flex-row justify-between gap-16">
                       <div className="flex-1 space-y-10">
                         <div className="flex items-center justify-between">
@@ -616,103 +694,163 @@ export default function AdminScreen() {
 
           {activeTab === 'blog' && isAdmin && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-16">
-              <div className="flex justify-between items-center bg-primary/5 p-8 rounded-[2.5rem] border border-primary/5">
-                <h2 className="editorial-label text-accent font-black tracking-[0.4em]">Gazette Records</h2>
+              <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8 bg-primary/5 p-8 rounded-[2.5rem] border border-primary/5">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-8 w-full xl:w-auto">
+                  <h2 className="editorial-label text-accent font-black tracking-[0.4em] shrink-0">Gazette</h2>
+                  <div className="relative w-full md:w-80 group">
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-primary/20 group-focus-within:text-accent transition-colors">
+                      <BookOpen className="w-4 h-4" />
+                    </div>
+                    <input 
+                      type="text" 
+                      placeholder="Search Scribe..." 
+                      value={blogSearch}
+                      onChange={e => setBlogSearch(e.target.value)}
+                      className="w-full bg-white border border-primary/5 rounded-2xl pl-14 pr-6 py-4 text-[10px] font-black uppercase tracking-widest focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                    />
+                  </div>
+                </div>
                 <button 
                   onClick={() => setEditingPost({ title: '', content: '', author: 'Curator', category: 'Heritage', layout: 'editorial', image: '', topic: '' })} 
-                  className="bg-primary text-white px-10 py-5 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest flex items-center gap-4 shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+                  className="w-full xl:w-auto bg-primary text-white px-10 py-5 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-4 shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
                 >
                   <Plus className="w-5 h-5" /> Compose Article
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                {posts.map(post => (
-                  <div key={post.id} className="bg-white rounded-[3rem] p-10 shadow-sm border border-primary/5 group flex gap-10 hover:shadow-2xl transition-all duration-700">
-                    <div className="w-48 h-48 rounded-[2rem] overflow-hidden shrink-0 bg-cream">
-                      {post.image ? (
-                        <img src={post.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" alt={post.title} />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-primary/10"><ImageIcon className="w-12 h-12" /></div>
-                      )}
-                    </div>
-                    <div className="flex-1 flex flex-col justify-between py-2">
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3">
-                          <span className="text-[9px] font-black uppercase tracking-[0.3em] text-accent">{post.category}</span>
-                          <span className="text-[9px] font-black uppercase tracking-[0.3em] text-primary/20">{post.date}</span>
+              {filteredBlog.length === 0 ? (
+                <div className="py-32 bg-white rounded-[4rem] text-center border border-primary/5">
+                  <BookOpen className="w-16 h-16 text-primary/5 mx-auto mb-6" />
+                  <p className="font-serif italic text-2xl text-primary/20">The Gazette records no matching stories.</p>
+                  <button onClick={() => setBlogSearch('')} className="mt-6 text-[10px] font-black uppercase tracking-widest text-accent hover:underline">Clear Search</button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  {filteredBlog.map(post => (
+                    <div key={post.id} className="bg-white rounded-[3rem] p-10 shadow-sm border border-primary/5 group flex gap-10 hover:shadow-2xl transition-all duration-700 relative overflow-hidden">
+                      {/* Blog Metadata Hover */}
+                      <div className="absolute top-4 left-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        <div className="bg-primary/90 backdrop-blur-md text-white/60 p-4 rounded-2xl border border-white/10 text-[6px] font-mono leading-relaxed shadow-2xl">
+                          <p className="uppercase text-[8px] text-accent font-black mb-2 tracking-widest">Story Folio</p>
+                          <p>UID: {post.id}</p>
+                          <p>LAYOUT: {post.layout.toUpperCase()}</p>
                         </div>
-                        <h3 className="font-serif text-3xl italic text-primary leading-tight">{post.title}</h3>
-                        <p className="text-[10px] text-primary/40 uppercase tracking-widest font-black line-clamp-2">{post.content}</p>
                       </div>
-                      <div className="flex gap-4 mt-6">
-                        <button onClick={() => setEditingPost(post)} className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-primary/30 hover:text-accent transition-all">
-                          <Edit className="w-4 h-4" /> Edit
-                        </button>
-                        <button onClick={() => {
-                          confirm({
-                            title: "Expunge Article",
-                            message: "Permanently remove this entry from the Gazette?",
-                            type: "danger",
-                            onConfirm: () => deletePost(post.id)
-                          });
-                        }} className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-primary/30 hover:text-red-600 transition-all">
-                          <Trash2 className="w-4 h-4" /> Delete
-                        </button>
+
+                      <div className="w-48 h-48 rounded-[2rem] overflow-hidden shrink-0 bg-cream">
+                        {post.image ? (
+                          <img src={post.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" alt={post.title} />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-primary/10"><ImageIcon className="w-12 h-12" /></div>
+                        )}
+                      </div>
+                      <div className="flex-1 flex flex-col justify-between py-2">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3">
+                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-accent">{post.category}</span>
+                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-primary/20">{post.date}</span>
+                          </div>
+                          <h3 className="font-serif text-3xl italic text-primary leading-tight">{post.title}</h3>
+                          <p className="text-[10px] text-primary/40 uppercase tracking-widest font-black line-clamp-2">{post.content}</p>
+                        </div>
+                        <div className="flex gap-4 mt-6">
+                          <button onClick={() => setEditingPost(post)} className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-primary/30 hover:text-accent transition-all">
+                            <Edit className="w-4 h-4" /> Edit
+                          </button>
+                          <button onClick={() => {
+                            confirm({
+                              title: "Expunge Article",
+                              message: "Permanently remove this entry from the Gazette?",
+                              type: "danger",
+                              onConfirm: () => deletePost(post.id)
+                            });
+                          }} className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-primary/30 hover:text-red-600 transition-all">
+                            <Trash2 className="w-4 h-4" /> Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
 
           {activeTab === 'staff' && isAdmin && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-16">
-              <div className="flex justify-between items-center bg-primary/5 p-8 rounded-[2.5rem] border border-primary/5">
-                <h2 className="editorial-label text-accent font-black tracking-[0.4em]">Sanctuary Guardians</h2>
+              <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8 bg-primary/5 p-8 rounded-[2.5rem] border border-primary/5">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-8 w-full xl:w-auto">
+                  <h2 className="editorial-label text-accent font-black tracking-[0.4em] shrink-0">Guardians</h2>
+                  <div className="relative w-full md:w-80 group">
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-primary/20 group-focus-within:text-accent transition-colors">
+                      <Users className="w-4 h-4" />
+                    </div>
+                    <input 
+                      type="text" 
+                      placeholder="Search Guardians..." 
+                      value={staffSearch}
+                      onChange={e => setStaffSearch(e.target.value)}
+                      className="w-full bg-white border border-primary/5 rounded-2xl pl-14 pr-6 py-4 text-[10px] font-black uppercase tracking-widest focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                    />
+                  </div>
+                </div>
                 <button 
                   onClick={() => setEditingStaff({ name: '', email: '', role: 'staff' })} 
-                  className="bg-primary text-white px-10 py-5 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest flex items-center gap-4 shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+                  className="w-full xl:w-auto bg-primary text-white px-10 py-5 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-4 shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
                 >
                   <Plus className="w-5 h-5" /> Add Team Member
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                {staff.map(member => (
-                  <div key={member.id} className="bg-white rounded-[2.5rem] p-10 border border-primary/5 shadow-sm hover:shadow-2xl transition-all group">
-                    <div className="flex items-center gap-6 mb-8">
-                      <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center text-accent font-serif text-2xl italic">
-                        {member.name.charAt(0)}
+              {filteredStaff.length === 0 ? (
+                <div className="py-32 bg-white rounded-[4rem] text-center border border-primary/5">
+                  <Users className="w-16 h-16 text-primary/5 mx-auto mb-6" />
+                  <p className="font-serif italic text-2xl text-primary/20">No guardians match your query.</p>
+                  <button onClick={() => setStaffSearch('')} className="mt-6 text-[10px] font-black uppercase tracking-widest text-accent hover:underline">Clear Search</button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                  {filteredStaff.map(member => (
+                    <div key={member.id} className="bg-white rounded-[2.5rem] p-10 border border-primary/5 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden">
+                      {/* Staff Metadata Hover */}
+                      <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        <div className="bg-primary/90 backdrop-blur-md text-white/40 p-3 rounded-xl border border-white/5 text-[6px] font-mono shadow-2xl">
+                          UID: {member.id}
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-serif text-2xl italic text-primary">{member.name}</h3>
-                        <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">{member.email}</p>
+
+                      <div className="flex items-center gap-6 mb-8">
+                        <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center text-accent font-serif text-2xl italic">
+                          {member.name.charAt(0)}
+                        </div>
+                        <div>
+                          <h3 className="font-serif text-2xl italic text-primary">{member.name}</h3>
+                          <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">{member.email}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between pt-6 border-t border-primary/5">
+                        <div className={cn(
+                          "px-6 py-2 rounded-full text-[9px] font-black uppercase tracking-widest",
+                          member.role === 'admin' ? "bg-accent text-white" : member.role === 'rider' ? "bg-blue-100 text-blue-600" : "bg-primary/5 text-primary/60"
+                        )}>
+                          {member.role}
+                        </div>
+                        <div className="flex gap-4">
+                          <button onClick={() => setEditingStaff(member)} className="p-3 bg-primary/5 rounded-xl hover:bg-accent hover:text-white transition-all"><Edit className="w-4 h-4" /></button>
+                          <button onClick={() => {
+                            confirm({
+                              title: "Remove Guardian",
+                              message: "Revoke sanctuary access for this member?",
+                              type: "danger",
+                              onConfirm: () => deleteStaff(member.id)
+                            });
+                          }} className="p-3 bg-primary/5 rounded-xl hover:bg-red-600 hover:text-white transition-all"><Trash2 className="w-4 h-4" /></button>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between pt-6 border-t border-primary/5">
-                      <div className={cn(
-                        "px-6 py-2 rounded-full text-[9px] font-black uppercase tracking-widest",
-                        member.role === 'admin' ? "bg-accent text-white" : member.role === 'rider' ? "bg-blue-100 text-blue-600" : "bg-primary/5 text-primary/60"
-                      )}>
-                        {member.role}
-                      </div>
-                      <div className="flex gap-4">
-                        <button onClick={() => setEditingStaff(member)} className="p-3 bg-primary/5 rounded-xl hover:bg-accent hover:text-white transition-all"><Edit className="w-4 h-4" /></button>
-                        <button onClick={() => {
-                          confirm({
-                            title: "Remove Guardian",
-                            message: "Revoke sanctuary access for this member?",
-                            type: "danger",
-                            onConfirm: () => deleteStaff(member.id)
-                          });
-                        }} className="p-3 bg-primary/5 rounded-xl hover:bg-red-600 hover:text-white transition-all"><Trash2 className="w-4 h-4" /></button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

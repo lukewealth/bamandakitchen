@@ -23,6 +23,13 @@ const MenuCard = memo(({ item, onAddToCart }: MenuCardProps) => {
       className="group"
     >
       <div className="relative overflow-hidden bg-surface-variant aspect-[4/5] mb-8 border border-on-surface/5 rounded-[2rem]">
+        {/* System Metadata Hover */}
+        <div className="absolute top-4 left-4 z-[30] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          <div className="bg-black/60 backdrop-blur-md text-white/40 p-3 rounded-xl border border-white/10 text-[6px] font-mono shadow-2xl">
+            ID: {item.id.slice(0, 8)}... | {item.category.toUpperCase()}
+          </div>
+        </div>
+
         <OptimizedImage 
           src={item.image} 
           alt={item.name} 
