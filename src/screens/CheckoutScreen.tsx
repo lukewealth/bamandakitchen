@@ -10,6 +10,7 @@ import { CartItem, Order } from '../types';
 import { generateOrderId, formatWhatsAppMessage, getWhatsAppUrl } from '../lib/order';
 import { useToast } from '../lib/toast-context';
 import { validateName, validatePhone, validateAddress, sanitizeInput, isThrottled, patronTracker } from '../lib/security';
+import { useDataSync } from '../lib/data-sync';
 
 interface CheckoutScreenProps {
   items: CartItem[];
@@ -18,6 +19,7 @@ interface CheckoutScreenProps {
 
 export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScreenProps) {
   const { showToast } = useToast();
+  const { createOrder } = useDataSync();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');

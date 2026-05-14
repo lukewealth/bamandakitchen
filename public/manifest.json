@@ -1,0 +1,21 @@
+{
+  "short_name": "Bamanda",
+  "name": "Bamanda Heritage Restaurant",
+  "icons": [
+    {
+      "src": "/logo.jpg",
+      "type": "image/jpeg",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/logo.jpg",
+      "type": "image/jpeg",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0A0D36",
+  "display": "standalone",
+  "theme_color": "#C4A484",
+  "description": "Luxury fine-dining experience celebrating African heritage."
+}

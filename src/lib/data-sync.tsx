@@ -4,7 +4,7 @@
  */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { MenuItem, BlogPost, StaffAccount } from '../types';
+import { MenuItem, BlogPost, StaffAccount, Order } from '../types';
 import { MENU_ITEMS } from '../data';
 import { db, auth } from './firebase';
 import { 
@@ -20,7 +20,8 @@ import {
   deleteDoc,
   getDoc,
   setDoc,
-  Unsubscribe
+  Unsubscribe,
+  limit
 } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useToast } from './toast-context';
@@ -29,6 +30,7 @@ interface DataSyncContextType {
   menu: MenuItem[];
   posts: BlogPost[];
   staff: StaffAccount[];
+  orders: Order[];
   userProfile: StaffAccount | null;
   isLoading: boolean;
   isCloudSyncing: boolean;
@@ -45,6 +47,11 @@ interface DataSyncContextType {
   // Staff Operations
   updateStaff: (member: Partial<StaffAccount>) => Promise<void>;
   deleteStaff: (id: string) => Promise<void>;
+
+  // Order Operations
+  createOrder: (order: Partial<Order>) => Promise<string | null>;
+  updateOrderStatus: (orderId: string, status: string) => Promise<void>;
+  deleteOrder: (orderId: string) => Promise<void>;
   
   // Logging
   logAction: (action: string, context?: any) => Promise<void>;
@@ -62,6 +69,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [staff, setStaff] = useState<StaffAccount[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [userProfile, setUserProfile] = useState<StaffAccount | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCloudSyncing, setIsCloudSyncing] = useState(false);
@@ -81,7 +89,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
         if (docSnap.exists()) {
           setUserProfile({ ...docSnap.data(), id: docSnap.id } as StaffAccount);
         } else {
-          const primaryAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'admin@bamanda.com';
+          const primaryAdminEmail = import.meta.env.VITE_ADMIN_EMAIL;
           if (user.email === primaryAdminEmail) {
             const initialAdmin = {
               name: 'Master Curator',
@@ -94,7 +102,6 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
             showToast('Sacred Profile Manifested.', 'success');
           } else {
             setUserProfile(null);
-            showToast('Access denied. No staff profile found.', 'error');
           }
         }
       } else {
@@ -114,10 +121,12 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
       const cachedMenu = localStorage.getItem('bamanda_menu_cache');
       const cachedPosts = localStorage.getItem('bamanda_blog_cache');
       const cachedStaff = localStorage.getItem('bamanda_staff_cache');
+      const cachedOrders = localStorage.getItem('bamanda_orders_cache');
 
       let initialMenu: MenuItem[] = [];
       let initialPosts: BlogPost[] = [];
       let initialStaff: StaffAccount[] = [];
+      let initialOrders: Order[] = [];
 
       try {
         if (cachedMenu) {
@@ -132,6 +141,10 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
           const parsed = JSON.parse(cachedStaff);
           if (Array.isArray(parsed)) initialStaff = parsed;
         }
+        if (cachedOrders) {
+          const parsed = JSON.parse(cachedOrders);
+          if (Array.isArray(parsed)) initialOrders = parsed;
+        }
       } catch (e) {
         console.error('Failed to parse cached data', e);
       }
@@ -141,6 +154,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
       setMenu(initialMenu);
       setPosts(initialPosts);
       setStaff(initialStaff);
+      setOrders(initialOrders);
       setIsLoading(false);
     };
 
@@ -164,17 +178,25 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
         setMenu(items);
         localStorage.setItem('bamanda_menu_cache', JSON.stringify(items));
       }
-    }, (err) => {
-      console.error('Menu Sync Failed:', err);
     });
 
     const unsubBlog = onSnapshot(query(collection(db, 'blog'), orderBy('date', 'desc')), (snapshot) => {
       const items = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as BlogPost));
       setPosts(items);
       localStorage.setItem('bamanda_blog_cache', JSON.stringify(items));
-    }, (err) => {
-      console.error('Blog Sync Failed:', err);
     });
+
+    // Orders Sync: 
+    // - For admins/staff: show all recent orders
+    // - For patrons: ideally handled via local tracking, but can sync if logged in (not implemented for patrons yet)
+    let unsubOrders: Unsubscribe | null = null;
+    if (userProfile) {
+      unsubOrders = onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc'), limit(100)), (snapshot) => {
+        const items = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Order));
+        setOrders(items);
+        localStorage.setItem('bamanda_orders_cache', JSON.stringify(items));
+      });
+    }
 
     // Only sync staff if the user is an admin
     let unsubStaff: Unsubscribe | null = null;
@@ -183,17 +205,16 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
         const items = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as StaffAccount));
         setStaff(items);
         localStorage.setItem('bamanda_staff_cache', JSON.stringify(items));
-      }, (err) => {
-        console.error('Staff Sync Failed:', err);
       });
     }
 
     return () => {
       unsubMenu();
       unsubBlog();
+      if (unsubOrders) unsubOrders();
       if (unsubStaff) unsubStaff();
     };
-  }, [userProfile?.role]);
+  }, [userProfile]);
 
   // ==========================================
   // OPERATIONS
@@ -213,6 +234,43 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       console.error('Failed to log action:', e);
     }
+  };
+
+  const createOrder = async (order: Partial<Order>): Promise<string | null> => {
+    if (!db) return null;
+    try {
+      const newDoc = await addDoc(collection(db, 'orders'), {
+        ...order,
+        createdAt: new Date().toISOString(), // Use string for local but can use serverTimestamp for cloud
+        serverCreatedAt: serverTimestamp(),
+        status: 'pending'
+      });
+      await logAction('CREATE_ORDER', { orderId: newDoc.id });
+      return newDoc.id;
+    } catch (e) {
+      showToast('Order failed to manifest in cloud.', 'error');
+      return null;
+    }
+  };
+
+  const updateOrderStatus = async (orderId: string, status: string) => {
+    if (!db) return;
+    try {
+      await updateDoc(doc(db, 'orders', orderId), { status });
+      await logAction('UPDATE_ORDER_STATUS', { orderId, status });
+      showToast(`Order marked as ${status}.`, 'success');
+    } catch (e) {
+      showToast('Status update failed.', 'error');
+    }
+  };
+
+  const deleteOrder = async (orderId: string) => {
+    if (!db || userProfile?.role !== 'admin') return;
+    try {
+      await deleteDoc(doc(db, 'orders', orderId));
+      await logAction('DELETE_ORDER', { orderId });
+      showToast('Order record expunged.', 'info');
+    } catch (e) {}
   };
 
   const updateMenuItem = async (item: Partial<MenuItem>) => {
@@ -386,6 +444,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
       menu,
       posts,
       staff,
+      orders,
       userProfile,
       isLoading,
       isCloudSyncing,
@@ -396,6 +455,9 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
       deletePost,
       updateStaff,
       deleteStaff,
+      createOrder,
+      updateOrderStatus,
+      deleteOrder,
       logAction,
       syncToCloud,
       restoreFromStatic,

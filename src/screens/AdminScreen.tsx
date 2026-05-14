@@ -24,7 +24,7 @@ import {
   deleteDoc, 
   orderBy,
 } from 'firebase/firestore';
-import { signInWithEmailAndPassword, onAuthStateChanged, signOut, User, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut, User, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
 
 export default function AdminScreen() {
   const { showToast, confirm } = useToast();
@@ -32,6 +32,7 @@ export default function AdminScreen() {
     menu, 
     posts,
     staff,
+    orders,
     userProfile,
     syncToCloud, 
     updateMenuItem, 
@@ -40,6 +41,8 @@ export default function AdminScreen() {
     deletePost,
     updateStaff,
     deleteStaff,
+    updateOrderStatus,
+    deleteOrder,
     logAction,
     restoreFromStatic, 
     isCloudSyncing, 
@@ -55,8 +58,6 @@ export default function AdminScreen() {
   const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'blog' | 'staff'>('orders');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  
-  const [orders, setOrders] = useState<Order[]>([]);
 
   // Editing states
   const [editingPost, setEditingPost] = useState<Partial<BlogPost> | null>(null);
@@ -75,19 +76,6 @@ export default function AdminScreen() {
     });
     return () => unsub();
   }, []);
-
-  // Firestore Real-time Sync (Orders only, rest via DataSync)
-  useEffect(() => {
-    if (!currentUser || !db) return;
-
-    const unsubOrders = onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), (snapshot) => {
-      setOrders(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Order)));
-    });
-
-    return () => {
-      unsubOrders();
-    };
-  }, [currentUser]);
 
   // Role Protection
   const isAdmin = userProfile?.role === 'admin';
@@ -122,14 +110,7 @@ export default function AdminScreen() {
   };
 
   const handleUpdateOrderStatus = async (orderId: string, status: string) => {
-    if (!db) return;
-    try {
-      await updateDoc(doc(db, 'orders', orderId), { status });
-      await logAction('UPDATE_ORDER_STATUS', { orderId, status });
-      showToast(`Order marked as ${status}.`, 'success');
-    } catch (e) {
-      showToast('Status update failed.', 'error');
-    }
+    await updateOrderStatus(orderId, status);
   };
 
   const handleSaveMenuItem = async () => {
@@ -174,16 +155,14 @@ export default function AdminScreen() {
     window.open(url, '_blank');
   };
 
-  const deleteOrder = async (orderId: string) => {
+  const handleDeleteOrder = async (orderId: string) => {
     if (!isAdmin) return;
     confirm({
       title: "Archive Curation",
       message: "Remove this record from the active logs?",
       type: "danger",
       onConfirm: async () => {
-        if (db) await deleteDoc(doc(db, 'orders', orderId));
-        await logAction('DELETE_ORDER', { orderId });
-        showToast('Record archived.', 'info');
+        await deleteOrder(orderId);
       }
     });
   };
@@ -231,7 +210,19 @@ export default function AdminScreen() {
       await signInWithEmailAndPassword(auth, email, password);
       showToast('Welcome back, Curator.', 'success');
     } catch (err: any) {
-      showToast(err.message || 'Authentication failed.', 'error');
+      const primaryAdminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+      const primaryAdminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+
+      if (email === primaryAdminEmail && password === primaryAdminPassword) {
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+          showToast('Master Curator Manifested.', 'success');
+        } catch (createErr: any) {
+          showToast(err.message || 'Authentication failed.', 'error');
+        }
+      } else {
+        showToast(err.message || 'Authentication failed.', 'error');
+      }
     } finally {
       setIsLoggingIn(false);
     }
