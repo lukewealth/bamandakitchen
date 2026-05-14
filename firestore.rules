@@ -39,8 +39,10 @@ service cloud.firestore {
     match /staff/{member} {
       // Allow users to read their own profile, admins read all
       allow read: if request.auth != null && (request.auth.uid == member || isAdmin());
-      // Only admins can create/update staff
-      allow write: if isAdmin();
+      // Allow the primary admin to create their own record during bootstrap
+      allow create: if request.auth != null && member == request.auth.uid && request.auth.token.email == "bamandakitchen25@gmail.com";
+      // Only admins can update or delete staff
+      allow update, delete: if isAdmin();
     }
     
     // Logs: Write-only for public, read for staff

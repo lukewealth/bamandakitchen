@@ -82,27 +82,38 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
     if (!auth || !db) return;
 
     const unsubAuth = onAuthStateChanged(auth, async (user) => {
+      console.log("[Auth] State changed:", user?.email);
       if (user) {
         const docRef = doc(db, 'staff', user.uid);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-          setUserProfile({ ...docSnap.data(), id: docSnap.id } as StaffAccount);
-        } else {
-          const primaryAdminEmail = import.meta.env.VITE_ADMIN_EMAIL;
-          if (user.email === primaryAdminEmail) {
-            const initialAdmin = {
-              name: 'Master Curator',
-              email: user.email,
-              role: 'admin' as const,
-              createdAt: new Date().toISOString()
-            };
-            await setDoc(docRef, { ...initialAdmin, createdAt: serverTimestamp() });
-            setUserProfile({ ...initialAdmin, id: user.uid });
-            showToast('Sacred Profile Manifested.', 'success');
+        try {
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            console.log("[Auth] Profile found:", docSnap.data());
+            setUserProfile({ ...docSnap.data(), id: docSnap.id } as StaffAccount);
           } else {
-            setUserProfile(null);
+            const primaryAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || "bamandakitchen25@gmail.com";
+            console.log("[Auth] No profile found. Checking bootstrap for:", primaryAdminEmail);
+            
+            if (user.email?.toLowerCase() === primaryAdminEmail.toLowerCase()) {
+              console.log("[Auth] Bootstrapping primary admin...");
+              const initialAdmin = {
+                name: 'Master Curator',
+                email: user.email,
+                role: 'admin' as const,
+                createdAt: new Date().toISOString()
+              };
+              await setDoc(docRef, { ...initialAdmin, createdAt: serverTimestamp() });
+              setUserProfile({ ...initialAdmin, id: user.uid });
+              showToast('Sacred Profile Manifested.', 'success');
+            } else {
+              console.warn("[Auth] Email mismatch. Bootstrap denied for:", user.email);
+              setUserProfile(null);
+            }
           }
+        } catch (error) {
+          console.error("[Auth] Error syncing profile:", error);
+          setUserProfile(null);
         }
       } else {
         setUserProfile(null);
