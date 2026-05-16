@@ -18,8 +18,10 @@ interface MenuCardProps {
 const MenuCard = memo(({ item, onAddToCart }: MenuCardProps) => {
   return (
     <motion.div 
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
       className="group"
     >
       <div className="relative overflow-hidden bg-surface-variant aspect-[4/5] mb-8 border border-on-surface/5 rounded-[2rem]">
@@ -35,7 +37,7 @@ const MenuCard = memo(({ item, onAddToCart }: MenuCardProps) => {
           alt={item.name} 
           referrerPolicy="no-referrer"
           aspectRatio="h-full w-full"
-          className="grayscale transition-transform duration-1000 group-hover:grayscale-0 group-hover:scale-110 group-hover:brightness-110"
+          className="transition-transform duration-1000 md:grayscale md:group-hover:grayscale-0 group-hover:scale-110 group-hover:brightness-110"
         />
         
         {/* Price Overlay - Stable 1x scale on hover */}

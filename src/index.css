@@ -20,8 +20,8 @@
 :root {
   --surface: #F8F5F0;
   --surface-variant: #FFFFFF;
-  --on-surface: #1A1A1A;
-  --on-surface-variant: #4A4A4A;
+  --on-surface: #000000;
+  --on-surface-variant: #333333;
   --border-color: rgba(15, 61, 46, 0.1);
   --accent: #FF6B00;
 }
@@ -29,18 +29,22 @@
 [data-theme='night'] {
   --surface: #0F3D2E;
   --surface-variant: #164D3B;
-  --on-surface: #F8F5F0;
-  --on-surface-variant: #A0C0B5;
+  --on-surface: #FFFFFF;
+  --on-surface-variant: #E0E0E0;
   --border-color: rgba(248, 245, 240, 0.1);
 }
 
 @layer base {
   body {
-    @apply bg-surface text-on-surface font-sans antialiased transition-colors duration-500;
+    @apply bg-surface text-on-surface font-sans antialiased transition-colors duration-500 selection:bg-accent/30;
   }
   
   h1, h2, h3, h4, .font-serif {
-    @apply font-serif tracking-tight;
+    @apply font-serif tracking-tight text-on-surface;
+  }
+
+  input, textarea, select {
+    @apply text-on-surface placeholder:text-on-surface/30;
   }
 }
 

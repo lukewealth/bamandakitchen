@@ -9,7 +9,8 @@ import { cn } from '../lib/utils';
 import { useDataSync } from '../lib/data-sync';
 import { 
   Lock, LogOut, ShoppingBag, Utensils, BookOpen, X, Star, Edit, Trash2, Plus, 
-  Image as ImageIcon, Save, MessageCircle, Users, ChevronLeft, ChevronRight, RefreshCw, Download, FileCode, Menu as MenuIcon, ShieldAlert
+  Image as ImageIcon, Save, MessageCircle, Users, ChevronLeft, ChevronRight, RefreshCw, Download, FileCode, Menu as MenuIcon, ShieldAlert,
+  Eye, EyeOff
 } from 'lucide-react';
 import { MenuItem, Order, BlogPost, BlogLayout, StaffAccount } from '../types';
 import { formatStatusUpdateMessage, getWhatsAppUrl } from '../lib/order';
@@ -54,6 +55,7 @@ export default function AdminScreen() {
   const [authLoading, setAuthLoading] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'blog' | 'staff'>('orders');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -293,8 +295,29 @@ export default function AdminScreen() {
           <Lock className="w-12 h-12 mx-auto mb-8 text-accent" />
           <h1 className="font-serif text-3xl italic mb-12 text-center text-primary">Curator Access</h1>
           <form onSubmit={handleLogin} className="space-y-6">
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans focus:ring-2 focus:ring-accent/50 outline-none transition-all" placeholder="Curator Email" />
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans focus:ring-2 focus:ring-accent/50 outline-none transition-all" placeholder="Sacred Key" />
+            <input 
+              type="email" 
+              value={email} 
+              onChange={e => setEmail(e.target.value)} 
+              className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans text-black focus:ring-2 focus:ring-accent/50 outline-none transition-all" 
+              placeholder="Curator Email" 
+            />
+            <div className="relative">
+              <input 
+                type={showPassword ? "text" : "password"} 
+                value={password} 
+                onChange={e => setPassword(e.target.value)} 
+                className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans text-black focus:ring-2 focus:ring-accent/50 outline-none transition-all pr-14" 
+                placeholder="Sacred Key" 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-primary/30 hover:text-accent transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
             <button 
               type="submit" 
               disabled={isLoggingIn}
@@ -858,62 +881,106 @@ export default function AdminScreen() {
         {/* MODAL EDITOR: MENU ITEM */}
         <AnimatePresence>
           {editingMenuItem && isAdmin && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-primary/95 backdrop-blur-2xl">
-              <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} className="bg-white w-full max-w-3xl rounded-[4rem] overflow-hidden shadow-2xl border border-primary/5">
-                <div className="p-16 border-b border-primary/5 flex justify-between items-center bg-cream/30">
-                  <div className="space-y-2">
-                    <h2 className="font-serif text-4xl italic text-primary">Curation Manuscript</h2>
-                    <p className="font-sans text-[10px] font-black uppercase tracking-[0.3em] text-primary/30">Refining the Inventory</p>
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/95 backdrop-blur-2xl">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9, y: 20 }} 
+                animate={{ opacity: 1, scale: 1, y: 0 }} 
+                exit={{ opacity: 0, scale: 0.9, y: 20 }} 
+                className="bg-white w-full max-w-xl max-h-[85vh] rounded-[1.5rem] overflow-hidden shadow-2xl border border-primary/5 flex flex-col"
+              >
+                <div className="p-6 sm:p-7 border-b border-primary/5 flex justify-between items-center bg-cream/30 shrink-0">
+                  <div className="space-y-1">
+                    <h2 className="font-serif text-xl sm:text-2xl italic text-primary">Curation Manuscript</h2>
+                    <p className="font-sans text-[7px] sm:text-[8px] font-black uppercase tracking-[0.2em] text-primary/30">Refining the Inventory</p>
                   </div>
-                  <button onClick={() => setEditingMenuItem(null)} className="p-6 bg-primary/5 rounded-full hover:bg-primary hover:text-white transition-all active:scale-90"><X className="w-8 h-8" /></button>
+                  <button 
+                    onClick={() => setEditingMenuItem(null)} 
+                    className="p-3 sm:p-4 bg-primary/5 rounded-full hover:bg-accent hover:text-white transition-all active:scale-90"
+                  >
+                    <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </button>
                 </div>
-                <div className="p-16 space-y-12 bg-white">
-                  <div className="grid grid-cols-2 gap-10">
-                    <div className="space-y-3">
-                      <label className="text-[10px] uppercase font-black text-accent tracking-[0.3em] ml-2">Title of Dish</label>
-                      <input type="text" value={editingMenuItem.name} onChange={e => setEditingMenuItem({ ...editingMenuItem, name: e.target.value })} className="w-full bg-primary/5 border-none rounded-3xl px-8 py-6 font-serif text-2xl placeholder:text-primary/10" placeholder="e.g. Imperial Jollof" />
+                
+                <div className="flex-1 overflow-y-auto p-6 sm:p-7 space-y-6 sm:space-y-7 custom-scrollbar">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                    <div className="space-y-1.5">
+                      <label className="text-[8px] uppercase font-black text-accent tracking-[0.2em] ml-1">Title of Dish</label>
+                      <input 
+                        type="text" 
+                        value={editingMenuItem.name} 
+                        onChange={e => setEditingMenuItem({ ...editingMenuItem, name: e.target.value })} 
+                        className="w-full bg-primary/5 border-none rounded-xl px-5 py-3.5 font-serif text-base sm:text-lg text-black placeholder:text-primary/10 focus:ring-2 focus:ring-accent/20 outline-none transition-all" 
+                        placeholder="e.g. Imperial Jollof" 
+                      />
                     </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] uppercase font-black text-accent tracking-[0.3em] ml-2">Sacred Price (₦)</label>
-                      <input type="number" value={editingMenuItem.price} onChange={e => setEditingMenuItem({ ...editingMenuItem, price: parseInt(e.target.value) })} className="w-full bg-primary/5 border-none rounded-3xl px-8 py-6 font-sans font-black text-2xl" />
+                    <div className="space-y-1.5">
+                      <label className="text-[8px] uppercase font-black text-accent tracking-[0.2em] ml-1">Sacred Price (₦)</label>
+                      <input 
+                        type="number" 
+                        value={editingMenuItem.price} 
+                        onChange={e => setEditingMenuItem({ ...editingMenuItem, price: parseInt(e.target.value) })} 
+                        className="w-full bg-primary/5 border-none rounded-xl px-5 py-3.5 font-sans font-black text-base sm:text-lg text-black focus:ring-2 focus:ring-accent/20 outline-none transition-all" 
+                      />
                     </div>
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] uppercase font-black text-accent tracking-[0.3em] ml-2">Visual Asset</label>
-                    <div className="flex gap-8 items-center">
-                      <div className="flex-1 space-y-4">
-                        <input type="text" value={editingMenuItem.image} onChange={e => setEditingMenuItem({ ...editingMenuItem, image: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans text-xs tracking-wider" placeholder="Sacred Image URL (Unsplash/Firebase)" />
-                        <div className="flex items-center gap-4">
-                          <label className="flex-1 bg-accent/5 border border-accent/20 rounded-2xl px-6 py-4 cursor-pointer hover:bg-accent/10 transition-all flex items-center gap-3">
-                            <ImageIcon className="w-4 h-4 text-accent" />
-                            <span className="text-[10px] font-black uppercase tracking-widest text-accent">Upload Local Manifest</span>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[8px] uppercase font-black text-accent tracking-[0.2em] ml-1">Visual Asset</label>
+                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center">
+                      <div className="w-full flex-1 space-y-2.5">
+                        <input 
+                          type="text" 
+                          value={editingMenuItem.image} 
+                          onChange={e => setEditingMenuItem({ ...editingMenuItem, image: e.target.value })} 
+                          className="w-full bg-primary/5 border-none rounded-lg px-4 py-2.5 font-sans text-[9px] text-black tracking-wider focus:ring-2 focus:ring-accent/20 outline-none transition-all" 
+                          placeholder="Sacred Image URL" 
+                        />
+                        <div className="flex items-center gap-2">
+                          <label className="flex-1 bg-accent/5 border border-accent/20 rounded-lg px-4 py-2.5 cursor-pointer hover:bg-accent/10 transition-all flex items-center justify-center gap-2 group">
+                            <ImageIcon className="w-3.5 h-3.5 text-accent group-hover:scale-110 transition-transform" />
+                            <span className="text-[8px] font-black uppercase tracking-widest text-accent">Upload Asset</span>
                             <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                           </label>
                           {editingMenuItem.image?.startsWith('data:') && (
-                            <button onClick={() => setEditingMenuItem({ ...editingMenuItem, image: '' })} className="p-4 bg-red-50 text-red-600 rounded-2xl hover:bg-red-100 transition-all">
-                              <X className="w-4 h-4" />
+                            <button 
+                              onClick={() => setEditingMenuItem({ ...editingMenuItem, image: '' })} 
+                              className="p-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all active:scale-90"
+                            >
+                              <X className="w-3.5 h-3.5" />
                             </button>
                           )}
                         </div>
                       </div>
-                      <div className="w-32 h-32 bg-primary/5 rounded-[2rem] flex items-center justify-center overflow-hidden shrink-0 shadow-inner border border-primary/5 relative group">
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 bg-primary/5 rounded-xl flex items-center justify-center overflow-hidden shrink-0 shadow-inner border border-primary/5 relative">
                         {editingMenuItem.image ? (
-                          <img src={editingMenuItem.image} className="w-full h-full object-cover" />
+                          <img src={editingMenuItem.image} className="w-full h-full object-cover" alt="Preview" />
                         ) : (
-                          <ImageIcon className="w-10 h-10 opacity-10" />
+                          <ImageIcon className="w-7 h-7 opacity-10 text-primary" />
                         )}
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] uppercase font-black text-accent tracking-[0.3em] ml-2">Curation Narrative</label>
-                    <textarea rows={4} value={editingMenuItem.description} onChange={e => setEditingMenuItem({ ...editingMenuItem, description: e.target.value })} className="w-full bg-primary/5 border-none rounded-[2rem] px-8 py-8 font-sans text-sm leading-relaxed placeholder:text-primary/10" placeholder="Manifest the story of this flavor..." />
+
+                  <div className="space-y-1.5">
+                    <label className="text-[8px] uppercase font-black text-accent tracking-[0.2em] ml-1">Curation Narrative</label>
+                    <textarea 
+                      rows={2} 
+                      value={editingMenuItem.description} 
+                      onChange={e => setEditingMenuItem({ ...editingMenuItem, description: e.target.value })} 
+                      className="w-full bg-primary/5 border-none rounded-xl px-5 py-4 font-sans text-xs text-black leading-relaxed placeholder:text-primary/10 focus:ring-2 focus:ring-accent/20 outline-none transition-all" 
+                      placeholder="Manifest the story of this flavor..." 
+                    />
                   </div>
-                  <div className="pt-8">
-                    <button onClick={handleSaveMenuItem} className="w-full bg-primary text-white py-8 rounded-[2rem] font-black uppercase tracking-[0.5em] text-[12px] shadow-[0_20px_50px_rgba(10,13,54,0.3)] hover:shadow-[0_30px_60px_rgba(10,13,54,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-6">
-                      <Save className="w-6 h-6" /> Manifest to Records
-                    </button>
-                  </div>
+                </div>
+
+                <div className="p-6 sm:p-7 border-t border-primary/5 bg-cream/10 shrink-0">
+                  <button 
+                    onClick={handleSaveMenuItem} 
+                    className="w-full bg-primary text-white py-4 sm:py-5 rounded-xl font-black uppercase tracking-[0.4em] text-[9px] sm:text-[10px] shadow-lg hover:bg-accent hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
+                  >
+                    <Save className="w-4 h-4 group-hover:rotate-12 transition-transform" /> 
+                    Manifest to Records
+                  </button>
                 </div>
               </motion.div>
             </div>
@@ -923,74 +990,131 @@ export default function AdminScreen() {
         {/* MODAL EDITOR: BLOG POST */}
         <AnimatePresence>
           {editingPost && isAdmin && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-primary/95 backdrop-blur-2xl">
-              <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} className="bg-white w-full max-w-4xl h-[85vh] rounded-[4rem] overflow-hidden shadow-2xl border border-primary/5 flex flex-col">
-                <div className="p-12 border-b border-primary/5 flex justify-between items-center bg-cream/30 shrink-0">
-                  <div className="space-y-2">
-                    <h2 className="font-serif text-4xl italic text-primary">Gazette Manuscript</h2>
-                    <p className="font-sans text-[10px] font-black uppercase tracking-[0.3em] text-primary/30">Curating the Heritage Narrative</p>
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/95 backdrop-blur-2xl">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9, y: 30 }} 
+                animate={{ opacity: 1, scale: 1, y: 0 }} 
+                exit={{ opacity: 0, scale: 0.9, y: 30 }} 
+                className="bg-white w-full max-w-2xl max-h-[85vh] rounded-[1.5rem] overflow-hidden shadow-2xl border border-primary/5 flex flex-col"
+              >
+                <div className="p-8 border-b border-primary/5 flex justify-between items-center bg-cream/30 shrink-0">
+                  <div className="space-y-1">
+                    <h2 className="font-serif text-2xl italic text-primary">Gazette Manuscript</h2>
+                    <p className="font-sans text-[8px] font-black uppercase tracking-[0.2em] text-primary/30">Curating the Heritage Narrative</p>
                   </div>
-                  <button onClick={() => setEditingPost(null)} className="p-6 bg-primary/5 rounded-full hover:bg-primary hover:text-white transition-all"><X className="w-8 h-8" /></button>
+                  <button 
+                    onClick={() => setEditingPost(null)} 
+                    className="p-4 bg-primary/5 rounded-full hover:bg-accent hover:text-white transition-all active:scale-90"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                 </div>
-                <div className="flex-1 overflow-y-auto p-12 space-y-12">
-                  <div className="grid grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <label className="text-[10px] uppercase font-black text-accent tracking-[0.3em] ml-2">Article Title</label>
-                      <input type="text" value={editingPost.title} onChange={e => setEditingPost({ ...editingPost, title: e.target.value })} className="w-full bg-primary/5 border-none rounded-3xl px-8 py-5 font-serif text-2xl" placeholder="e.g. The Ritual of Smoke" />
+                
+                <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[9px] uppercase font-black text-accent tracking-[0.2em] ml-1">Article Title</label>
+                      <input 
+                        type="text" 
+                        value={editingPost.title} 
+                        onChange={e => setEditingPost({ ...editingPost, title: e.target.value })} 
+                        className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-serif text-xl text-black focus:ring-2 focus:ring-accent/20 outline-none transition-all" 
+                        placeholder="e.g. The Ritual of Smoke" 
+                      />
                     </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] uppercase font-black text-accent tracking-[0.3em] ml-2">Topic Header</label>
-                      <input type="text" value={editingPost.topic} onChange={e => setEditingPost({ ...editingPost, topic: e.target.value })} className="w-full bg-primary/5 border-none rounded-3xl px-8 py-5 font-sans font-black text-xs uppercase tracking-widest" placeholder="e.g. CULINARY TRADITIONS" />
+                    <div className="space-y-2">
+                      <label className="text-[9px] uppercase font-black text-accent tracking-[0.2em] ml-1">Topic Header</label>
+                      <input 
+                        type="text" 
+                        value={editingPost.topic} 
+                        onChange={e => setEditingPost({ ...editingPost, topic: e.target.value })} 
+                        className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans font-black text-[10px] uppercase tracking-widest text-black focus:ring-2 focus:ring-accent/20 outline-none transition-all" 
+                        placeholder="e.g. CULINARY TRADITIONS" 
+                      />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-8">
-                    <div className="space-y-3">
-                      <label className="text-[10px] uppercase font-black text-accent tracking-[0.3em] ml-2">Category</label>
-                      <select value={editingPost.category} onChange={e => setEditingPost({ ...editingPost, category: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans text-xs font-black uppercase tracking-widest">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[9px] uppercase font-black text-accent tracking-[0.2em] ml-1">Category</label>
+                      <select 
+                        value={editingPost.category} 
+                        onChange={e => setEditingPost({ ...editingPost, category: e.target.value })} 
+                        className="w-full bg-primary/5 border-none rounded-xl px-5 py-3 font-sans text-[10px] font-black uppercase tracking-widest text-black focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                      >
                         {['Heritage', 'Innovation', 'Rituals', 'Sustainability'].map(cat => (
                           <option key={cat} value={cat}>{cat}</option>
                         ))}
                       </select>
                     </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] uppercase font-black text-accent tracking-[0.3em] ml-2">Visual Layout</label>
-                      <select value={editingPost.layout} onChange={e => setEditingPost({ ...editingPost, layout: e.target.value as BlogLayout })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans text-xs font-black uppercase tracking-widest">
+                    <div className="space-y-2">
+                      <label className="text-[9px] uppercase font-black text-accent tracking-[0.2em] ml-1">Visual Layout</label>
+                      <select 
+                        value={editingPost.layout} 
+                        onChange={e => setEditingPost({ ...editingPost, layout: e.target.value as BlogLayout })} 
+                        className="w-full bg-primary/5 border-none rounded-xl px-5 py-3 font-sans text-[10px] font-black uppercase tracking-widest text-black focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                      >
                         {['editorial', 'minimal', 'narrative', 'journal', 'luxury'].map(lay => (
                           <option key={lay} value={lay}>{lay}</option>
                         ))}
                       </select>
                     </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] uppercase font-black text-accent tracking-[0.3em] ml-2">Author</label>
-                      <input type="text" value={editingPost.author} onChange={e => setEditingPost({ ...editingPost, author: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans text-xs font-black" />
+                    <div className="space-y-2">
+                      <label className="text-[9px] uppercase font-black text-accent tracking-[0.2em] ml-1">Author</label>
+                      <input 
+                        type="text" 
+                        value={editingPost.author} 
+                        onChange={e => setEditingPost({ ...editingPost, author: e.target.value })} 
+                        className="w-full bg-primary/5 border-none rounded-xl px-5 py-3 font-sans text-[10px] font-black text-black focus:ring-2 focus:ring-accent/20 outline-none transition-all" 
+                      />
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <label className="text-[10px] uppercase font-black text-accent tracking-[0.3em] ml-2">Hero Narrative (Content)</label>
-                    <textarea rows={10} value={editingPost.content} onChange={e => setEditingPost({ ...editingPost, content: e.target.value })} className="w-full bg-primary/5 border-none rounded-[2.5rem] px-8 py-8 font-sans text-sm leading-relaxed" placeholder="Tell the story..." />
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase font-black text-accent tracking-[0.2em] ml-1">Hero Narrative</label>
+                    <textarea 
+                      rows={6} 
+                      value={editingPost.content} 
+                      onChange={e => setEditingPost({ ...editingPost, content: e.target.value })} 
+                      className="w-full bg-primary/5 border-none rounded-[1.5rem] px-6 py-6 font-sans text-xs text-black leading-relaxed focus:ring-2 focus:ring-accent/20 outline-none transition-all" 
+                      placeholder="Tell the story..." 
+                    />
                   </div>
 
-                  <div className="space-y-3">
-                    <label className="text-[10px] uppercase font-black text-accent tracking-[0.3em] ml-2">Visual Asset</label>
-                    <div className="flex gap-8 items-center">
-                      <div className="flex-1 space-y-4">
-                        <input type="text" value={editingPost.image} onChange={e => setEditingPost({ ...editingPost, image: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans text-xs tracking-wider" placeholder="Image URL" />
-                        <label className="block w-full bg-accent/5 border border-accent/20 rounded-2xl px-6 py-4 cursor-pointer hover:bg-accent/10 transition-all text-center">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-accent">Upload Base64 Asset</span>
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase font-black text-accent tracking-[0.2em] ml-1">Visual Asset</label>
+                    <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+                      <div className="w-full flex-1 space-y-3">
+                        <input 
+                          type="text" 
+                          value={editingPost.image} 
+                          onChange={e => setEditingPost({ ...editingPost, image: e.target.value })} 
+                          className="w-full bg-primary/5 border-none rounded-xl px-5 py-3 font-sans text-[9px] text-black tracking-wider focus:ring-2 focus:ring-accent/20 outline-none transition-all" 
+                          placeholder="Sacred Image URL" 
+                        />
+                        <label className="block w-full bg-accent/5 border border-accent/20 rounded-xl px-5 py-3 cursor-pointer hover:bg-accent/10 transition-all text-center group">
+                          <span className="text-[9px] font-black uppercase tracking-widest text-accent group-hover:scale-105 transition-transform inline-block">Upload Base64 Asset</span>
                           <input type="file" accept="image/*" onChange={handlePostImageUpload} className="hidden" />
                         </label>
                       </div>
-                      <div className="w-40 h-40 bg-primary/5 rounded-[2rem] overflow-hidden flex items-center justify-center border border-primary/5 shrink-0">
-                        {editingPost.image ? <img src={editingPost.image} className="w-full h-full object-cover" /> : <ImageIcon className="w-12 h-12 opacity-10" />}
+                      <div className="w-24 h-24 bg-primary/5 rounded-xl overflow-hidden flex items-center justify-center border border-primary/5 shrink-0 shadow-inner relative">
+                        {editingPost.image ? (
+                          <img src={editingPost.image} className="w-full h-full object-cover" />
+                        ) : (
+                          <ImageIcon className="w-8 h-8 opacity-10 text-primary" />
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="p-12 border-t border-primary/5 bg-cream/10 shrink-0">
-                  <button onClick={handleSavePost} className="w-full bg-primary text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.5em] text-[11px] flex items-center justify-center gap-6 shadow-2xl hover:scale-[1.01] transition-all">
-                    <Save className="w-6 h-6" /> Manifest to Gazette
+                
+                <div className="p-8 border-t border-primary/5 bg-cream/10 shrink-0">
+                  <button 
+                    onClick={handleSavePost} 
+                    className="w-full bg-primary text-white py-5 rounded-xl font-black uppercase tracking-[0.4em] text-[10px] flex items-center justify-center gap-4 shadow-xl hover:bg-accent hover:scale-[1.01] active:scale-[0.98] transition-all group"
+                  >
+                    <Save className="w-5 h-5 group-hover:rotate-12 transition-transform" /> 
+                    Manifest to Gazette
                   </button>
                 </div>
               </motion.div>
@@ -1001,34 +1125,54 @@ export default function AdminScreen() {
         {/* MODAL EDITOR: STAFF MEMBER */}
         <AnimatePresence>
           {editingStaff && isAdmin && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-primary/95 backdrop-blur-2xl">
-              <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} className="bg-white w-full max-w-xl rounded-[4rem] overflow-hidden shadow-2xl border border-primary/5">
-                <div className="p-12 border-b border-primary/5 flex justify-between items-center bg-cream/30">
-                  <div className="space-y-2">
-                    <h2 className="font-serif text-3xl italic text-primary">Guardian Folio</h2>
-                    <p className="font-sans text-[10px] font-black uppercase tracking-[0.3em] text-primary/30">Managing Sanctuary Access</p>
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/95 backdrop-blur-2xl">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9, y: 20 }} 
+                animate={{ opacity: 1, scale: 1, y: 0 }} 
+                exit={{ opacity: 0, scale: 0.9, y: 20 }} 
+                className="bg-white w-full max-w-lg rounded-[1.5rem] overflow-hidden shadow-2xl border border-primary/5 flex flex-col"
+              >
+                <div className="p-8 border-b border-primary/5 flex justify-between items-center bg-cream/30">
+                  <div className="space-y-1">
+                    <h2 className="font-serif text-2xl italic text-primary">Guardian Folio</h2>
+                    <p className="font-sans text-[8px] font-black uppercase tracking-[0.2em] text-primary/30">Managing Sanctuary Access</p>
                   </div>
-                  <button onClick={() => setEditingStaff(null)} className="p-5 bg-primary/5 rounded-full hover:bg-primary hover:text-white transition-all"><X className="w-6 h-6" /></button>
+                  <button 
+                    onClick={() => setEditingStaff(null)} 
+                    className="p-4 bg-primary/5 rounded-full hover:bg-accent hover:text-white transition-all active:scale-90"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                 </div>
-                <div className="p-12 space-y-8">
-                  <div className="space-y-3">
-                    <label className="text-[10px] uppercase font-black text-accent tracking-[0.3em] ml-2">Full Name</label>
-                    <input type="text" value={editingStaff.name} onChange={e => setEditingStaff({ ...editingStaff, name: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans font-bold" />
+                <div className="p-8 space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase font-black text-accent tracking-[0.2em] ml-1">Full Name</label>
+                    <input 
+                      type="text" 
+                      value={editingStaff.name} 
+                      onChange={e => setEditingStaff({ ...editingStaff, name: e.target.value })} 
+                      className="w-full bg-primary/5 border-none rounded-xl px-5 py-3.5 font-sans font-bold text-black focus:ring-2 focus:ring-accent/20 outline-none transition-all" 
+                    />
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] uppercase font-black text-accent tracking-[0.3em] ml-2">Email Address</label>
-                    <input type="email" value={editingStaff.email} onChange={e => setEditingStaff({ ...editingStaff, email: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-4 font-sans font-bold" />
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase font-black text-accent tracking-[0.2em] ml-1">Email Address</label>
+                    <input 
+                      type="email" 
+                      value={editingStaff.email} 
+                      onChange={e => setEditingStaff({ ...editingStaff, email: e.target.value })} 
+                      className="w-full bg-primary/5 border-none rounded-xl px-5 py-3.5 font-sans font-bold text-black focus:ring-2 focus:ring-accent/20 outline-none transition-all" 
+                    />
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] uppercase font-black text-accent tracking-[0.3em] ml-2">Assigned Role</label>
-                    <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase font-black text-accent tracking-[0.2em] ml-1">Assigned Role</label>
+                    <div className="grid grid-cols-3 gap-3">
                       {['admin', 'staff', 'rider'].map(role => (
                         <button 
                           key={role} 
                           onClick={() => setEditingStaff({ ...editingStaff, role: role as any })}
                           className={cn(
-                            "py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all",
-                            editingStaff.role === role ? "bg-accent text-white shadow-lg" : "bg-primary/5 text-primary/40 hover:bg-primary/10"
+                            "py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all",
+                            editingStaff.role === role ? "bg-accent text-white shadow-lg" : "bg-primary/5 text-primary/40 hover:bg-primary/10 hover:text-primary"
                           )}
                         >
                           {role}
@@ -1036,9 +1180,13 @@ export default function AdminScreen() {
                       ))}
                     </div>
                   </div>
-                  <div className="pt-8">
-                    <button onClick={handleSaveStaff} className="w-full bg-primary text-white py-6 rounded-2xl font-black uppercase tracking-[0.4em] text-[11px] flex items-center justify-center gap-4 shadow-xl">
-                      <Save className="w-5 h-5" /> Update Records
+                  <div className="pt-6 border-t border-primary/5">
+                    <button 
+                      onClick={handleSaveStaff} 
+                      className="w-full bg-primary text-white py-5 rounded-xl font-black uppercase tracking-[0.4em] text-[10px] flex items-center justify-center gap-4 shadow-xl hover:bg-accent transition-all active:scale-95 group"
+                    >
+                      <Save className="w-5 h-5 group-hover:rotate-12 transition-transform" /> 
+                      Update Records
                     </button>
                   </div>
                 </div>
