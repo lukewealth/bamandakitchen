@@ -10,7 +10,7 @@ import { useDataSync } from '../lib/data-sync';
 import { 
   Lock, LogOut, ShoppingBag, Utensils, BookOpen, X, Star, Edit, Trash2, Plus, 
   Image as ImageIcon, Save, MessageCircle, Users, ChevronLeft, ChevronRight, RefreshCw, Download, FileCode, Menu as MenuIcon, ShieldAlert,
-  Eye, EyeOff
+  Eye, EyeOff, Home
 } from 'lucide-react';
 import { MenuItem, Order, BlogPost, BlogLayout, StaffAccount } from '../types';
 import { formatStatusUpdateMessage, getWhatsAppUrl } from '../lib/order';
@@ -26,8 +26,10 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, User, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 
 export default function AdminScreen() {
+  const navigate = useNavigate();
   const { showToast, confirm } = useToast();
   const { 
     menu, 
@@ -290,8 +292,24 @@ export default function AdminScreen() {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-primary p-6">
-        <div className="max-w-md w-full bg-white p-12 rounded-[3rem] shadow-2xl">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-primary p-6 relative overflow-hidden">
+        {/* Background Texture */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none wood-texture" />
+        
+        {/* Minimal Navigation */}
+        <div className="absolute top-10 left-10 z-20">
+          <button 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-3 text-white/40 hover:text-accent transition-all group"
+          >
+            <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:border-accent group-hover:bg-accent/5 transition-all">
+              <Home className="w-4 h-4" />
+            </div>
+            <span className="text-[9px] font-black uppercase tracking-[0.3em] hidden sm:block">Return Home</span>
+          </button>
+        </div>
+
+        <div className="max-w-md w-full bg-white p-12 rounded-[3rem] shadow-2xl relative z-10">
           <Lock className="w-12 h-12 mx-auto mb-8 text-accent" />
           <h1 className="font-serif text-3xl italic mb-12 text-center text-primary">Curator Access</h1>
           <form onSubmit={handleLogin} className="space-y-6">
