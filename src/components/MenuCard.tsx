@@ -18,11 +18,13 @@ interface MenuCardProps {
 const MenuCard = memo(({ item, onAddToCart }: MenuCardProps) => {
   return (
     <motion.div 
+      layout
       initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.3 } }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-      className="group"
+      className="group z-10"
     >
       <div className="relative overflow-hidden bg-surface-variant aspect-[4/5] mb-8 border border-on-surface/5 rounded-[2rem]">
         {/* System Metadata Hover */}
@@ -37,7 +39,7 @@ const MenuCard = memo(({ item, onAddToCart }: MenuCardProps) => {
           alt={item.name} 
           referrerPolicy="no-referrer"
           aspectRatio="h-full w-full"
-          className="transition-transform duration-1000 md:grayscale md:group-hover:grayscale-0 group-hover:scale-110 group-hover:brightness-110"
+          className="transition-transform duration-1000 group-hover:scale-110 group-hover:brightness-110"
         />
         
         {/* Price Overlay - Stable 1x scale on hover */}
@@ -61,7 +63,7 @@ const MenuCard = memo(({ item, onAddToCart }: MenuCardProps) => {
 
       <div className="space-y-4 px-2">
         <div className="flex justify-between items-start">
-          <h3 className="font-serif text-3xl italic text-on-surface leading-tight group-hover:text-accent transition-colors duration-500">
+          <h3 className="font-serif text-3xl italic text-black leading-tight group-hover:text-accent transition-colors duration-500">
             {item.name}
           </h3>
         </div>
