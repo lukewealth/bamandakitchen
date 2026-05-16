@@ -60,7 +60,7 @@ export default function ContactScreen() {
                 </div>
                 <div>
                   <h3 className="editorial-label text-xs mb-2 opacity-50">Email</h3>
-                  <p className="font-serif italic text-2xl text-on-surface">concierge@bamanda.com</p>
+                  <p className="font-serif italic text-2xl text-on-surface">bamandakitchen25@gmail.com</p>
                 </div>
               </div>
             </div>
