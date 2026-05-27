@@ -50,7 +50,7 @@ interface DataSyncContextType {
 
   // Order Operations
   createOrder: (order: Partial<Order>) => Promise<string | null>;
-  updateOrderStatus: (orderId: string, status: string) => Promise<void>;
+  updateOrderStatus: (orderId: string, status: string, extraData?: Partial<Order>) => Promise<void>;
   deleteOrder: (orderId: string) => Promise<void>;
   
   // Logging
@@ -89,14 +89,10 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
           const docSnap = await getDoc(docRef);
           
           if (docSnap.exists()) {
-            console.log("[Auth] Profile found:", docSnap.data());
             setUserProfile({ ...docSnap.data(), id: docSnap.id } as StaffAccount);
           } else {
             const primaryAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || "bamandakitchen25@gmail.com";
-            console.log("[Auth] No profile found. Checking bootstrap for:", primaryAdminEmail);
-            
             if (user.email?.toLowerCase() === primaryAdminEmail.toLowerCase()) {
-              console.log("[Auth] Bootstrapping primary admin...");
               const initialAdmin = {
                 name: 'Master Curator',
                 email: user.email,
@@ -107,17 +103,15 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
               setUserProfile({ ...initialAdmin, id: user.uid });
               showToast('Sacred Profile Manifested.', 'success');
             } else {
-              console.warn("[Auth] Email mismatch. Bootstrap denied for:", user.email);
               setUserProfile(null);
             }
           }
         } catch (error) {
-          console.error("[Auth] Error syncing profile:", error);
           setUserProfile(null);
         }
       } else {
         setUserProfile(null);
-        setStaff([]); // Clear staff list when logged out
+        setStaff([]); 
       }
     });
 
@@ -125,7 +119,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   }, [showToast]);
 
   // ==========================================
-  // INITIAL LOAD (LocalStorage)
+  // INITIAL LOAD (LocalStorage / Caching)
   // ==========================================
   useEffect(() => {
     const loadRootData = async () => {
@@ -160,6 +154,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
         console.error('Failed to parse cached data', e);
       }
 
+      // Fallback Logic: If nothing in cache, use static definitions
       if (initialMenu.length === 0) initialMenu = MENU_ITEMS;
 
       setMenu(initialMenu);
@@ -197,9 +192,6 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('bamanda_blog_cache', JSON.stringify(items));
     });
 
-    // Orders Sync: 
-    // - For admins/staff: show all recent orders
-    // - For patrons: ideally handled via local tracking, but can sync if logged in (not implemented for patrons yet)
     let unsubOrders: Unsubscribe | null = null;
     if (userProfile) {
       unsubOrders = onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc'), limit(100)), (snapshot) => {
@@ -209,7 +201,6 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
       });
     }
 
-    // Only sync staff if the user is an admin
     let unsubStaff: Unsubscribe | null = null;
     if (userProfile?.role === 'admin') {
       unsubStaff = onSnapshot(query(collection(db, 'staff'), orderBy('name')), (snapshot) => {
@@ -252,11 +243,11 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
     try {
       const newDoc = await addDoc(collection(db, 'orders'), {
         ...order,
-        createdAt: new Date().toISOString(), // Use string for local but can use serverTimestamp for cloud
+        createdAt: new Date().toISOString(),
         serverCreatedAt: serverTimestamp(),
         status: 'pending'
       });
-      await logAction('CREATE_ORDER', { orderId: newDoc.id });
+      await logAction('CREATE_ORDER', { orderId: newDoc.id, customer: order.customer?.name });
       return newDoc.id;
     } catch (e) {
       showToast('Order failed to manifest in cloud.', 'error');
@@ -264,10 +255,14 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const updateOrderStatus = async (orderId: string, status: string) => {
+  const updateOrderStatus = async (orderId: string, status: string, extraData: Partial<Order> = {}) => {
     if (!db) return;
     try {
-      await updateDoc(doc(db, 'orders', orderId), { status });
+      await updateDoc(doc(db, 'orders', orderId), { 
+        status, 
+        ...extraData,
+        updatedAt: serverTimestamp() 
+      });
       await logAction('UPDATE_ORDER_STATUS', { orderId, status });
       showToast(`Order marked as ${status}.`, 'success');
     } catch (e) {
@@ -381,10 +376,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    let updatedMember = { 
-      ...member, 
-      createdAt: member.createdAt || new Date().toISOString() 
-    } as StaffAccount;
+    let updatedMember = { ...member, createdAt: member.createdAt || new Date().toISOString() } as StaffAccount;
 
     if (db) {
       try {

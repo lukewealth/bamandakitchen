@@ -6,9 +6,12 @@
 import { CartItem, Order } from '../types';
 
 export const generateOrderId = () => {
-  const timestamp = Date.now().toString(36).toUpperCase();
+  const date = new Date();
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear().toString().slice(-2);
   const random = Math.random().toString(36).substring(2, 5).toUpperCase();
-  return `BAM-${timestamp}-${random}`;
+  return `BAM-${day}${month}${year}-${random}`;
 };
 
 export const formatWhatsAppMessage = (order: Order) => {

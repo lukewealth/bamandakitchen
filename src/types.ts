@@ -48,6 +48,8 @@ export interface Order {
   };
   notes?: string;
   createdAt: string;
+  confirmedAt?: string;
+  queuePosition?: number;
   estimatedDeliveryTime: number; // minutes remaining
   metadata?: {
     platform: string;

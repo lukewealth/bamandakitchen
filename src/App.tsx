@@ -25,9 +25,10 @@ import { ToastProvider } from './lib/toast-context';
 import { DataSyncProvider, useDataSync } from './lib/data-sync';
 import { db } from './lib/firebase';
 import { setDoc, doc } from 'firebase/firestore';
+import { patronTracker } from './lib/security';
 
 function AppContent() {
-  const { menu, posts, isLoading: isDataLoading } = useDataSync();
+  const { menu, posts, isLoading: isDataLoading, logAction } = useDataSync();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -71,6 +72,7 @@ function AppContent() {
       'legal': '/legal'
     };
     navigate(paths[screen] || '/');
+    logAction('NAVIGATE', { to: screen });
   };
 
   useEffect(() => {
@@ -116,6 +118,8 @@ function AppContent() {
       return [...prev, { ...item, quantity: 1 }];
     });
     setIsCartOpen(true);
+    patronTracker.trackView(item.id);
+    logAction('ADD_TO_CART', { itemId: item.id, name: item.name });
   };
 
   const updateQuantity = (id: string, delta: number) => {
@@ -135,6 +139,8 @@ function AppContent() {
 
   const handleOrderComplete = async (order: Order) => {
     setActiveOrder(order);
+    patronTracker.saveOrder(order); // Explicit patron tracking
+
     try {
       const existing = JSON.parse(localStorage.getItem('bamanda_orders') || '[]');
       localStorage.setItem('bamanda_orders', JSON.stringify([order, ...existing].slice(0, 50)));
