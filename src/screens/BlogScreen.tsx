@@ -213,7 +213,7 @@ export default function BlogScreen({ posts: propPosts }: BlogScreenProps) {
           <h2 className="font-serif italic text-4xl md:text-5xl">Stay in the Ritual</h2>
           <p className="text-on-surface-variant text-base md:text-lg opacity-60">Join our newsletter to receive monthly curations of heritage recipes and stories of our people.</p>
           <div className="flex flex-col sm:flex-row max-w-md mx-auto gap-4">
-            <input type="email" placeholder="email@heritage.com" className="flex-1 bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-sm" />
+            <input type="email" placeholder="email@heritage.com" className="flex-1 bg-white border border-white/10 rounded-xl px-6 py-4 text-sm text-black" />
             <button className="bg-accent text-white px-8 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px]">Subscribe</button>
           </div>
         </div>

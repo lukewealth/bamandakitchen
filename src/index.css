@@ -44,7 +44,7 @@
   }
 
   input, textarea, select {
-    @apply text-on-surface placeholder:text-on-surface/30;
+    @apply text-black placeholder:text-black/30;
   }
 }
 

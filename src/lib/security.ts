@@ -54,14 +54,14 @@ export const patronTracker = {
     // Also save favorite items
     const favorites = patronTracker.getFavorites();
     order.items.forEach((item: any) => {
-      const existing = favorites.find(f => f.id === item.id);
+      const existing = favorites.find((f: any) => f.id === item.id);
       if (existing) {
         existing.count += 1;
       } else {
         favorites.push({ id: item.id, name: item.name, count: 1 });
       }
     });
-    localStorage.setItem('bamanda_patron_favorites', JSON.stringify(favorites.sort((a, b) => b.count - a.count).slice(0, 5)));
+    localStorage.setItem('bamanda_patron_favorites', JSON.stringify(favorites.sort((a: any, b: any) => b.count - a.count).slice(0, 5)));
   },
 
   getHistory: (): any[] => {
@@ -75,6 +75,34 @@ export const patronTracker = {
   getFavorites: (): any[] => {
     try {
       return JSON.parse(localStorage.getItem('bamanda_patron_favorites') || '[]');
+    } catch {
+      return [];
+    }
+  },
+
+  /**
+   * Manual wishlist/favorites management
+   */
+  toggleManualFavorite: (itemId: string) => {
+    const favorites = patronTracker.getManualFavorites();
+    const exists = favorites.includes(itemId);
+    let updated;
+    if (exists) {
+      updated = favorites.filter(id => id !== itemId);
+    } else {
+      updated = [...favorites, itemId];
+    }
+    localStorage.setItem('bamanda_manual_favorites', JSON.stringify(updated));
+    return !exists;
+  },
+
+  isManualFavorite: (itemId: string): boolean => {
+    return patronTracker.getManualFavorites().includes(itemId);
+  },
+
+  getManualFavorites: (): string[] => {
+    try {
+      return JSON.parse(localStorage.getItem('bamanda_manual_favorites') || '[]');
     } catch {
       return [];
     }

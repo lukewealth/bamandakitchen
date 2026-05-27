@@ -75,13 +75,13 @@ export default function MenuScreen({ menuItems, onAddToCart, initialFilter }: Me
       <section className="bg-surface py-16 px-6 relative overflow-hidden editorial-border-b">
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none wood-texture" />
         <div className="max-w-7xl mx-auto text-center relative z-10">
-          <motion.div
+          <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <div className="editorial-label mb-4 text-accent">Full Online Store</div>
             <h1 className="font-serif text-5xl md:text-7xl mb-8 text-black">The Curated Menu</h1>
-            
+
             <div className="max-w-2xl mx-auto relative group">
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" />
               <input 
@@ -89,10 +89,11 @@ export default function MenuScreen({ menuItems, onAddToCart, initialFilter }: Me
                 placeholder="Search by name, category, or tag (e.g. 'Spicy')..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white text-primary rounded-full py-5 pl-16 pr-6 shadow-2xl focus:ring-4 focus:ring-accent/20 transition-all outline-none font-sans border border-on-surface/5"
+                className="w-full bg-white text-black rounded-full py-5 pl-16 pr-6 shadow-2xl focus:ring-4 focus:ring-accent/20 transition-all outline-none font-sans border border-on-surface/5"
               />
             </div>
           </motion.div>
+
         </div>
       </section>
 

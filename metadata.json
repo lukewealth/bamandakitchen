@@ -1,6 +1,8 @@
 {
   "name": "Bamanda Heritage Restaurant",
-  "description": "A luxury fine-dining experience celebrating African heritage and modern culinary refinement.",
+  "description": "A luxury fine-dining experience celebrating African heritage and modern culinary refinement. Explore our curated menu of authentic flavors and heritage-inspired dishes.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["Food Delivery", "Fine Dining", "African Cuisine", "Luxury Experience"],
+  "version": "1.0.0",
+  "author": "Bamanda Luxury"
 }

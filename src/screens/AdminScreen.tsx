@@ -597,7 +597,7 @@ export default function AdminScreen() {
                       placeholder="Search Manifest..." 
                       value={menuSearch}
                       onChange={e => setMenuSearch(e.target.value)}
-                      className="w-full bg-white border border-primary/5 rounded-2xl pl-14 pr-6 py-4 text-[10px] font-black uppercase tracking-widest focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                      className="w-full bg-white border border-primary/5 rounded-2xl pl-14 pr-6 py-4 text-[10px] font-black text-black uppercase tracking-widest focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                     />
                   </div>
                   <div className="hidden md:block h-8 w-px bg-primary/10" />
@@ -747,7 +747,7 @@ export default function AdminScreen() {
                       placeholder="Search Scribe..." 
                       value={blogSearch}
                       onChange={e => setBlogSearch(e.target.value)}
-                      className="w-full bg-white border border-primary/5 rounded-2xl pl-14 pr-6 py-4 text-[10px] font-black uppercase tracking-widest focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                      className="w-full bg-white border border-primary/5 rounded-2xl pl-14 pr-6 py-4 text-[10px] font-black text-black uppercase tracking-widest focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -831,7 +831,7 @@ export default function AdminScreen() {
                       placeholder="Search Guardians..." 
                       value={staffSearch}
                       onChange={e => setStaffSearch(e.target.value)}
-                      className="w-full bg-white border border-primary/5 rounded-2xl pl-14 pr-6 py-4 text-[10px] font-black uppercase tracking-widest focus:ring-2 focus:ring-accent/20 outline-none transition-all"
+                      className="w-full bg-white border border-primary/5 rounded-2xl pl-14 pr-6 py-4 text-[10px] font-black text-black uppercase tracking-widest focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                     />
                   </div>
                 </div>

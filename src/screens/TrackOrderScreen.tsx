@@ -141,7 +141,7 @@ export default function TrackOrderScreen({ order: initialOrder, onBack }: TrackO
                 placeholder="Enter Unique Order ID (e.g. BAM-XXXX-XXXX)"
                 value={searchId}
                 onChange={(e) => setSearchId(e.target.value)}
-                className="flex-1 bg-transparent border-none focus:ring-0 p-4 font-sans text-lg text-primary uppercase tracking-widest"
+                className="flex-1 bg-transparent border-none focus:ring-0 p-4 font-sans text-lg text-black uppercase tracking-widest"
                 required
               />
               <button 

@@ -152,7 +152,7 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
                     placeholder="Kwame Mensah"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-transparent border-none focus:ring-0 p-0 placeholder:text-on-surface-variant/30 font-sans text-base text-primary"
+                    className="w-full bg-transparent border-none focus:ring-0 p-0 placeholder:text-on-surface-variant/30 font-sans text-base text-black"
                     required
                   />
                 </div>
@@ -163,7 +163,7 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
                     placeholder="+234 XX XXX XXXX"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-transparent border-none focus:ring-0 p-0 placeholder:text-on-surface-variant/30 font-sans text-base text-primary"
+                    className="w-full bg-transparent border-none focus:ring-0 p-0 placeholder:text-on-surface-variant/30 font-sans text-base text-black"
                     required
                   />
                 </div>
@@ -176,7 +176,7 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
                   rows={2}
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full bg-transparent border-none focus:ring-0 p-0 placeholder:text-on-surface-variant/30 font-sans text-base text-primary resize-none"
+                  className="w-full bg-transparent border-none focus:ring-0 p-0 placeholder:text-on-surface-variant/30 font-sans text-base text-black resize-none"
                   required
                 />
               </div>
@@ -188,7 +188,7 @@ export default function CheckoutScreen({ items, onOrderComplete }: CheckoutScree
                   rows={2}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full bg-transparent border-none focus:ring-0 p-0 placeholder:text-on-surface-variant/30 font-sans text-base text-primary resize-none"
+                  className="w-full bg-transparent border-none focus:ring-0 p-0 placeholder:text-on-surface-variant/30 font-sans text-base text-black resize-none"
                 />
               </div>
             </div>
