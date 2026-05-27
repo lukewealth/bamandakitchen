@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ArrowRight, Utensils, Globe, Martini, ShoppingBag, Heart, Star, Truck } from "lucide-react";
+import { ArrowRight, Utensils, Globe, Martini, Star } from "lucide-react";
 import { motion } from "motion/react";
 import { MenuItem, Screen } from "../types";
 import HeroSlider from "../components/HeroSlider";
 import OptimizedImage from "../components/OptimizedImage";
-import { patronTracker } from "../lib/security";
+import MenuCard from "../components/MenuCard";
 
 interface HomeScreenProps {
   onNavigate: (screen: Screen) => void;
@@ -84,48 +84,7 @@ export default function HomeScreen({ onNavigate, onNavigateToMenu, onAddToCart, 
           {trendingDishes.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
               {trendingDishes.map((dish) => (
-                <motion.div 
-                  layout
-                  key={dish.id} 
-                  className="bg-white rounded-2xl overflow-hidden shadow-lg card-hover flex flex-col group"
-                >
-                  <div className="relative aspect-[4/5] overflow-hidden">
-                    <OptimizedImage 
-                      src={dish.image} 
-                      className="grayscale transition-transform duration-1000 group-hover:scale-110 group-hover:grayscale-0 group-hover:brightness-110" 
-                      alt={dish.name} 
-                      aspectRatio="h-full w-full"
-                    />
-                    <div className="absolute top-4 left-4 flex gap-2 z-20">
-                      <div className="bg-accent text-white px-4 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg">
-                        Trending
-                      </div>
-                      {dish.tag && (
-                        <div className="bg-primary text-white px-4 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg">
-                          {dish.tag}
-                        </div>
-                      )}
-                    </div>
-                    <button className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-md rounded-full text-primary hover:text-accent transition-colors shadow-lg z-20">
-                      <Heart className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <div className="p-8 flex-1 flex flex-col">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-serif text-xl text-primary group-hover:text-accent transition-colors duration-500">{dish.name}</h3>
-                      <span className="font-bold text-accent">₦{dish.price.toLocaleString()}</span>
-                    </div>
-                    <p className="text-sm text-on-surface-variant mb-6 line-clamp-2 italic">{dish.description}</p>
-                    <div className="mt-auto">
-                      <button 
-                        onClick={() => onAddToCart(dish)}
-                        className="w-full flex items-center justify-center gap-2 bg-accent text-white px-6 py-4 rounded-xl font-bold hover:bg-accent/90 transition-all shadow-xl shadow-accent/20"
-                      >
-                        <ShoppingBag className="w-4 h-4" /> Add to Cart
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
+                <MenuCard key={dish.id} item={dish} onAddToCart={onAddToCart} />
               ))}
             </div>
           ) : (

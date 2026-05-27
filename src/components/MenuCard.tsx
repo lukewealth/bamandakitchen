@@ -57,10 +57,14 @@ const MenuCard = memo(({ item, onAddToCart }: MenuCardProps) => {
         />
         
         {/* Hover Description Overlay (Web) / Active State (Mobile) */}
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-all duration-500 flex items-center justify-center p-8 z-10">
-          <p className="font-sans text-white text-center text-base leading-relaxed tracking-wide opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-700 delay-100">
-            {item.description}
-          </p>
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-md opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-all duration-700 flex items-center justify-center p-10 z-10">
+          <div className="text-center space-y-4">
+             <div className="w-12 h-[1px] bg-accent/50 mx-auto" />
+             <p className="font-sans text-white text-center text-sm md:text-base leading-relaxed tracking-wide opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-700 delay-100">
+               {item.description}
+             </p>
+             <div className="w-12 h-[1px] bg-accent/50 mx-auto" />
+          </div>
         </div>
 
         {/* Price Overlay - Stable 1x scale on hover */}
@@ -88,20 +92,18 @@ const MenuCard = memo(({ item, onAddToCart }: MenuCardProps) => {
         )}
       </div>
 
-      <div className="space-y-4 px-2">
+      <div className="space-y-2 px-2">
         <div className="flex justify-between items-start">
           <h3 className="font-serif text-3xl italic text-black leading-tight group-hover:text-accent transition-colors duration-500">
             {item.name}
           </h3>
         </div>
-        <p className="font-sans text-base text-on-surface-variant leading-relaxed line-clamp-2 tracking-normal opacity-70 group-hover:opacity-0 transition-opacity duration-300">
-          {item.description}
-        </p>
+        {/* Redundant description removed as per user request */}
       </div>
 
       <button 
         onClick={() => onAddToCart(item)}
-        className="mt-10 w-full py-6 bg-on-surface text-surface font-sans uppercase tracking-[0.3em] text-xs font-black hover:bg-accent hover:text-primary transition-all duration-500 flex items-center justify-center gap-3 rounded-2xl shadow-xl shadow-on-surface/10 active:scale-[0.98]"
+        className="mt-8 w-full py-6 bg-on-surface text-surface font-sans uppercase tracking-[0.3em] text-xs font-black hover:bg-accent hover:text-primary transition-all duration-500 flex items-center justify-center gap-3 rounded-2xl shadow-xl shadow-on-surface/10 active:scale-[0.98]"
       >
         <Plus className="w-5 h-5" />
         Add to Selection

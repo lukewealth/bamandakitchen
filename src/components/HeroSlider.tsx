@@ -72,7 +72,7 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
   }, []);
 
   return (
-    <section className="relative h-[90vh] w-full overflow-hidden flex items-center justify-center">
+    <section className="relative h-[85vh] md:h-[90vh] w-full overflow-hidden flex items-center justify-center">
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
@@ -85,16 +85,16 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
           <OptimizedImage 
             src={slides[current].image} 
             containerClassName="w-full h-full"
-            className="brightness-[0.45] contrast-[1.05]"
+            className="brightness-[0.4] contrast-[1.05]"
             alt={slides[current].title}
             aspectRatio="h-full w-full"
             priority={true}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-transparent to-primary/60 z-[5]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/90 via-transparent to-primary/80 z-[5]" />
         </motion.div>
       </AnimatePresence>
       
-      <div className="relative z-10 text-center px-4 md:px-6 max-w-5xl">
+      <div className="relative z-10 text-center px-6 md:px-12 max-w-6xl mt-10 md:mt-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={current}
@@ -105,22 +105,22 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
           >
             <motion.div 
               initial={{ opacity: 0, letterSpacing: "0.5em" }}
-              animate={{ opacity: 1, letterSpacing: "0.3em" }}
-              className="editorial-label mb-6 text-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] font-black"
+              animate={{ opacity: 1, letterSpacing: "0.4em" }}
+              className="editorial-label mb-4 md:mb-8 text-accent drop-shadow-xl font-black text-[10px] md:text-xs"
             >
               {slides[current].highlight}
             </motion.div>
-            <h1 className="font-serif text-[clamp(2.5rem,10vw,7.5rem)] text-white leading-[0.9] tracking-tighter mb-8 drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]">
+            <h1 className="font-serif text-[clamp(2.5rem,12vw,7rem)] text-white leading-[0.85] tracking-tighter mb-8 md:mb-10 drop-shadow-2xl">
               {slides[current].title.split(" ")[0]} <br />
               <span className="italic text-accent">{slides[current].title.split(" ").slice(1).join(" ")}</span>
             </h1>
-            <p className="text-white/90 text-base md:text-xl mb-12 max-w-2xl mx-auto font-sans font-medium tracking-wide drop-shadow-md leading-relaxed">
+            <p className="text-white/80 text-sm md:text-xl mb-12 md:mb-16 max-w-2xl mx-auto font-sans font-medium tracking-wide drop-shadow-md leading-relaxed md:leading-loose">
               {slides[current].subtitle}
             </p>
-            <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center">
               <button 
                 onClick={() => onNavigate("menu")}
-                className="group relative bg-accent text-white px-10 py-5 rounded-2xl font-bold uppercase tracking-[0.2em] text-[11px] overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_20px_40px_-15px_rgba(255,107,0,0.5)] w-full sm:w-auto flex items-center justify-center gap-3"
+                className="group relative bg-accent text-white px-12 py-5 md:py-6 rounded-2xl font-bold uppercase tracking-[0.25em] text-[10px] md:text-[11px] overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_20px_50px_-15px_rgba(255,107,0,0.4)] w-full sm:w-auto flex items-center justify-center gap-4"
               >
                 <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                 <ShoppingBag className="w-4 h-4" />
@@ -131,10 +131,10 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
                   patronTracker.captureTrackingMetadata("check_track_landing");
                   onNavigate("track-order");
                 }}
-                className="group border border-white/30 text-white px-10 py-5 rounded-2xl font-bold uppercase tracking-[0.2em] text-[11px] hover:bg-white hover:text-primary transition-all w-full sm:w-auto backdrop-blur-md flex items-center justify-center gap-3 hover:border-white shadow-xl"
+                className="group border border-white/20 text-white px-12 py-5 md:py-6 rounded-2xl font-bold uppercase tracking-[0.25em] text-[10px] md:text-[11px] hover:bg-white hover:text-primary transition-all w-full sm:w-auto backdrop-blur-md flex items-center justify-center gap-4 hover:border-white shadow-xl"
               >
                 <Truck className="w-4 h-4 group-hover:animate-bounce" />
-                <span>Check Order</span>
+                <span>Track Journey</span>
               </button>
             </div>
           </motion.div>
@@ -142,7 +142,7 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
       </div>
 
       {/* Navigation Indicators */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-4 z-20">
+      <div className="absolute bottom-10 md:bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-3 z-20">
         <div className="flex gap-2.5">
           {slides.map((_, i) => (
             <button
@@ -151,8 +151,8 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
               className="group p-2"
               aria-label={`Go to slide ${i + 1}`}
             >
-              <div className={`h-1 transition-all duration-700 rounded-full ${
-                i === current ? "w-10 bg-accent shadow-[0_0_10px_#FF6B00]" : "w-4 bg-white/20 hover:bg-white/40"
+              <div className={`h-[2px] transition-all duration-700 rounded-full ${
+                i === current ? "w-12 bg-accent shadow-[0_0_15px_rgba(255,107,0,0.8)]" : "w-4 bg-white/30 hover:bg-white/50"
               }`} />
             </button>
           ))}
