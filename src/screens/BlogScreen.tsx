@@ -178,7 +178,7 @@ export default function BlogScreen({ posts: propPosts }: BlogScreenProps) {
   };
 
   return (
-    <div className="pt-20 min-h-screen bg-cream text-charcoal overflow-x-hidden">
+    <div className="min-h-screen bg-cream text-charcoal overflow-x-hidden">
       {/* Editorial Header */}
       <header className="py-16 md:py-24 editorial-container text-center border-b border-primary/10">
         <motion.div

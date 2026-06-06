@@ -37,7 +37,7 @@ export default function AboutScreen() {
             </p>
             <div className="mt-16">
               <span className="editorial-label text-[10px] block mb-2 opacity-60">Kitchen Manager</span>
-              <h4 className="font-serif text-3xl md:text-4xl italic text-white">Michael David</h4>
+              <h4 className="font-serif text-3xl md:text-4xl italic text-white">CHIDERA EZIKE NICHOLAS</h4>
             </div>
           </div>
         </div>
@@ -94,7 +94,7 @@ export default function AboutScreen() {
               Bamanda Heritage Restaurant stands as a testament to the enduring power of culinary tradition. Our mission is to reclaim the narratives of our past and present them with modern precision, creating an experience that nourishes both the body and the soul.
             </p>
             <p>
-              Under the guidance of our Kitchen Manager, Michael David, we have curated a space where quality is non-negotiable and heritage is celebrated. Every spice is selected for its medicinal and historical value, and every technique is a tribute to those who came before us.
+              Under the guidance of our Kitchen Manager, CHIDERA EZIKE NICHOLAS, we have curated a space where quality is non-negotiable and heritage is celebrated. Every spice is selected for its medicinal and historical value, and every technique is a tribute to those who came before us.
             </p>
             <p>
               We believe that eating well is a form of living healthy, and through our commitment to organic integrity and sustainable sourcing, we ensure that Bamanda remains a sanctuary for all who seek authenticity in a rapidly changing world.

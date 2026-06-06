@@ -70,7 +70,7 @@ export default function MenuScreen({ menuItems, onAddToCart, initialFilter }: Me
   }, [menuItems, activeCategory, activeMealTime, searchQuery]);
 
   return (
-    <div className="pt-20 min-h-screen bg-cream">
+    <div className="min-h-screen bg-cream">
       {/* Header / Search Area */}
       <section className="bg-surface py-16 px-6 relative overflow-hidden editorial-border-b">
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none wood-texture" />

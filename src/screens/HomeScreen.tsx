@@ -25,7 +25,7 @@ export default function HomeScreen({ onNavigate, onNavigateToMenu, onAddToCart, 
   ];
 
   return (
-    <div className="w-full pt-20 bg-cream">
+    <div className="w-full bg-cream">
       {/* Hero Section */}
       <HeroSlider onNavigate={(screen) => {
         if (screen === 'menu') onNavigateToMenu();
