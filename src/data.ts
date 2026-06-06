@@ -52,7 +52,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 4000,
     category: 'Rice Dishes',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Asun Rice.jpg',
     portion: 'full',
     tags: ['spicy', 'goat-meat'],
     available: true,
@@ -65,7 +65,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 2000,
     category: 'Rice Dishes',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Asun Rice.jpg',
     portion: 'half',
     tags: ['spicy', 'portion'],
     available: true
@@ -324,7 +324,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 2500,
     category: 'Rice Dishes',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Beans .jpeg',
     portion: 'full',
     tags: ['balanced', 'classic'],
     available: true
@@ -336,7 +336,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 1500,
     category: 'Rice Dishes',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Beans .jpeg',
     portion: 'half',
     tags: ['balanced', 'portion'],
     available: true
@@ -373,7 +373,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 2500,
     category: 'Rice Dishes',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1512058560366-cd2427ff5a63?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Basmati white rice.webp',
     tags: ['premium', 'fragrant'],
     available: true
   },
@@ -410,7 +410,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 6000,
     category: 'Proteins',
     mealTime: ['Lunch', 'Dinner'],
-    image: '/images/meals/turkey.png',
+    image: '/images/Smoked Turkey Wings.jpg',
     tags: ['meat', 'grilled'],
     available: true,
     whatsappLink: 'https://wa.me/p/26387980920798908/2349024084911'
@@ -422,7 +422,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 7000,
     category: 'Proteins',
     mealTime: ['Lunch', 'Dinner'],
-    image: '/images/meals/turkey.png',
+    image: '/images/Smoked Turkey Wings.jpg',
     tags: ['meat', 'large'],
     available: true
   },
@@ -477,7 +477,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 5000,
     category: 'Proteins',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Asun.png',
     tags: ['meat', 'spicy'],
     available: true
   },
@@ -579,7 +579,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 4000,
     category: 'Proteins',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Assorted Meat.png',
     tags: ['meat', 'assorted'],
     available: true
   },
@@ -590,7 +590,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 1500,
     category: 'Proteins',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&q=80&w=800',
+    image: '/images/beaf.jpg',
     tags: ['beef', 'tender'],
     available: true
   },
@@ -601,7 +601,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 500,
     category: 'Proteins',
     mealTime: ['Breakfast', 'Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1506084868730-342337f90f23?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Boiled Eg.webp',
     tags: ['protein', 'basic'],
     available: true,
     whatsappLink: 'https://wa.me/p/25501974992817913/2349024084911'
@@ -712,7 +712,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 9000,
     category: 'Snacks',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1562967914-6c827382d1e5?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Big Chicken & Chips.jpg',
     tags: ['large', 'chicken'],
     available: true
   },
@@ -723,7 +723,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 8000,
     category: 'Snacks',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1562967914-6c827382d1e5?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Big Chicken & Chips.jpg',
     tags: ['standard', 'chicken'],
     available: true
   },
@@ -745,7 +745,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 6000,
     category: 'Snacks',
     mealTime: ['Breakfast', 'Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1561651823-34feb02250e4?auto=format&fit=crop&q=80&w=800',
+    image: '/images/beefshawarma.jpg',
     tags: ['popular', 'beef'],
     available: true
   },
@@ -893,7 +893,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 1000,
     category: 'Sides, Sauces & Porridge',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1551462147-37885acc3c41?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Beans .jpeg',
     tags: ['honey-beans', 'protein'],
     available: true
   },
@@ -991,7 +991,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 2000,
     category: 'Drinks',
     mealTime: ['Breakfast', 'Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&q=80&w=800',
+    image: '/images/5Alive.png',
     tags: ['juice', 'chilled'],
     available: true
   },
@@ -1024,7 +1024,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 3000,
     category: 'Drinks',
     mealTime: ['Breakfast', 'Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Active Juice.png',
     tags: ['juice', 'active'],
     available: true
   },
@@ -1035,7 +1035,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 1300,
     category: 'Drinks',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1600213959891-bd3d502ad7b4?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Amstel Malt.png',
     tags: ['malt', 'premium'],
     available: true
   },
@@ -1046,7 +1046,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 1200,
     category: 'Drinks',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1624517452488-04869289c4ca?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Fanta.jpg',
     tags: ['soft-drink', 'canned'],
     available: true
   },
@@ -1090,7 +1090,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 1000,
     category: 'Drinks',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Active Zest.png',
     tags: ['zesty', 'refreshing'],
     available: true
   },
@@ -1145,7 +1145,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 800,
     category: 'Drinks',
     mealTime: ['Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=800',
+    image: '/images/7up.png',
     tags: ['soft-drink', 'lemon-lime'],
     available: true
   },
@@ -1178,7 +1178,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 800,
     category: 'Drinks',
     mealTime: ['Breakfast', 'Lunch', 'Dinner'],
-    image: 'https://images.unsplash.com/photo-1624517452488-04869289c4ca?auto=format&fit=crop&q=80&w=800',
+    image: '/images/Fanta.jpg',
     tags: ['soft', 'orange'],
     available: true
   },
