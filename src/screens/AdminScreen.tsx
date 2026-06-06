@@ -10,15 +10,22 @@ import { useDataSync } from '../lib/data-sync';
 import { 
   Lock, LogOut, ShoppingBag, Utensils, BookOpen, X, Star, Edit, Trash2, Plus, 
   Image as ImageIcon, Save, MessageCircle, Users, ChevronRight, RefreshCw, Download, FileCode, Menu as MenuIcon, ShieldAlert,
-  Eye, EyeOff, Home, BarChart3, TrendingUp, UserCheck, Clock, CheckCircle2
+  Eye, EyeOff, Home, BarChart3, TrendingUp, UserCheck, Clock, CheckCircle2,
+  Upload, Check, AlertCircle, Info
 } from 'lucide-react';
-import { MenuItem, Order, BlogPost, BlogLayout, StaffAccount } from '../types';
+import { MenuItem, Order, BlogPost, BlogLayout, StaffAccount, MenuCategory } from '../types';
 import { formatStatusUpdateMessage, getWhatsAppUrl } from '../lib/order';
 import { useToast } from '../lib/toast-context';
 import { db, auth } from '../lib/firebase';
 import { onAuthStateChanged, signOut, User, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { patronTracker } from '../lib/security';
+
+const CATEGORIES: MenuCategory[] = [
+  'Rice Dishes', 'Proteins', 'Pasta & Noodles', 'Snacks', 
+  'Sides, Sauces & Porridge', 'Drinks', 'Heritage Collection', 
+  'African Dishes', 'Intercontinental'
+];
 
 export default function AdminScreen() {
   const navigate = useNavigate();
@@ -489,7 +496,7 @@ export default function AdminScreen() {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-16">
               <div className="flex justify-between items-center bg-primary/5 p-8 rounded-[2.5rem] border border-primary/5">
                 <input type="text" placeholder="Search Manifest..." value={menuSearch} onChange={e => setMenuSearch(e.target.value)} className="w-80 bg-white border border-primary/5 rounded-2xl pl-14 pr-6 py-4 text-[10px] font-black text-black uppercase tracking-widest focus:ring-2 focus:ring-accent/20 outline-none transition-all" />
-                <button onClick={() => setEditingMenuItem({ name: '', price: 0, category: 'Rice Dishes', description: '', isTrending: false, image: '' })} className="bg-primary text-white px-10 py-5 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest flex items-center gap-4 shadow-2xl shadow-primary/20 hover:scale-[1.02] transition-all"><Plus className="w-5 h-5" /> Add New Item</button>
+                <button onClick={() => setEditingMenuItem({ name: '', price: 0, category: 'Rice Dishes', description: '', isTrending: false, image: '', available: true, tags: [], mealTime: ['Lunch', 'Dinner'] })} className="bg-primary text-white px-10 py-5 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest flex items-center gap-4 shadow-2xl shadow-primary/20 hover:scale-[1.02] transition-all"><Plus className="w-5 h-5" /> Add New Item</button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
                 {filteredMenu.map(item => (
@@ -514,16 +521,89 @@ export default function AdminScreen() {
           )}
         </AnimatePresence>
 
-        {/* MODAL EDITOR: MENU ITEM (Simplified for brevity) */}
+        {/* ENHANCED MODAL EDITOR: MENU ITEM */}
         <AnimatePresence>
           {editingMenuItem && isAdmin && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/95 backdrop-blur-2xl">
-              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-white w-full max-w-xl rounded-[1.5rem] overflow-hidden shadow-2xl p-10 space-y-8">
-                 <h2 className="font-serif text-3xl italic text-primary">Curation Manuscript</h2>
-                 <input type="text" value={editingMenuItem.name} onChange={e => setEditingMenuItem({ ...editingMenuItem, name: e.target.value })} className="w-full bg-primary/5 border-none rounded-xl px-6 py-4" placeholder="Dish Title" />
-                 <input type="number" value={editingMenuItem.price} onChange={e => setEditingMenuItem({ ...editingMenuItem, price: parseInt(e.target.value) })} className="w-full bg-primary/5 border-none rounded-xl px-6 py-4" placeholder="Price" />
-                 <button onClick={handleSaveMenuItem} className="w-full bg-primary text-white py-5 rounded-xl font-black uppercase tracking-[0.4em] text-[10px] hover:bg-accent transition-all flex items-center justify-center gap-3"><Save className="w-4 h-4" /> Manifest to Records</button>
-                 <button onClick={() => setEditingMenuItem(null)} className="w-full text-primary/30 uppercase text-[9px] font-black tracking-widest">Cancel</button>
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/95 backdrop-blur-2xl overflow-y-auto">
+              <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className="bg-white w-full max-w-4xl rounded-[3rem] overflow-hidden shadow-2xl relative my-8">
+                <button onClick={() => setEditingMenuItem(null)} className="absolute top-8 right-8 p-4 bg-primary/5 rounded-2xl hover:bg-accent hover:text-white transition-all z-10"><X className="w-6 h-6" /></button>
+                
+                <div className="flex flex-col lg:flex-row">
+                  {/* Left Side: Image Upload & Preview */}
+                  <div className="lg:w-2/5 bg-cream/30 p-12 flex flex-col items-center justify-center border-r border-primary/5">
+                    <div className="w-full aspect-square rounded-[2.5rem] overflow-hidden bg-white shadow-inner mb-8 group relative">
+                      {editingMenuItem.image ? (
+                        <img src={editingMenuItem.image} className="w-full h-full object-cover" alt="Preview" />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-primary/20 gap-4">
+                          <ImageIcon className="w-16 h-16" />
+                          <p className="text-[10px] font-black uppercase tracking-widest">No Image Manifested</p>
+                        </div>
+                      )}
+                      <label className="absolute inset-0 bg-primary/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center cursor-pointer">
+                        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                        <div className="flex flex-col items-center gap-3 text-white">
+                          <Upload className="w-8 h-8" />
+                          <span className="text-[10px] font-black uppercase tracking-[0.3em]">Upload Vision</span>
+                        </div>
+                      </label>
+                    </div>
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-primary/30 text-center leading-relaxed">Recommended: 1024x1024px<br/>PNG or JPG (Max 2MB)</p>
+                  </div>
+
+                  {/* Right Side: Form Fields */}
+                  <div className="flex-1 p-12 lg:p-16 space-y-10">
+                    <header className="space-y-2">
+                      <div className="editorial-label text-accent font-black tracking-[0.4em] text-[9px]">Inventory Management</div>
+                      <h2 className="font-serif text-4xl italic text-primary">Curation Manuscript</h2>
+                    </header>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-3">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-4">Dish Title</label>
+                        <input type="text" value={editingMenuItem.name} onChange={e => setEditingMenuItem({ ...editingMenuItem, name: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-5 font-sans font-bold text-primary focus:ring-2 focus:ring-accent/50 outline-none transition-all" placeholder="e.g. Smoky Jollof Heritage" />
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-4">Price (NGN)</label>
+                        <input type="number" value={editingMenuItem.price} onChange={e => setEditingMenuItem({ ...editingMenuItem, price: parseInt(e.target.value) || 0 })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-5 font-sans font-black text-primary focus:ring-2 focus:ring-accent/50 outline-none transition-all" placeholder="0" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-4">Category Selection</label>
+                      <select value={editingMenuItem.category} onChange={e => setEditingMenuItem({ ...editingMenuItem, category: e.target.value as MenuCategory })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-5 font-sans font-bold text-primary focus:ring-2 focus:ring-accent/50 outline-none transition-all appearance-none cursor-pointer">
+                        {CATEGORIES.map(cat => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-4">Flavor Narrative (Description)</label>
+                      <textarea value={editingMenuItem.description} onChange={e => setEditingMenuItem({ ...editingMenuItem, description: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-5 font-sans text-sm text-primary/70 focus:ring-2 focus:ring-accent/50 outline-none transition-all h-32 resize-none" placeholder="Describe the ancestral essence of this dish..." />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-8 pt-4">
+                      <div className="flex items-center gap-4 cursor-pointer group" onClick={() => setEditingMenuItem({ ...editingMenuItem, isTrending: !editingMenuItem.isTrending })}>
+                        <div className={cn("w-14 h-8 rounded-full transition-all flex items-center px-1", editingMenuItem.isTrending ? "bg-accent" : "bg-primary/10")}>
+                          <motion.div animate={{ x: editingMenuItem.isTrending ? 24 : 0 }} className="w-6 h-6 bg-white rounded-full shadow-lg" />
+                        </div>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-primary/60 group-hover:text-accent transition-colors">Trending Hot Pick</span>
+                      </div>
+                      <div className="flex items-center gap-4 cursor-pointer group" onClick={() => setEditingMenuItem({ ...editingMenuItem, available: editingMenuItem.available === false ? true : false })}>
+                        <div className={cn("w-14 h-8 rounded-full transition-all flex items-center px-1", editingMenuItem.available !== false ? "bg-green-500" : "bg-primary/10")}>
+                          <motion.div animate={{ x: editingMenuItem.available !== false ? 24 : 0 }} className="w-6 h-6 bg-white rounded-full shadow-lg" />
+                        </div>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-primary/60 group-hover:text-green-500 transition-colors">Active Availability</span>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4 pt-8">
+                      <button onClick={handleSaveMenuItem} className="flex-1 bg-primary text-white py-6 rounded-2xl font-black uppercase tracking-[0.4em] text-[11px] hover:bg-accent transition-all flex items-center justify-center gap-4 shadow-2xl shadow-primary/20 active:scale-95"><Save className="w-5 h-5" /> Manifest Changes</button>
+                      <button onClick={() => setEditingMenuItem(null)} className="px-10 bg-primary/5 text-primary/40 py-6 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-50 hover:text-red-500 transition-all active:scale-95">Discard</button>
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             </div>
           )}
