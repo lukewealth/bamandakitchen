@@ -5,10 +5,10 @@
 
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, CheckCircle2, AlertCircle, Info, Bell, ShieldAlert, Check } from 'lucide-react';
+import { X, CheckCircle2, AlertCircle, Info, Bell, ShieldAlert, Check, Sparkles, Cloud, Command } from 'lucide-react';
 import { cn } from './utils';
 
-type ToastType = 'success' | 'error' | 'info' | 'warning';
+type ToastType = 'success' | 'error' | 'info' | 'warning' | 'cloud';
 
 interface Toast {
   id: string;
@@ -63,38 +63,60 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={{ showToast, confirm }}>
       {children}
       
-      {/* Toast Notifications */}
-      <div className="fixed bottom-8 right-8 z-[500] flex flex-col gap-4 pointer-events-none">
+      {/* Toast Notifications - Top Center "Dynamic Island" style */}
+      <div className="fixed top-8 left-1/2 -translate-x-1/2 z-[500] flex flex-col items-center gap-4 pointer-events-none w-full max-w-xl px-6">
         <AnimatePresence>
           {toasts.map((toast) => (
             <motion.div
               key={toast.id}
-              initial={{ opacity: 0, x: 50, scale: 0.9 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+              initial={{ opacity: 0, y: -40, scale: 0.9, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, scale: 0.9, y: -20, transition: { duration: 0.3, ease: "circIn" } }}
               className={cn(
-                "pointer-events-auto flex items-center gap-4 px-6 py-4 rounded-2xl shadow-2xl border backdrop-blur-xl min-w-[320px] max-w-md",
-                toast.type === 'success' && "bg-primary/95 text-white border-accent/20",
-                toast.type === 'error' && "bg-red-950/95 text-red-50 border-red-900/50",
-                toast.type === 'warning' && "bg-orange-950/95 text-orange-50 border-orange-900/50",
-                toast.type === 'info' && "bg-surface/95 text-primary border-primary/10"
+                "pointer-events-auto flex items-center gap-5 px-10 py-4 rounded-full shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] border backdrop-blur-3xl min-w-[320px] max-w-full relative overflow-hidden group",
+                toast.type === 'success' && "bg-primary/95 text-white border-accent/40",
+                toast.type === 'cloud' && "bg-accent text-primary border-white/20",
+                toast.type === 'error' && "bg-red-600 text-white border-red-400/20",
+                toast.type === 'warning' && "bg-orange-500 text-white border-orange-300/20",
+                toast.type === 'info' && "bg-white/95 text-primary border-primary/10"
               )}
             >
-              <div className="shrink-0 p-2 rounded-xl bg-white/5">
-                {toast.type === 'success' && <CheckCircle2 className="w-5 h-5 text-accent" />}
-                {toast.type === 'error' && <ShieldAlert className="w-5 h-5 text-red-500" />}
-                {toast.type === 'warning' && <Bell className="w-5 h-5 text-orange-500" />}
-                {toast.type === 'info' && <Info className="w-5 h-5 text-accent" />}
+              {/* Premium Glossy Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
+
+              <div className={cn(
+                "shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-lg",
+                toast.type === 'success' && "bg-accent/20 text-accent",
+                toast.type === 'cloud' && "bg-primary/10 text-primary",
+                toast.type === 'error' && "bg-white/20 text-white",
+                toast.type === 'warning' && "bg-white/20 text-white",
+                toast.type === 'info' && "bg-primary/5 text-accent"
+              )}>
+                {toast.type === 'success' && <Check className="w-5 h-5 stroke-[3px]" />}
+                {toast.type === 'cloud' && <Cloud className="w-5 h-5" />}
+                {toast.type === 'error' && <ShieldAlert className="w-5 h-5" />}
+                {toast.type === 'warning' && <Bell className="w-5 h-5" />}
+                {toast.type === 'info' && <Sparkles className="w-5 h-5" />}
               </div>
               
-              <div className="flex-1 pr-2">
-                <p className="font-sans text-[9px] uppercase tracking-[0.3em] font-black opacity-40 mb-1">{toast.type}</p>
-                <p className="font-serif italic text-sm leading-relaxed">{toast.message}</p>
+              <div className="flex-1 min-w-0">
+                <p className={cn(
+                  "font-sans text-[7px] uppercase tracking-[0.4em] font-black mb-0.5",
+                  toast.type === 'success' || toast.type === 'error' || toast.type === 'warning' || toast.type === 'cloud' ? "opacity-60" : "text-accent"
+                )}>
+                  {toast.type === 'success' ? "Manifestation Confirmed" : 
+                   toast.type === 'cloud' ? "Cloud Sync Active" :
+                   toast.type === 'error' ? "Ritual Interrupted" :
+                   toast.type === 'warning' ? "Oracle Warning" : "Sacred Insight"}
+                </p>
+                <p className="font-serif italic text-sm leading-tight tracking-wide truncate">
+                  {toast.message}
+                </p>
               </div>
 
               <button 
                 onClick={() => removeToast(toast.id)}
-                className="shrink-0 opacity-20 hover:opacity-100 transition-opacity p-2"
+                className="shrink-0 opacity-40 hover:opacity-100 transition-all ml-2"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -115,25 +137,25 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             >
               <div className="p-10 space-y-8 text-center">
                 <div className={cn(
-                  "w-20 h-20 mx-auto rounded-3xl flex items-center justify-center",
+                  "w-20 h-20 mx-auto rounded-3xl flex items-center justify-center shadow-2xl",
                   activeConfirm.type === 'danger' ? "bg-red-50 text-red-600" : "bg-accent/10 text-accent"
                 )}>
-                  {activeConfirm.type === 'danger' ? <ShieldAlert className="w-10 h-10" /> : <Bell className="w-10 h-10" />}
+                  {activeConfirm.type === 'danger' ? <ShieldAlert className="w-10 h-10" /> : <Command className="w-10 h-10" />}
                 </div>
 
                 <div className="space-y-3">
                   <h3 className="font-serif italic text-3xl text-primary">{activeConfirm.title}</h3>
-                  <p className="font-sans text-sm text-primary/60 leading-relaxed max-w-[280px] mx-auto uppercase tracking-widest font-bold text-[10px]">
+                  <p className="font-sans text-sm text-primary/60 leading-relaxed max-w-[280px] mx-auto uppercase tracking-widest font-bold text-[9px]">
                     {activeConfirm.message}
                   </p>
                 </div>
 
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 pt-4">
                   <button
                     onClick={handleConfirmAction}
                     className={cn(
-                      "w-full py-5 rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] transition-all active:scale-95 shadow-xl shadow-accent/20",
-                      activeConfirm.type === 'danger' ? "bg-red-600 text-white" : "bg-primary text-white"
+                      "w-full py-5 rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] transition-all active:scale-95 shadow-xl",
+                      activeConfirm.type === 'danger' ? "bg-red-600 text-white shadow-red-600/20" : "bg-primary text-white shadow-primary/20"
                     )}
                   >
                     {activeConfirm.confirmLabel || 'Proceed'}

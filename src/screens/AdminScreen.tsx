@@ -27,6 +27,8 @@ const CATEGORIES: MenuCategory[] = [
   'African Dishes', 'Intercontinental'
 ];
 
+import BrandLoader from '../components/BrandLoader';
+
 export default function AdminScreen() {
   const navigate = useNavigate();
   const { showToast, confirm } = useToast();
@@ -68,6 +70,7 @@ export default function AdminScreen() {
   const [editingPost, setEditingPost] = useState<Partial<BlogPost> | null>(null);
   const [editingMenuItem, setEditingMenuItem] = useState<Partial<MenuItem> | null>(null);
   const [editingStaff, setEditingStaff] = useState<Partial<StaffAccount> | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Persistence & Auth Check
   useEffect(() => {
@@ -170,9 +173,15 @@ export default function AdminScreen() {
 
   const handleSaveMenuItem = async () => {
     if (!isAdmin || !editingMenuItem?.name || !editingMenuItem?.price) return;
-    await updateMenuItem(editingMenuItem);
-    setEditingMenuItem(null);
+    setIsSaving(true);
+    try {
+      await updateMenuItem(editingMenuItem);
+      setEditingMenuItem(null);
+    } finally {
+      setIsSaving(false);
+    }
   };
+
 
   const handleRestoreHeritage = () => {
     if (!isAdmin) return;
@@ -552,7 +561,12 @@ export default function AdminScreen() {
                   </div>
 
                   {/* Right Side: Form Fields */}
-                  <div className="flex-1 p-12 lg:p-16 space-y-10">
+                  <div className="flex-1 p-12 lg:p-16 space-y-10 relative">
+                    <AnimatePresence>
+                      {isSaving && (
+                        <BrandLoader isInline message="Manifesting Changes" subMessage="Updating Cloud Sanctuary" />
+                      )}
+                    </AnimatePresence>
                     <header className="space-y-2">
                       <div className="editorial-label text-accent font-black tracking-[0.4em] text-[9px]">Inventory Management</div>
                       <h2 className="font-serif text-4xl italic text-primary">Curation Manuscript</h2>
@@ -599,7 +613,23 @@ export default function AdminScreen() {
                     </div>
 
                     <div className="flex gap-4 pt-8">
-                      <button onClick={handleSaveMenuItem} className="flex-1 bg-primary text-white py-6 rounded-2xl font-black uppercase tracking-[0.4em] text-[11px] hover:bg-accent transition-all flex items-center justify-center gap-4 shadow-2xl shadow-primary/20 active:scale-95"><Save className="w-5 h-5" /> Manifest Changes</button>
+                      <button 
+                        onClick={handleSaveMenuItem} 
+                        disabled={isSaving}
+                        className="flex-1 bg-primary text-white py-6 rounded-2xl font-black uppercase tracking-[0.4em] text-[11px] hover:bg-accent transition-all flex items-center justify-center gap-4 shadow-2xl shadow-primary/20 active:scale-95 disabled:opacity-50"
+                      >
+                        {isSaving ? (
+                          <>
+                            <RefreshCw className="w-5 h-5 animate-spin" />
+                            Manifesting...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-5 h-5" />
+                            Manifest Changes
+                          </>
+                        )}
+                      </button>
                       <button onClick={() => setEditingMenuItem(null)} className="px-10 bg-primary/5 text-primary/40 py-6 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-50 hover:text-red-500 transition-all active:scale-95">Discard</button>
                     </div>
                   </div>

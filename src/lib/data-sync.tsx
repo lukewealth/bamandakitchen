@@ -292,10 +292,12 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
         if (item.id) {
           await updateDoc(doc(db, 'menu', item.id), { ...item, updatedAt: serverTimestamp() });
           await logAction('UPDATE_MENU_ITEM', { itemId: item.id, name: item.name });
+          showToast(`Manifest for ${item.name} updated in cloud.`, 'success');
         } else {
           const newDoc = await addDoc(collection(db, 'menu'), { ...item, updatedAt: serverTimestamp() });
           updatedItem.id = newDoc.id;
           await logAction('CREATE_MENU_ITEM', { itemId: newDoc.id, name: item.name });
+          showToast(`${item.name} manifested in cloud.`, 'success');
         }
       } catch (err) {
         showToast('Cloud sync failed. Preserving local copy.', 'warning');
@@ -417,6 +419,7 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   const syncToCloud = async () => {
     if (!db || userProfile?.role !== 'admin') return;
     setIsCloudSyncing(true);
+    showToast('Initiating cloud manifestation...', 'cloud');
     try {
       const batch = writeBatch(db);
       menu.forEach(item => {
@@ -424,9 +427,9 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
       });
       await batch.commit();
       await logAction('SYNC_TO_CLOUD');
-      showToast('Heritage manifested in cloud.', 'success');
+      showToast('Heritage successfully manifested in cloud sanctuary.', 'success');
     } catch (error) {
-      showToast('Manifestation failed.', 'error');
+      showToast('Manifestation failed to reach the heavens.', 'error');
     } finally {
       setIsCloudSyncing(false);
     }
