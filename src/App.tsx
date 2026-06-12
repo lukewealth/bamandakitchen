@@ -5,12 +5,14 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { AnimatePresence } from 'motion/react';
 import { cn, getCookie, setCookie } from './lib/utils';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
 import FloatingCart from './components/FloatingCart';
 import BrandLoader from './components/BrandLoader';
+import PageTransition from './components/PageTransition';
 import HomeScreen from './screens/HomeScreen';
 import MenuScreen from './screens/MenuScreen';
 import CheckoutScreen from './screens/CheckoutScreen';
@@ -51,9 +53,6 @@ function AppContent() {
     if (path === '/contact') return 'contact';
     if (path === '/track-order') return 'track-order';
     if (path === '/admin') return 'admin';
-    if (path === '/heritage') return 'heritage';
-    if (path === '/sustainability') return 'sustainability';
-    if (path === '/legal') return 'legal';
     return 'home';
   }, [location.pathname]);
 
@@ -66,10 +65,7 @@ function AppContent() {
       'blog': '/blog',
       'contact': '/contact',
       'track-order': '/track-order',
-      'admin': '/admin',
-      'heritage': '/heritage',
-      'sustainability': '/sustainability',
-      'legal': '/legal'
+      'admin': '/admin'
     };
     navigate(paths[screen] || '/');
     logAction('NAVIGATE', { to: screen });
@@ -92,17 +88,17 @@ function AppContent() {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
+  // Handle subtle screen-change loading for premium feel
   useEffect(() => {
-    if (isLoading || isDataLoading) return;
+    if (isDataLoading) return;
     
-    window.scrollTo(0, 0);
-    setIsLoading(true);
-    setLoadingMessage(currentScreen === 'menu' ? "Curing the Inventory" : "Navigating the Sanctuary");
-    
-    const delay = hasVisited ? 400 : 800;
-    const timer = setTimeout(() => setIsLoading(false), delay);
-    return () => clearTimeout(timer);
-  }, [currentScreen, isDataLoading, hasVisited]);
+    // Only show full loader if not already on the page or first visit
+    if (!hasVisited) {
+      setIsLoading(true);
+      const timer = setTimeout(() => setIsLoading(false), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [location.pathname, isDataLoading, hasVisited]);
 
   const handleNavigateToMenu = (filter?: string) => {
     setMenuFilter(filter);
@@ -139,7 +135,7 @@ function AppContent() {
 
   const handleOrderComplete = async (order: Order) => {
     setActiveOrder(order);
-    patronTracker.saveOrder(order); // Explicit patron tracking
+    patronTracker.saveOrder(order);
 
     try {
       const existing = JSON.parse(localStorage.getItem('bamanda_orders') || '[]');
@@ -166,7 +162,18 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-surface selection:bg-accent/30 overflow-x-hidden">
       
-      {(isLoading || isDataLoading) && <BrandLoader subMessage={loadingMessage} />}
+      <AnimatePresence>
+        {(isLoading || isDataLoading) && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            className="fixed inset-0 z-[500]"
+          >
+            <BrandLoader subMessage={loadingMessage} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {currentScreen !== 'admin' && (
         <Header 
@@ -181,42 +188,54 @@ function AppContent() {
       )}
 
       <main className={cn(currentScreen !== 'admin' && "pt-20")}>
-        <Routes>
-          <Route path="/" element={
-            <HomeScreen 
-              onNavigate={handleNavigate}
-              onNavigateToMenu={handleNavigateToMenu} 
-              onAddToCart={handleAddToCart} 
-              trendingDishes={menu.filter(item => item.isTrending)} 
-            />
-          } />
-          <Route path="/menu" element={
-            <MenuScreen menuItems={menu} onAddToCart={handleAddToCart} initialFilter={menuFilter} />
-          } />
-          <Route path="/about" element={<AboutScreen />} />
-          <Route path="/blog" element={<BlogScreen posts={posts} />} />
-          <Route path="/contact" element={<ContactScreen />} />
-          <Route path="/checkout" element={<CheckoutScreen items={cart} onOrderComplete={handleOrderComplete} />} />
-          <Route path="/track-order" element={<TrackOrderScreen order={activeOrder} onBack={() => navigate('/menu')} />} />
-          <Route path="/admin" element={<AdminScreen />} />
-          
-          <Route path="/heritage" element={
-            <InfoScreen 
-              title="Our Heritage" 
-              subtitle="The Legacy"
-              onBack={() => navigate('/')}
-              content="Bamanda Kitchen is more than a restaurant; it is a sanctuary of ancestral recipes."
-            />
-          } />
-          <Route path="/sustainability" element={
-            <InfoScreen title="Sustainability" subtitle="Earth First" onBack={() => navigate('/')} content="Guided by our responsibility to the future land." />
-          } />
-          <Route path="/legal" element={
-            <InfoScreen title="Legal" subtitle="Transparency" onBack={() => navigate('/')} content="Legal framework ensuring data protection." />
-          } />
-          
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={
+              <PageTransition>
+                <HomeScreen 
+                  onNavigate={handleNavigate}
+                  onNavigateToMenu={handleNavigateToMenu} 
+                  onAddToCart={handleAddToCart} 
+                  trendingDishes={menu.filter(item => item.isTrending)} 
+                />
+              </PageTransition>
+            } />
+            <Route path="/menu" element={
+              <PageTransition>
+                <MenuScreen menuItems={menu} onAddToCart={handleAddToCart} initialFilter={menuFilter} />
+              </PageTransition>
+            } />
+            <Route path="/about" element={<PageTransition><AboutScreen /></PageTransition>} />
+            <Route path="/blog" element={<PageTransition><BlogScreen posts={posts} /></PageTransition>} />
+            <Route path="/contact" element={<PageTransition><ContactScreen /></PageTransition>} />
+            <Route path="/checkout" element={<PageTransition><CheckoutScreen items={cart} onOrderComplete={handleOrderComplete} /></PageTransition>} />
+            <Route path="/track-order" element={<PageTransition><TrackOrderScreen order={activeOrder} onBack={() => navigate('/menu')} /></PageTransition>} />
+            <Route path="/admin" element={<AdminScreen />} />
+            
+            <Route path="/heritage" element={
+              <PageTransition>
+                <InfoScreen 
+                  title="Our Heritage" 
+                  subtitle="The Legacy"
+                  onBack={() => navigate('/')}
+                  content="Bamanda Kitchen is more than a restaurant; it is a sanctuary of ancestral recipes."
+                />
+              </PageTransition>
+            } />
+            <Route path="/sustainability" element={
+              <PageTransition>
+                <InfoScreen title="Sustainability" subtitle="Earth First" onBack={() => navigate('/')} content="Guided by our responsibility to the future land." />
+              </PageTransition>
+            } />
+            <Route path="/legal" element={
+              <PageTransition>
+                <InfoScreen title="Legal" subtitle="Transparency" onBack={() => navigate('/')} content="Legal framework ensuring data protection." />
+              </PageTransition>
+            } />
+            
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AnimatePresence>
       </main>
 
       {currentScreen !== 'admin' && <Footer onNavigate={handleNavigate} />}

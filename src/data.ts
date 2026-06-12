@@ -367,6 +367,18 @@ export const MENU_ITEMS: MenuItem[] = [
     available: true
   },
   {
+    id: 'heritage_moi_moi_deluxe',
+    name: 'Heritage Moi Moi Deluxe',
+    description: 'Slow-steamed honey bean pudding enriched with wild-caught prawns, boiled eggs, and ancestral spices.',
+    price: 3500,
+    category: 'Heritage Collection',
+    mealTime: ['Breakfast', 'Lunch'],
+    image: '/images/1780956444283.jpeg',
+    tags: ['luxury', 'traditional', 'protein'],
+    available: true,
+    isTrending: true
+  },
+  {
     id: 'basmati_white_rice_std',
     name: 'Basmati white rice',
     description: 'Premium long-grain fragrant basmati rice, steamed to perfection for a light and airy experience.',
