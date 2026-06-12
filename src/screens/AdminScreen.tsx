@@ -629,24 +629,37 @@ export default function AdminScreen() {
                 
                 <div className="flex flex-col lg:flex-row">
                   <div className="lg:w-2/5 bg-cream/30 p-12 flex flex-col items-center justify-center border-r border-primary/5">
-                    <div className="w-full aspect-square rounded-[2.5rem] overflow-hidden bg-white shadow-inner mb-8 group relative">
-                      {editingMenuItem.image ? (
-                        <img src={editingMenuItem.image} className="w-full h-full object-cover" alt="Preview" />
-                      ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center text-primary/20 gap-4">
-                          <ImageIcon className="w-16 h-16" />
-                          <p className="text-[10px] font-black uppercase tracking-widest">No Image Manifested</p>
-                        </div>
-                      )}
-                      <label className="absolute inset-0 bg-primary/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center cursor-pointer">
-                        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                        <div className="flex flex-col items-center gap-3 text-white">
-                          <Upload className="w-8 h-8" />
-                          <span className="text-[10px] font-black uppercase tracking-[0.3em]">Upload Vision</span>
-                        </div>
-                      </label>
+                    <div className="w-full space-y-4">
+                      <div className="relative group rounded-[2.5rem] overflow-hidden bg-white shadow-inner aspect-square flex flex-col">
+                        {editingMenuItem.image ? (
+                          <img src={editingMenuItem.image} className="w-full h-full object-cover" alt="Preview" />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center text-primary/20 gap-4">
+                            <ImageIcon className="w-16 h-16" />
+                            <p className="text-[10px] font-black uppercase tracking-widest">No Image Manifested</p>
+                          </div>
+                        )}
+                        <label className="absolute inset-0 bg-primary/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center cursor-pointer">
+                          <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                          <div className="flex flex-col items-center gap-3 text-white">
+                            <Upload className="w-8 h-8" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em]">Upload Vision</span>
+                          </div>
+                        </label>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-black uppercase tracking-[0.2em] text-primary/40 px-4">Direct Visual Path (URL)</label>
+                        <input 
+                          type="text" 
+                          value={editingMenuItem.image || ''} 
+                          onChange={e => setEditingMenuItem({ ...editingMenuItem, image: e.target.value })}
+                          placeholder="https://... or /images/..."
+                          className="w-full bg-white border border-primary/5 rounded-xl px-4 py-3 font-mono text-[9px] text-primary/60 focus:ring-1 focus:ring-accent/50 outline-none transition-all"
+                        />
+                      </div>
                     </div>
-                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-primary/30 text-center leading-relaxed">Recommended: 1024x1024px<br/>PNG or JPG (Max 2MB)</p>
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-primary/30 text-center leading-relaxed mt-4">Recommended: 1024x1024px<br/>PNG or JPG (Max 2MB)</p>
                   </div>
 
                   <div className="flex-1 p-12 lg:p-16 space-y-10 relative">
