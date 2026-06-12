@@ -228,14 +228,32 @@ export default function AdminScreen() {
 
   const handleSavePost = async () => {
     if (!isAdmin || !editingPost?.title || !editingPost?.content) return;
-    await updatePost(editingPost);
-    setEditingPost(null);
+    setIsSaving(true);
+    try {
+      await updatePost(editingPost);
+      setEditingPost(null);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleSaveStaff = async () => {
     if (!isAdmin || !editingStaff?.name || !editingStaff?.email) return;
-    await updateStaff(editingStaff);
-    setEditingStaff(null);
+    setIsSaving(true);
+    try {
+      await updateStaff(editingStaff);
+      setEditingStaff(null);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handlePostImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => setEditingPost(prev => prev ? { ...prev, image: reader.result as string } : null);
+    reader.readAsDataURL(file);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -528,6 +546,78 @@ export default function AdminScreen() {
               </div>
             </motion.div>
           )}
+
+          {activeTab === 'blog' && isAdmin && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-16">
+              <div className="flex justify-between items-center bg-primary/5 p-8 rounded-[2.5rem] border border-primary/5">
+                <input type="text" placeholder="Search Gazette..." value={blogSearch} onChange={e => setBlogSearch(e.target.value)} className="w-80 bg-white border border-primary/5 rounded-2xl pl-14 pr-6 py-4 text-[10px] font-black text-black uppercase tracking-widest focus:ring-2 focus:ring-accent/20 outline-none transition-all" />
+                <button onClick={() => setEditingPost({ title: '', content: '', author: 'Master Curator', category: 'Heritage', layout: 'editorial', date: new Date().toISOString().split('T')[0], topic: '', image: '' })} className="bg-primary text-white px-10 py-5 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest flex items-center gap-4 shadow-2xl shadow-primary/20 hover:scale-[1.02] transition-all"><Plus className="w-5 h-5" /> New Article</button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                {filteredBlog.map(post => (
+                  <div key={post.id} className="bg-white rounded-[3rem] p-10 shadow-sm border border-primary/5 group hover:shadow-2xl transition-all duration-700">
+                    <div className="flex gap-10">
+                      <div className="w-40 h-40 rounded-2xl overflow-hidden bg-cream shrink-0">
+                        {post.image ? <img src={post.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt={post.title} /> : <div className="w-full h-full flex items-center justify-center text-primary/10"><BookOpen className="w-10 h-10" /></div>}
+                      </div>
+                      <div className="flex-1 space-y-4">
+                        <div className="editorial-label text-accent font-black tracking-[0.3em] text-[8px]">{post.category} | {post.date}</div>
+                        <h3 className="font-serif text-3xl italic text-primary leading-tight line-clamp-2">{post.title}</h3>
+                        <p className="text-[10px] font-sans font-black text-primary/30 uppercase tracking-widest">By {post.author}</p>
+                        <div className="flex gap-4 pt-4">
+                          <button onClick={() => setEditingPost(post)} className="p-3 bg-primary/5 rounded-xl hover:bg-accent hover:text-white transition-all"><Edit className="w-4 h-4" /></button>
+                          <button onClick={() => deletePost(post.id)} className="p-3 bg-primary/5 rounded-xl hover:bg-red-600 hover:text-white transition-all"><Trash2 className="w-4 h-4" /></button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'staff' && isAdmin && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-16">
+              <div className="flex justify-between items-center bg-primary/5 p-8 rounded-[2.5rem] border border-primary/5">
+                <input type="text" placeholder="Search Guardians..." value={staffSearch} onChange={e => setStaffSearch(e.target.value)} className="w-80 bg-white border border-primary/5 rounded-2xl pl-14 pr-6 py-4 text-[10px] font-black text-black uppercase tracking-widest focus:ring-2 focus:ring-accent/20 outline-none transition-all" />
+                <button onClick={() => setEditingStaff({ name: '', email: '', role: 'staff' })} className="bg-primary text-white px-10 py-5 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest flex items-center gap-4 shadow-2xl shadow-primary/20 hover:scale-[1.02] transition-all"><Plus className="w-5 h-5" /> Add Guardian</button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                {filteredStaff.map(member => (
+                  <div key={member.id} className="bg-white p-10 rounded-[3rem] border border-primary/5 shadow-sm group hover:shadow-2xl transition-all duration-700">
+                    <div className="flex items-center gap-8 mb-10">
+                      <div className="w-20 h-20 rounded-[1.5rem] bg-accent/5 flex items-center justify-center text-accent font-serif italic text-4xl">
+                        {member.name.charAt(0)}
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-serif italic text-2xl text-primary">{member.name}</h4>
+                        <p className="font-sans text-[10px] font-black uppercase tracking-widest text-primary/30">{member.email}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-8 border-t border-primary/5">
+                      <div className={cn(
+                        "px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest",
+                        member.role === 'admin' ? "bg-accent text-white" : member.role === 'rider' ? "bg-blue-100 text-blue-600" : "bg-primary/5 text-primary/60"
+                      )}>
+                        {member.role}
+                      </div>
+                      <div className="flex gap-4">
+                        <button onClick={() => setEditingStaff(member)} className="p-3 bg-primary/5 rounded-xl hover:bg-accent hover:text-white transition-all"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => {
+                          confirm({
+                            title: "Remove Guardian",
+                            message: "Revoke sanctuary access for this member?",
+                            type: "danger",
+                            onConfirm: () => deleteStaff(member.id)
+                          });
+                        }} className="p-3 bg-primary/5 rounded-xl hover:bg-red-600 hover:text-white transition-all"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
 
         {/* ENHANCED MODAL EDITOR: MENU ITEM */}
@@ -538,7 +628,6 @@ export default function AdminScreen() {
                 <button onClick={() => setEditingMenuItem(null)} className="absolute top-8 right-8 p-4 bg-primary/5 rounded-2xl hover:bg-accent hover:text-white transition-all z-10"><X className="w-6 h-6" /></button>
                 
                 <div className="flex flex-col lg:flex-row">
-                  {/* Left Side: Image Upload & Preview */}
                   <div className="lg:w-2/5 bg-cream/30 p-12 flex flex-col items-center justify-center border-r border-primary/5">
                     <div className="w-full aspect-square rounded-[2.5rem] overflow-hidden bg-white shadow-inner mb-8 group relative">
                       {editingMenuItem.image ? (
@@ -560,7 +649,6 @@ export default function AdminScreen() {
                     <p className="text-[9px] font-black uppercase tracking-[0.2em] text-primary/30 text-center leading-relaxed">Recommended: 1024x1024px<br/>PNG or JPG (Max 2MB)</p>
                   </div>
 
-                  {/* Right Side: Form Fields */}
                   <div className="flex-1 p-12 lg:p-16 space-y-10 relative">
                     <AnimatePresence>
                       {isSaving && (
@@ -613,25 +701,152 @@ export default function AdminScreen() {
                     </div>
 
                     <div className="flex gap-4 pt-8">
-                      <button 
-                        onClick={handleSaveMenuItem} 
-                        disabled={isSaving}
-                        className="flex-1 bg-primary text-white py-6 rounded-2xl font-black uppercase tracking-[0.4em] text-[11px] hover:bg-accent transition-all flex items-center justify-center gap-4 shadow-2xl shadow-primary/20 active:scale-95 disabled:opacity-50"
-                      >
-                        {isSaving ? (
-                          <>
-                            <RefreshCw className="w-5 h-5 animate-spin" />
-                            Manifesting...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="w-5 h-5" />
-                            Manifest Changes
-                          </>
-                        )}
+                      <button onClick={handleSaveMenuItem} disabled={isSaving} className="flex-1 bg-primary text-white py-6 rounded-2xl font-black uppercase tracking-[0.4em] text-[11px] hover:bg-accent transition-all flex items-center justify-center gap-4 shadow-2xl shadow-primary/20 active:scale-95 disabled:opacity-50">
+                        {isSaving ? <><RefreshCw className="w-5 h-5 animate-spin" /> Manifesting...</> : <><Save className="w-5 h-5" /> Manifest Changes</>}
                       </button>
                       <button onClick={() => setEditingMenuItem(null)} className="px-10 bg-primary/5 text-primary/40 py-6 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-50 hover:text-red-500 transition-all active:scale-95">Discard</button>
                     </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* ENHANCED MODAL EDITOR: BLOG POST */}
+        <AnimatePresence>
+          {editingPost && isAdmin && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/95 backdrop-blur-2xl overflow-y-auto">
+              <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className="bg-white w-full max-w-5xl rounded-[3rem] overflow-hidden shadow-2xl relative my-8">
+                <button onClick={() => setEditingPost(null)} className="absolute top-8 right-8 p-4 bg-primary/5 rounded-2xl hover:bg-accent hover:text-white transition-all z-10"><X className="w-6 h-6" /></button>
+                
+                <div className="flex flex-col lg:flex-row">
+                  <div className="lg:w-2/5 bg-cream/30 p-12 flex flex-col items-center justify-center border-r border-primary/5">
+                    <div className="w-full aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-white shadow-inner mb-8 group relative">
+                      {editingPost.image ? (
+                        <img src={editingPost.image} className="w-full h-full object-cover" alt="Preview" />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-primary/20 gap-4">
+                          <BookOpen className="w-16 h-16" />
+                          <p className="text-[10px] font-black uppercase tracking-widest">No Visual Manifested</p>
+                        </div>
+                      )}
+                      <label className="absolute inset-0 bg-primary/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center cursor-pointer">
+                        <input type="file" accept="image/*" onChange={handlePostImageUpload} className="hidden" />
+                        <div className="flex flex-col items-center gap-3 text-white">
+                          <Upload className="w-8 h-8" />
+                          <span className="text-[10px] font-black uppercase tracking-[0.3em]">Upload Narrative Visual</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 p-12 lg:p-16 space-y-10 relative">
+                    <AnimatePresence>
+                      {isSaving && <BrandLoader isInline message="Curating the Gazette" subMessage="Updating the Heritage Records" />}
+                    </AnimatePresence>
+                    <header className="space-y-2">
+                      <div className="editorial-label text-accent font-black tracking-[0.4em] text-[9px]">Heritage Gazette</div>
+                      <h2 className="font-serif text-4xl italic text-primary">Article Manuscript</h2>
+                    </header>
+
+                    <div className="space-y-3">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-4">Article Title</label>
+                      <input type="text" value={editingPost.title} onChange={e => setEditingPost({ ...editingPost, title: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-5 font-serif text-2xl italic text-primary focus:ring-2 focus:ring-accent/50 outline-none transition-all" placeholder="e.g. The Ritual of Smoke" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-8">
+                      <div className="space-y-3">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-4">Topic Header</label>
+                        <input type="text" value={editingPost.topic} onChange={e => setEditingPost({ ...editingPost, topic: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-5 font-sans font-black text-[10px] uppercase tracking-widest text-primary focus:ring-2 focus:ring-accent/50 outline-none transition-all" placeholder="CULINARY TRADITIONS" />
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-4">Category</label>
+                        <select value={editingPost.category} onChange={e => setEditingPost({ ...editingPost, category: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-5 font-sans font-bold text-primary focus:ring-2 focus:ring-accent/50 outline-none transition-all appearance-none cursor-pointer">
+                          {['Heritage', 'Innovation', 'Rituals', 'Sustainability'].map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-8">
+                      <div className="space-y-3">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-4">Visual Layout</label>
+                        <select value={editingPost.layout} onChange={e => setEditingPost({ ...editingPost, layout: e.target.value as BlogLayout })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-5 font-sans font-bold text-primary focus:ring-2 focus:ring-accent/50 outline-none transition-all appearance-none cursor-pointer">
+                          {['editorial', 'minimal', 'narrative', 'journal', 'luxury'].map(lay => (
+                            <option key={lay} value={lay}>{lay}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-4">Author Name</label>
+                        <input type="text" value={editingPost.author} onChange={e => setEditingPost({ ...editingPost, author: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-5 font-sans font-bold text-primary focus:ring-2 focus:ring-accent/50 outline-none transition-all" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-4">Narrative Content</label>
+                      <textarea value={editingPost.content} onChange={e => setEditingPost({ ...editingPost, content: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-6 py-5 font-sans text-sm text-primary/70 focus:ring-2 focus:ring-accent/50 outline-none transition-all h-64 resize-none" placeholder="Tell the story of our heritage..." />
+                    </div>
+
+                    <div className="flex gap-4 pt-8">
+                      <button onClick={handleSavePost} disabled={isSaving} className="flex-1 bg-primary text-white py-6 rounded-2xl font-black uppercase tracking-[0.4em] text-[11px] hover:bg-accent transition-all flex items-center justify-center gap-4 shadow-2xl shadow-primary/20 active:scale-95 disabled:opacity-50">
+                        {isSaving ? <><RefreshCw className="w-5 h-5 animate-spin" /> Manifesting...</> : <><Save className="w-5 h-5" /> Manifest to Gazette</>}
+                      </button>
+                      <button onClick={() => setEditingPost(null)} className="px-10 bg-primary/5 text-primary/40 py-6 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-50 hover:text-red-500 transition-all active:scale-95">Discard</button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* ENHANCED MODAL EDITOR: STAFF MEMBER */}
+        <AnimatePresence>
+          {editingStaff && isAdmin && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/95 backdrop-blur-2xl overflow-y-auto">
+              <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className="bg-white w-full max-w-2xl rounded-[3rem] overflow-hidden shadow-2xl relative my-8">
+                <button onClick={() => setEditingStaff(null)} className="absolute top-8 right-8 p-4 bg-primary/5 rounded-2xl hover:bg-accent hover:text-white transition-all z-10"><X className="w-6 h-6" /></button>
+                
+                <div className="p-12 lg:p-16 space-y-12 relative">
+                  <AnimatePresence>
+                    {isSaving && <BrandLoader isInline message="Updating Guardian Records" subMessage="Securing the Sanctuary" />}
+                  </AnimatePresence>
+                  <header className="space-y-2">
+                    <div className="editorial-label text-accent font-black tracking-[0.4em] text-[9px]">Guardian Folio</div>
+                    <h2 className="font-serif text-4xl italic text-primary">Member Registration</h2>
+                  </header>
+
+                  <div className="space-y-8">
+                    <div className="space-y-3">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-4">Full Name</label>
+                      <input type="text" value={editingStaff.name} onChange={e => setEditingStaff({ ...editingStaff, name: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-8 py-6 font-sans font-bold text-xl text-primary focus:ring-2 focus:ring-accent/50 outline-none transition-all" placeholder="Enter Full Name" />
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-4">Email Address</label>
+                      <input type="email" value={editingStaff.email} onChange={e => setEditingStaff({ ...editingStaff, email: e.target.value })} className="w-full bg-primary/5 border-none rounded-2xl px-8 py-6 font-sans font-bold text-lg text-primary focus:ring-2 focus:ring-accent/50 outline-none transition-all" placeholder="email@heritage.com" />
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-primary/40 ml-4">Assigned Sanctuary Role</label>
+                      <div className="grid grid-cols-3 gap-4">
+                        {['admin', 'staff', 'rider'].map(role => (
+                          <button key={role} onClick={() => setEditingStaff({ ...editingStaff, role: role as any })} className={cn("py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border-2", editingStaff.role === role ? "bg-primary text-white border-primary shadow-xl" : "bg-white text-primary/40 border-primary/5 hover:border-accent/20 hover:text-accent")}>
+                            {role}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 pt-8">
+                    <button onClick={handleSaveStaff} disabled={isSaving} className="flex-1 bg-primary text-white py-6 rounded-2xl font-black uppercase tracking-[0.4em] text-[11px] hover:bg-accent transition-all flex items-center justify-center gap-4 shadow-2xl shadow-primary/20 active:scale-95 disabled:opacity-50">
+                      {isSaving ? <><RefreshCw className="w-5 h-5 animate-spin" /> Updating...</> : <><Save className="w-5 h-5" /> Update Records</>}
+                    </button>
+                    <button onClick={() => setEditingStaff(null)} className="px-10 bg-primary/5 text-primary/40 py-6 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-50 hover:text-red-500 transition-all active:scale-95">Discard</button>
                   </div>
                 </div>
               </motion.div>
