@@ -48,15 +48,24 @@ The Bamanda Heritage Digital Experience is currently architected as a high-perfo
 **Technical Risk:** As the patronage grows to 50k+ records, the `AdminScreen` will experience significant "Main Thread Lock," freezing the UI during the `useMemo` calculation.
 **Insight:** Implement **Collection Group Queries** and **Composite Indexing**. By pre-indexing `orders` by `customer.phone` and `createdAt`, we can fetch "Top 10 Patrons" via a single O(log n) query rather than an O(n) client-side calculation.
 
+### H. Multi-Cloud Storage Strategy (Firebase + Vercel Fallback)
+**Observation:** Relying solely on Firebase Storage can lead to single-point-of-failure scenarios, particularly regarding CORS misconfigurations in production.
+**Technical Risk:** A CORS block on Firebase Storage prevents all admin-led visual updates, stalling content management.
+**Insight:** Implement a **Storage Fallback Layer**. 
+1. **Primary:** Firebase Storage (GCP).
+2. **Fallback:** **Vercel Blob**. If the Firebase upload fails (e.g., status 403/CORS), the system should automatically route the asset to Vercel's Edge Storage.
+3. **Local Continuity:** While cloud uploads are pending or failing, keep the Base64 asset in `localStorage` (limited to 5MB) to ensure the Admin sees immediate persistence.
+
 ## 4. Intelligent Scaling Roadmap
 
 | Phase | Milestone | Objective | Status |
 | :--- | :--- | :--- | :--- |
 | **Phase 1** | **Asset Decoupling** | Move Base64 images to Firebase Storage. | **COMPLETED** |
 | **Phase 2** | **Transaction Layer** | Refactor status updates to use Atomic Transactions. | **COMPLETED** |
-| **Phase 3** | **Observability** | Deploy Custom Telemetry for UX Latency tracking. | |
-| **Phase 4** | **Edge Distribution** | Move Gazette to Edge Caching (Vercel/Cloudflare) for instant global brand story delivery. | |
-| **Phase 5** | **Data Intelligence** | Integrate BigQuery for deep cohort analysis and predictive inventory management. | |
+| **Phase 3** | **Storage Resilience** | Implement Vercel Blob fallback for image uploads. | **IN PROGRESS** |
+| **Phase 4** | **Observability** | Deploy Custom Telemetry for UX Latency tracking. | |
+| **Phase 5** | **Edge Distribution** | Move Gazette to Edge Caching (Vercel/Cloudflare) for instant global brand story delivery. | |
+| **Phase 6** | **Data Intelligence** | Integrate BigQuery for deep cohort analysis and predictive inventory management. | |
 
 ## 5. Conclusion
 The foundation is solid. By shifting from a "Document-Heavy" to an "Asset-Referential" architecture and modularizing the state layer, Bamanda Heritage can scale from a single boutique kitchen to a nation-wide luxury culinary network.

@@ -13,8 +13,9 @@ This document serves as the master record for the Bamanda Digital Experience inv
 ## 📦 Storage Strategy
 
 - **Static Assets:** Located in `/public/images/`.
-- **Dynamic Uploads:** Stored in **Firebase Storage** (or fallback to **Vercel Blob**) via the `data-sync` layer.
-- **Local Persistence:** All menu and order data is cached in `localStorage` for sub-100ms loading.
+- **Dynamic Uploads:** Primary storage in **Firebase Storage**. 
+- **Resilience Fallback:** If cloud synchronization fails (e.g., CORS or Network issues), the system attempts a fallback to **Vercel Blob** (via Vercel CLI/Edge).
+- **Local Persistence:** All menu and order data is cached in `localStorage` for sub-100ms loading. Large visual assets (Base64) are temporarily held in `localStorage` as a buffer if cloud manifests are blocked.
 
 ## 🔄 Synchronization Pipeline
 

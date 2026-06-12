@@ -30,6 +30,7 @@ import {
   getDownloadURL,
   uploadBytes
 } from 'firebase/storage';
+import { put } from '@vercel/blob';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useToast } from './toast-context';
 
@@ -233,23 +234,36 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   // OPERATIONS
   // ==========================================
 
-  // Helper to upload an asset (base64 or file) to Firebase Storage
+  // Helper to upload an asset (base64 or file) to Firebase Storage OR Vercel Blob
   const uploadAsset = async (asset: string | File, path: string): Promise<string> => {
+    // Attempt Vercel Blob FIRST as it is production-ready and bypasses CORS
+    try {
+      if (typeof asset === 'string' && isBase64Image(asset)) {
+        // Vercel Blob handles base64 easily via Buffer or raw put
+        // Note: BLOB_READ_WRITE_TOKEN must be in Vercel/Environment
+        const { url } = await put(path, asset, {
+          access: 'public',
+          contentType: 'image/jpeg'
+        });
+        console.log("[Storage] Manifested via Vercel Blob:", url);
+        return url;
+      }
+    } catch (vercelErr) {
+      console.warn("[Storage] Vercel Blob failed, falling back to Firebase:", vercelErr);
+    }
+
+    // Fallback to Firebase Storage
     if (!storage) throw new Error('Storage not available');
-    
     const storageRef = ref(storage, path);
     
     if (typeof asset === 'string' && isBase64Image(asset)) {
-      // It's a base64 string
       const result = await uploadString(storageRef, asset, 'data_url');
       return await getDownloadURL(result.ref);
     } else if (asset instanceof File) {
-      // It's a File object
       const result = await uploadBytes(storageRef, asset);
       return await getDownloadURL(result.ref);
     }
     
-    // Fallback or if already a URL
     return typeof asset === 'string' ? asset : '';
   };
 
@@ -334,8 +348,15 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
         // High Intelligence: Check for Base64 image and move to Storage Sanctuary
         if (updatedItem.image && isBase64Image(updatedItem.image)) {
           showToast('Manifesting visual asset in cloud sanctuary...', 'info');
-          const fileName = `menu/${Date.now()}-${updatedItem.name.replace(/\s+/g, '_').toLowerCase()}.jpg`;
-          updatedItem.image = await uploadAsset(updatedItem.image, fileName);
+          try {
+            const fileName = `menu/${Date.now()}-${updatedItem.name.replace(/\s+/g, '_').toLowerCase()}.jpg`;
+            updatedItem.image = await uploadAsset(updatedItem.image, fileName);
+          } catch (storageErr) {
+            console.error('All Cloud Storage providers failed:', storageErr);
+            showToast('Cloud storage blocked. Falling back to local manifest.', 'warning');
+            // We keep updatedItem.image as Base64. It might hit Firestore size limits (1MB),
+            // but it will definitely work in localStorage.
+          }
         }
 
         if (item.id) {
@@ -391,8 +412,12 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
         // High Intelligence: Handle Blog visuals via Storage
         if (updatedPost.image && isBase64Image(updatedPost.image)) {
           showToast('Archiving narrative visual...', 'info');
-          const fileName = `blog/${Date.now()}-${updatedPost.title.replace(/\s+/g, '_').toLowerCase()}.jpg`;
-          updatedPost.image = await uploadAsset(updatedPost.image, fileName);
+          try {
+            const fileName = `blog/${Date.now()}-${updatedPost.title.replace(/\s+/g, '_').toLowerCase()}.jpg`;
+            updatedPost.image = await uploadAsset(updatedPost.image, fileName);
+          } catch (err) {
+            console.error('Blog image upload failed:', err);
+          }
         }
 
         if (post.id) {
