@@ -6,7 +6,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { MenuItem, BlogPost, StaffAccount, Order } from '../types';
 import { MENU_ITEMS } from '../data';
-import { db, auth } from './firebase';
+import { db, auth, storage } from './firebase';
 import { 
   collection, 
   query, 
@@ -23,10 +23,20 @@ import {
   Unsubscribe,
   limit
 } from 'firebase/firestore';
+import { 
+  ref, 
+  uploadString, 
+  getDownloadURL,
+  uploadBytes
+} from 'firebase/storage';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useToast } from './toast-context';
 
+// Utility to check if a string is a base64 image
+const isBase64Image = (str: string) => str.startsWith('data:image/');
+
 interface DataSyncContextType {
+  // ... (rest of interface remains same)
   menu: MenuItem[];
   posts: BlogPost[];
   staff: StaffAccount[];
@@ -222,6 +232,26 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   // OPERATIONS
   // ==========================================
 
+  // Helper to upload an asset (base64 or file) to Firebase Storage
+  const uploadAsset = async (asset: string | File, path: string): Promise<string> => {
+    if (!storage) throw new Error('Storage not available');
+    
+    const storageRef = ref(storage, path);
+    
+    if (typeof asset === 'string' && isBase64Image(asset)) {
+      // It's a base64 string
+      const result = await uploadString(storageRef, asset, 'data_url');
+      return await getDownloadURL(result.ref);
+    } else if (asset instanceof File) {
+      // It's a File object
+      const result = await uploadBytes(storageRef, asset);
+      return await getDownloadURL(result.ref);
+    }
+    
+    // Fallback or if already a URL
+    return typeof asset === 'string' ? asset : '';
+  };
+
   const logAction = async (action: string, context?: any) => {
     if (!db) return;
     try {
@@ -289,18 +319,26 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
     
     if (db) {
       try {
+        // High Intelligence: Check for Base64 image and move to Storage Sanctuary
+        if (updatedItem.image && isBase64Image(updatedItem.image)) {
+          showToast('Manifesting visual asset in cloud sanctuary...', 'info');
+          const fileName = `menu/${Date.now()}-${updatedItem.name.replace(/\s+/g, '_').toLowerCase()}.jpg`;
+          updatedItem.image = await uploadAsset(updatedItem.image, fileName);
+        }
+
         if (item.id) {
-          await updateDoc(doc(db, 'menu', item.id), { ...item, updatedAt: serverTimestamp() });
+          await updateDoc(doc(db, 'menu', item.id), { ...updatedItem, updatedAt: serverTimestamp() });
           await logAction('UPDATE_MENU_ITEM', { itemId: item.id, name: item.name });
           showToast(`Manifest for ${item.name} updated in cloud.`, 'success');
         } else {
-          const newDoc = await addDoc(collection(db, 'menu'), { ...item, updatedAt: serverTimestamp() });
+          const newDoc = await addDoc(collection(db, 'menu'), { ...updatedItem, updatedAt: serverTimestamp() });
           updatedItem.id = newDoc.id;
           await logAction('CREATE_MENU_ITEM', { itemId: newDoc.id, name: item.name });
           showToast(`${item.name} manifested in cloud.`, 'success');
         }
       } catch (err) {
-        showToast('Cloud sync failed. Preserving local copy.', 'warning');
+        console.error('Cloud sync failed:', err);
+        showToast('Cloud sync failed. Document limit or network issue.', 'warning');
       }
     }
     const newMenu = item.id ? menu.map(m => m.id === item.id ? updatedItem : m) : [updatedItem, ...menu];
@@ -338,15 +376,23 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
 
     if (db) {
       try {
+        // High Intelligence: Handle Blog visuals via Storage
+        if (updatedPost.image && isBase64Image(updatedPost.image)) {
+          showToast('Archiving narrative visual...', 'info');
+          const fileName = `blog/${Date.now()}-${updatedPost.title.replace(/\s+/g, '_').toLowerCase()}.jpg`;
+          updatedPost.image = await uploadAsset(updatedPost.image, fileName);
+        }
+
         if (post.id) {
-          await updateDoc(doc(db, 'blog', post.id), { ...post, updatedAt: serverTimestamp() });
+          await updateDoc(doc(db, 'blog', post.id), { ...updatedPost, updatedAt: serverTimestamp() });
           await logAction('UPDATE_BLOG_POST', { postId: post.id, title: post.title });
         } else {
-          const newDoc = await addDoc(collection(db, 'blog'), { ...post, updatedAt: serverTimestamp() });
+          const newDoc = await addDoc(collection(db, 'blog'), { ...updatedPost, updatedAt: serverTimestamp() });
           updatedPost.id = newDoc.id;
           await logAction('CREATE_BLOG_POST', { postId: newDoc.id, title: post.title });
         }
       } catch (err) {
+        console.error('Cloud blog sync failed:', err);
         showToast('Cloud blog sync failed.', 'warning');
       }
     }
