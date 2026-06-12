@@ -21,7 +21,8 @@ import {
   getDoc,
   setDoc,
   Unsubscribe,
-  limit
+  limit,
+  runTransaction
 } from 'firebase/firestore';
 import { 
   ref, 
@@ -288,15 +289,26 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   const updateOrderStatus = async (orderId: string, status: string, extraData: Partial<Order> = {}) => {
     if (!db) return;
     try {
-      await updateDoc(doc(db, 'orders', orderId), { 
-        status, 
-        ...extraData,
-        updatedAt: serverTimestamp() 
+      await runTransaction(db, async (transaction) => {
+        const orderRef = doc(db, 'orders', orderId);
+        const orderDoc = await transaction.get(orderRef);
+        
+        if (!orderDoc.exists()) {
+          throw new Error("Order folio not found in the cloud sanctuary.");
+        }
+
+        transaction.update(orderRef, { 
+          status, 
+          ...extraData,
+          updatedAt: serverTimestamp() 
+        });
       });
+      
       await logAction('UPDATE_ORDER_STATUS', { orderId, status });
       showToast(`Order marked as ${status}.`, 'success');
     } catch (e) {
-      showToast('Status update failed.', 'error');
+      console.error('Status transition failed:', e);
+      showToast('Status update failed due to concurrency or network.', 'error');
     }
   };
 
