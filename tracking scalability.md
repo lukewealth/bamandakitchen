@@ -60,3 +60,19 @@ The Bamanda Heritage Digital Experience is currently architected as a high-perfo
 
 ## 5. Conclusion
 The foundation is solid. By shifting from a "Document-Heavy" to an "Asset-Referential" architecture and modularizing the state layer, Bamanda Heritage can scale from a single boutique kitchen to a nation-wide luxury culinary network.
+
+
+
+
+I have installed the Google Cloud SDK (providing gcloud and gsutil) and authenticated it with your account. 
+
+  However, since Firebase Storage hasn't been fully initialized in the console for the bamandakitchen project, I couldn't apply the
+  CORS settings yet. 
+
+  I've left the helper script at scripts/set-storage-cors.ts which you can run later with:
+
+   1 npx tsx scripts/set-storage-cors.ts
+  ...once Storage is active.
+
+  Is there anything else I can help you with?
+
