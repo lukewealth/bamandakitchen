@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { cn, getCookie, setCookie } from './lib/utils';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -189,7 +189,7 @@ function AppContent() {
 
       <main className={cn(currentScreen !== 'admin' && "pt-20")}>
         <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
+          <Routes location={location}>
             <Route path="/" element={
               <PageTransition>
                 <HomeScreen 
