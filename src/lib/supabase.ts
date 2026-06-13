@@ -6,13 +6,16 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://vzkwqmnegijzqrjagydh.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseAnonKey) {
-  console.warn('⚠️ Missing VITE_SUPABASE_ANON_KEY in environment.');
+  console.warn('⚠️ Missing VITE_SUPABASE_ANON_KEY in environment. Supabase features will be disabled.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Only create the client if we have a key, otherwise export null or a proxy
+export const supabase = supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null;
 
 /**
  * Helper to upload a base64 image or File to Supabase Storage
@@ -22,6 +25,10 @@ export const uploadToSupabase = async (
   path: string,
   asset: string | File
 ): Promise<string | null> => {
+  if (!supabase) {
+    console.error('[Supabase Storage] Client not initialized. Check your environment variables.');
+    return null;
+  }
   try {
     let body: any;
     let contentType = 'image/jpeg';
