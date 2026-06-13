@@ -85,3 +85,4 @@ I have installed the Google Cloud SDK (providing gcloud and gsutil) and authenti
 
   Is there anything else I can help you with?
 
+[Supabase Credentials Removed for Security]

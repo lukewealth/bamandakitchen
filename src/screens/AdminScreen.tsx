@@ -643,8 +643,9 @@ export default function AdminScreen() {
                           <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                           <div className="flex flex-col items-center gap-3 text-white">
                             <Upload className="w-8 h-8" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em]">Upload Vision</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em]">Upload to Supabase</span>
                           </div>
+
                         </label>
                       </div>
                       

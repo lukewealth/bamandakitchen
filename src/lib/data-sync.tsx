@@ -33,6 +33,7 @@ import {
 import { put } from '@vercel/blob';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useToast } from './toast-context';
+import { supabase, uploadToSupabase } from './supabase';
 
 // Utility to check if a string is a base64 image
 const isBase64Image = (str: string) => str.startsWith('data:image/');
@@ -234,13 +235,22 @@ export function DataSyncProvider({ children }: { children: React.ReactNode }) {
   // OPERATIONS
   // ==========================================
 
-  // Helper to upload an asset (base64 or file) to Firebase Storage OR Vercel Blob
+  // Helper to upload an asset (base64 or file) to Cloud Storage (Supabase / Vercel / Firebase)
   const uploadAsset = async (asset: string | File, path: string): Promise<string> => {
-    // Attempt Vercel Blob FIRST as it is production-ready and bypasses CORS
+    // Attempt Supabase Storage FIRST (Highest Intelligence & Reliability)
+    try {
+      const publicUrl = await uploadToSupabase('images', path, asset);
+      if (publicUrl) {
+        console.log("[Storage] Manifested via Supabase:", publicUrl);
+        return publicUrl;
+      }
+    } catch (supaErr) {
+      console.warn("[Storage] Supabase failed, trying Vercel Blob:", supaErr);
+    }
+
+    // Attempt Vercel Blob SECOND
     try {
       if (typeof asset === 'string' && isBase64Image(asset)) {
-        // Vercel Blob handles base64 easily via Buffer or raw put
-        // Note: BLOB_READ_WRITE_TOKEN must be in Vercel/Environment
         const { url } = await put(path, asset, {
           access: 'public',
           contentType: 'image/jpeg'
